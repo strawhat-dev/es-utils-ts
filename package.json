@@ -9,7 +9,7 @@
   "repository": "github:strawhat-dev/es-utils-ts",
   "types": "./dist/index.d.ts",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://registry.npmjs.org/es-utils-ts"
   },
   "files": [
     "dist"
