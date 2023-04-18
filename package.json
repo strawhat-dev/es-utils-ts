@@ -9,9 +9,6 @@
   "exports": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "repository": "github:strawhat-dev/es-utils-ts",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
   "files": [
     "dist",
     "package.json"
