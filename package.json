@@ -2,12 +2,15 @@
   "name": "es-utils-ts",
   "version": "0.0.0",
   "license": "ISC",
-  "repository": "github:strawhat-dev/es-utils-ts",
   "type": "module",
   "sideEffects": false,
   "module": "./dist/index.js",
   "exports": "./dist/index.js",
+  "repository": "github:strawhat-dev/es-utils-ts",
   "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "files": [
     "dist"
   ],
@@ -40,12 +43,12 @@
       "tsup>rollup": "3.20.4"
     }
   },
-  "prettier": {
-    "singleQuote": true
-  },
   "np": {
     "tests": false,
     "branch": "main",
     "contents": "dist"
+  },
+  "prettier": {
+    "singleQuote": true
   }
 }
