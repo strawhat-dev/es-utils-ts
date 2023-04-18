@@ -6,13 +6,11 @@
   "sideEffects": false,
   "module": "./dist/index.js",
   "exports": "./dist/index.js",
-  "repository": "github:strawhat-dev/es-utils-ts",
   "types": "./dist/index.d.ts",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
+  "repository": "github:strawhat-dev/es-utils-ts",
   "files": [
-    "dist"
+    "dist",
+    "package.json"
   ],
   "engines": {
     "node": ">=14.16"
@@ -44,6 +42,7 @@
     }
   },
   "np": {
+    "yarn": false,
     "tests": false,
     "branch": "main",
     "contents": "dist"
