@@ -44,8 +44,7 @@
   },
   "np": {
     "tests": false,
-    "branch": "main",
-    "contents": "dist"
+    "branch": "main"
   },
   "prettier": {
     "singleQuote": true
