@@ -46,7 +46,6 @@
     }
   },
   "np": {
-    "yarn": false,
     "tests": false,
     "branch": "main",
     "contents": "dist"
