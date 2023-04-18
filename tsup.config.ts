@@ -1,13 +1,15 @@
 import { defineConfig } from 'tsup';
+import { globbySync as glob } from 'globby';
 
 export default defineConfig({
-  entry: ['src/index.ts'],
+  entry: glob('src/**/!(types).ts'),
   outDir: 'dist',
-  format: ['esm'],
+  format: 'esm',
   target: 'es2020',
   platform: 'neutral',
-  dts: true,
   clean: true,
   splitting: true,
-  keepNames: true,
+  treeshake: true,
+  dts: { resolve: true },
+  skipNodeModulesBundle: true,
 });
