@@ -1,1 +1,1 @@
-export { isobject, isprimitive, nullish, nullishFalse } from './chunk-OFUMZCYK.js';
+export { isobject, isprimitive, not, nullish } from './chunk-SW3RGDPZ.js';

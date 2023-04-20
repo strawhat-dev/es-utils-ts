@@ -8,7 +8,7 @@ export const sleep = async (ms: NumberLike): Promise<void> => {
 };
 
 /**
- * Dynamically import any esm library from a cdn (hosted by jsdelivr).
+ * Dynamically import any esm library from cdn (hosted on jsdelivr).
  * @see {@link https://www.jsdelivr.com/esm}
  */
 export const cdn = async (name: string) => {

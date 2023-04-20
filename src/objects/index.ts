@@ -1,8 +1,8 @@
 import type { Merge } from 'type-fest';
-import type { JsObject, KeyOf, Maybe, Type } from '@/types';
+import type { JsObject, KeyOf, Maybe } from '@/types';
 import type {
-  ExtendedObject,
   FilterArgs,
+  FilterFn,
   FilteredResult,
   FindKeyFn,
   MapArgs,
@@ -11,7 +11,7 @@ import type {
 } from '@/objects/types';
 
 import { deepmerge } from 'deepmerge-ts';
-import { isobject, isprimitive, nullishFalse } from '@/conditionals';
+import { isobject, isprimitive, not } from '@/conditionals';
 
 export const clear = (obj: object) => {
   Object.keys(obj).forEach((k) => delete obj[k]);
@@ -25,8 +25,8 @@ export const deepcopy = <T extends object>(
   if (hashmap.has(obj)) return hashmap.get(obj); // circular reference
   const target = Array.isArray(obj) ? [] : {};
   hashmap.set(obj, target);
-  return Object.entries(obj).reduce((acc, [k, v]) => {
-    acc[k] = isprimitive(v) ? v : deepcopy(v, hashmap);
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    acc[key] = isprimitive(value) ? value : deepcopy(value, hashmap);
     return acc;
   }, target) as T;
 };
@@ -54,78 +54,67 @@ export const extend = <
 };
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-export const findkey = <T extends object>(obj: T, predicate?: FindKeyFn<T>) => {
-  predicate ||= (value) => !nullishFalse(value);
+export const findkey = <T extends object>(
+  obj: T,
+  predicate: FindKeyFn<T> = (value) => !not(value)
+) => {
   return Object.keys(obj || {}).find((k) =>
     predicate!(obj[k], k as never)
   ) as Maybe<KeyOf<T>>;
 };
 
-export const map = <
-  Result extends JsObject,
-  T = object,
-  WithChainedMethods extends boolean = true
->(
+export const map = <T extends JsObject, Deep extends boolean>(
   obj: T,
-  ...args: MapArgs<T, WithChainedMethods>
+  ...args: MapArgs<T, Deep>
 ) => {
-  let [mapper, opts = { deep: false, chainMethods: true }] = args as [MapFn<T>];
-  if (typeof opts === 'function') {
-    [mapper, opts] = [opts, mapper as typeof opts];
+  let [mapper, opts = { deep: false }] = args as [MapFn<T, Deep>];
+  if (isobject(mapper) || typeof opts === 'function') {
+    [mapper, opts] = [opts as never, mapper as never];
   }
 
-  const { deep, chainMethods } = opts;
-  const result = Object.entries(obj || {}).reduce((acc, [key, val]) => {
+  const { deep } = { ...opts };
+  const result = Object.entries(obj || {}).reduce((acc, [key, value]) => {
     const entry = (
-      deep && isobject(val)
-        ? [key, map(val as T, { deep, chainMethods: false }, mapper)]
-        : mapper(key as never, val as never)
+      deep && isobject(value)
+        ? [key, map(value, { deep }, mapper as never)]
+        : mapper(key as never, value as never)
     ) as unknown;
 
     if (!entry) return acc;
     const entries = Array.isArray(entry) ? entry : [entry];
     if (isobject(entries[0])) return deepmerge(acc, ...entries);
     (Array.isArray(entries[0]) ? entries : [entries]).forEach(
-      ([k, v]) => nullishFalse(k) || (acc[k] = v)
+      ([k, v]) => not(k) || (acc[k] = v)
     );
 
     return acc;
   }, {});
 
-  return (chainMethods ? extended(result) : result) as Type<
-    T extends Result ? MappedResult<T, WithChainedMethods> : Result
-  >;
+  return result as MappedResult<T, Deep>;
 };
 
 export const filter = <
-  Result extends JsObject,
-  T = object,
-  WithRest extends boolean = false,
-  WithChainedMethods extends boolean = true
+  T extends JsObject,
+  Deep extends boolean,
+  WithRest extends boolean
 >(
   obj: T,
-  ...args: FilterArgs<T, WithRest, WithChainedMethods>
+  ...args: FilterArgs<T, Deep, WithRest>
 ) => {
-  const defaultOpts = {
-    deep: !args.length,
-    withRest: false,
-    chainMethods: true,
-  };
-
   let [
-    opts = defaultOpts,
     predicate = ({ value }) => typeof value !== 'undefined',
-  ] = args;
+    opts = { deep: !args.length, withRest: false },
+  ] = args as [FilterFn<T, Deep>];
 
-  if (typeof opts === 'function') {
-    [opts, predicate] = [defaultOpts, opts];
+  if (isobject(predicate) || typeof opts === 'function') {
+    [predicate, opts] = [opts as never, predicate as never];
   }
 
-  const { deep, withRest, chainMethods } = opts;
-  let [filtered, rest] = Object.entries(obj || {}).reduce(
+  const { deep, withRest } = { ...opts };
+  const [filtered, rest] = Object.entries(obj || {}).reduce(
     ([acc, omit], [key, value]) => {
       if (deep && isobject(value)) {
-        value = filter(value as T, { deep, chainMethods: false }, predicate);
+        value = filter(value, { deep }, predicate as never);
       }
 
       (predicate({ key, value } as never) ? acc : omit)[key] = value;
@@ -134,32 +123,9 @@ export const filter = <
     [{}, {}]
   );
 
-  chainMethods && ([filtered, rest] = [extended(filtered), extended(rest)]);
-  return (withRest ? [filtered, rest] : filtered) as Type<
-    T extends Result ? FilteredResult<T, WithRest, WithChainedMethods> : Result
+  return (withRest ? [filtered, rest] : filtered) as FilteredResult<
+    T,
+    Deep,
+    WithRest
   >;
-};
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/** @internal */
-const extended = <T extends object>(obj: T) => {
-  const $MAP = (...args: never) => map(obj, ...args);
-  const $FILTER = (...args: never) => filter(obj, ...args);
-  const $FINDKEY: any = (predicate: never) => findkey(obj, predicate);
-  return extend(
-    obj,
-    [$MAP, $FILTER, $FINDKEY].reduce((acc, fn) => {
-      const { name } = fn;
-      const prop = name.slice(1).toLowerCase();
-      if (
-        !Object.hasOwn(obj, prop) ||
-        (typeof obj[prop] === 'function' && obj[prop].name === name)
-      ) {
-        acc[prop] = fn;
-      }
-
-      return acc;
-    }, {}),
-    { configurable: true, writable: true }
-  ) as ExtendedObject<T>;
 };

@@ -1,78 +1,51 @@
-import type { Merge } from 'type-fest';
+import type { PartialDeep } from 'type-fest';
 import type {
   JsObject,
   KeyOf,
-  Maybe,
+  KeyOfDeep,
   Multi,
-  NullishFalse,
+  Nullish,
   Type,
   Union,
   ValueOf,
+  ValueOfDeep,
 } from '@/types';
 
-export type MappedResult<T, WithChainedMethods> = ExtendedObject<
-  Partial<T>,
-  WithChainedMethods
+export type MapArgs<T, Deep extends boolean> = Type<
+  [MapFn<T, Deep>] | [{ deep?: Deep }, MapFn<T, Deep>]
 >;
-
-export type FilteredResult<
-  T,
-  WithRest,
-  WithChainedMethods,
-  Result = ExtendedObject<Partial<T>, WithChainedMethods>
-> = WithRest extends true ? [Result, Result] : Result;
-
-export type MapArgs<
-  T,
-  WithChainedMethods extends boolean,
-  Options = {
-    deep?: boolean;
-    chainMethods?: WithChainedMethods;
-  }
-> = [MapFn<T>] | [Options, MapFn<T>];
 
 export type FilterArgs<
   T,
-  WithRest extends boolean,
-  WithChainedMethods extends boolean,
-  Options = {
-    deep?: boolean;
-    withRest?: WithRest;
-    chainMethods?: WithChainedMethods;
-  }
-> = [] | [FilterFn<T>] | [Options, FilterFn<T>];
-
-export type MapFn<T> = (
-  key: Union<KeyOf<T>>,
-  value: ValueOf<T>
-) => NullishFalse | Multi<JsObject> | Multi<[unknown, unknown]>;
-
-export type FilterFn<T> = (entry: {
-  key: Union<KeyOf<T>>;
-  value: ValueOf<T>;
-}) => unknown;
-
-export type FindKeyFn<T> = (value: ValueOf<T>, key: Union<KeyOf<T>>) => unknown;
-
-export type ExtendedObject<T, WithChainedMethods = true> = Type<
-  WithChainedMethods extends true
-    ? Merge<ObjectMethods<T>, T & JsObject>
-    : T & JsObject
+  Deep extends boolean,
+  WithRest extends boolean
+> = Type<
+  | []
+  | [FilterFn<T, Deep>]
+  | [{ deep?: Deep; withRest?: WithRest }, FilterFn<T, Deep>]
 >;
 
-/** @internal */
-type ObjectMethods<T> = {
-  findkey: <T extends object>(
-    obj: T,
-    predicate?: FindKeyFn<T>
-  ) => Maybe<KeyOf<T>>;
-  map: <WithChainedMethods extends boolean = true>(
-    ...args: MapArgs<T, WithChainedMethods>
-  ) => MappedResult<T, WithChainedMethods>;
-  filter: <
-    WithRest extends boolean = false,
-    WithChainedMethods extends boolean = true
-  >(
-    ...args: FilterArgs<T, WithRest, WithChainedMethods>
-  ) => FilteredResult<T, WithRest, WithChainedMethods>;
-};
+export type MappedResult<T, Deep> = Type<
+  (Deep extends true ? PartialDeep<T> : Partial<T>) & JsObject
+>;
+
+export type FilteredResult<T, Deep, WithRest> = Type<
+  WithRest extends true
+    ? [MappedResult<T, Deep>, MappedResult<T, Deep>]
+    : MappedResult<T, Deep>
+>;
+
+export type MapFn<T, Deep> = (
+  key: Union<Deep extends true ? KeyOfDeep<T> : KeyOf<T>>,
+  value: Union<Deep extends true ? ValueOfDeep<T> : ValueOf<T>>
+) => (false | Nullish) | Multi<JsObject> | Multi<[unknown, unknown]>;
+
+export type FilterFn<T, Deep> = (entry: {
+  key: Union<Deep extends true ? KeyOfDeep<T> : KeyOf<T>>;
+  value: Union<Deep extends true ? ValueOfDeep<T> : ValueOf<T>>;
+}) => unknown;
+
+export type FindKeyFn<T> = (
+  value: Union<ValueOf<T>>,
+  key: Union<KeyOf<T>>
+) => unknown;

@@ -1,71 +1,92 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import type {
+  ConditionalKeys,
   IsLiteral as LiteralCheck,
   LiteralToPrimitive,
   OmitIndexSignature,
   Simplify,
+  StringKeyOf,
+  UnionToIntersection,
 } from 'type-fest';
 
-// common type utilities
+// simple common type utilities
 export type Multi<T> = T | T[];
 export type Numeric = number | bigint;
 export type NumberLike = number | `${number}`;
-export type Maybe<T> = T | undefined;
-export type Nullable<T> = T | null;
 export type Nullish = null | undefined;
-export type NullishFalse = Simplify<Nullish | false>;
+export type Nullable<T> = T | null;
+export type Maybe<T> = T | Nullish;
+
+/**
+ * simple common primitves
+ * (may be serializable or literally typed)
+ * @see {@link primitive} for any primitives
+ */
+export type Primitive = Simplify<string | boolean | number | Nullish>;
 
 /** any non-nullish value */
-export interface Unknown {}
+export interface Defined {}
 
 /** any non-object value */
-export type primitive = Simplify<Primitive | symbol>;
+export type primitive = Simplify<Primitive | bigint | symbol>;
 
-/** js primitves (without symbol) */
-export type Primitive = Simplify<string | boolean | Numeric | Nullish>;
-
-/** objects or primitves (without symbol) */
-export type JsValue = Simplify<Primitive | object>;
+/** any js value (primitves or objects) */
+export type JsValue = Simplify<primitive | object>;
 
 /** plain js objects */
 export type JsObject<value = JsValue> = { [key: string]: value };
 
 /**
- * If possible, creates a union type from a given object's keys;
- * else falls back to `string` by default.
+ * More reliably extract and create types from a given type's keys by joining
+ * any union types into an intersection (so that `never` is not returned)
+ * and omitting the index signature (so that literal keys may be resolved).
  */
-export type KeyOf<T, Fallback = string> = Type<
-  keyof T extends never
-    ? Fallback
-    : keyof OmitIndexSignature<T> extends never
-    ? keyof T
-    : keyof OmitIndexSignature<T>
->;
+export type KeyOf<
+  T,
+  Fallback = string,
+  Target = Normalize<T>
+> = StringKeyOf<Target> extends never ? Fallback : StringKeyOf<Target>;
 
 /**
  * If possible, creates a union type from a given object's values;
- * else falls back to any js value.
+ * else falls back to any js value by default.
  */
-export type ValueOf<T, Fallback = JsValue> = Type<
-  keyof T extends never
-    ? Fallback
-    : T[keyof T] extends never
-    ? Fallback
-    : T[keyof T]
->;
+export type ValueOf<
+  T,
+  Fallback = JsValue,
+  Target = Normalize<T>
+> = KeyOf<T> extends keyof Target ? Target[KeyOf<T>] : Fallback;
 
 /**
- * Generic that allows for both the literal
- * and base types without sacrificing completions.
+ * Like {@link Keys}, but recursively extracts all keys, including nested ones.
+ */
+export type KeyOfDeep<
+  T,
+  Current = Normalize<T>,
+  Nested extends keyof Current = ConditionalKeys<Current, JsObject>
+> = KeyOf<T> | (Nested extends never ? never : KeyOfDeep<Current[Nested]>);
+
+/**
+ * Like {@link Values}, but recursively extracts all value types, including nested ones.
+ */
+export type ValueOfDeep<
+  T,
+  Current = Normalize<T>,
+  Nested extends keyof Current = ConditionalKeys<Current, JsObject>
+> = ValueOf<T> | (Nested extends never ? never : ValueOfDeep<Current[Nested]>);
+
+/**
+ * Generic that allows for both the literal and
+ * base types without sacrificing completions.
  * (base type automatically inferred from given literal)
  */
 export type Union<T> = Type<
-  T | (IsLiteral<T> extends true ? LiteralToPrimitive<T> & Unknown : Narrow<T>)
+  T | (IsLiteral<T> extends true ? LiteralToPrimitive<T> & Defined : Narrow<T>)
 >;
 
 /**
- * Narrows down a type to its base type as much as possible.
+ * Narrow down a type to a base type.
  */
 export type Narrow<T> = Type<
   T extends Promise<infer Resolved>
@@ -76,6 +97,8 @@ export type Narrow<T> = Type<
     ? Set<Narrow<Item>>
     : T extends Map<infer K, infer V>
     ? Map<Narrow<K>, Narrow<V>>
+    : T extends Element
+    ? Element
     : T extends Function
     ? Function
     : T extends JsObject
@@ -84,7 +107,7 @@ export type Narrow<T> = Type<
     ? object
     : T extends primitive
     ? LiteralToPrimitive<T>
-    : Unknown
+    : Defined
 >;
 
 /**
@@ -93,6 +116,13 @@ export type Narrow<T> = Type<
  * within angle brackets without leaving hanging indents.
  */
 export type Type<T> = T;
+
+/**
+ * @internal
+ * Ensure a type can be resolved as a single type by joining
+ * any unions into intersections, and omits the index signature
+ */
+type Normalize<T> = OmitIndexSignature<UnionToIntersection<T>>;
 
 /**
  * @internal

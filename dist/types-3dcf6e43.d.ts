@@ -79,6 +79,11 @@ fn(someInterface as Simplify<SomeInterface>); // Good: transform an `interface` 
 type Simplify<T> = {[KeyType in keyof T]: T[KeyType]} & {};
 
 /**
+Matches any primitive, `Date`, or `RegExp` value.
+*/
+type BuiltIns = Primitive$1 | Date | RegExp;
+
+/**
 Returns a boolean for whether the given `boolean` is not `false`.
 */
 type IsNotFalse<T extends boolean> = [T] extends [false] ? false : true;
@@ -191,6 +196,115 @@ type OmitIndexSignature<ObjectType> = {
 		: KeyType]: ObjectType[KeyType];
 };
 
+/**
+Extract the keys from a type where the value type of the key extends the given `Condition`.
+
+Internally this is used for the `ConditionalPick` and `ConditionalExcept` types.
+
+@example
+```
+import type {ConditionalKeys} from 'type-fest';
+
+interface Example {
+	a: string;
+	b: string | number;
+	c?: string;
+	d: {};
+}
+
+type StringKeysOnly = ConditionalKeys<Example, string>;
+//=> 'a'
+```
+
+To support partial types, make sure your `Condition` is a union of undefined (for example, `string | undefined`) as demonstrated below.
+
+@example
+```
+import type {ConditionalKeys} from 'type-fest';
+
+type StringKeysAndUndefined = ConditionalKeys<Example, string | undefined>;
+//=> 'a' | 'c'
+```
+
+@category Object
+*/
+type ConditionalKeys<Base, Condition> = NonNullable<
+// Wrap in `NonNullable` to strip away the `undefined` type from the produced union.
+{
+	// Map through all the keys of the given base type.
+	[Key in keyof Base]:
+	// Pick only keys with types extending the given `Condition` type.
+	Base[Key] extends Condition
+	// Retain this key since the condition passes.
+		? Key
+	// Discard this key since the condition fails.
+		: never;
+
+	// Convert the produced object into a union type of the keys which passed the conditional test.
+}[keyof Base]
+>;
+
+/**
+Convert a union type to an intersection type using [distributive conditional types](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#distributive-conditional-types).
+
+Inspired by [this Stack Overflow answer](https://stackoverflow.com/a/50375286/2172153).
+
+@example
+```
+import type {UnionToIntersection} from 'type-fest';
+
+type Union = {the(): void} | {great(arg: string): void} | {escape: boolean};
+
+type Intersection = UnionToIntersection<Union>;
+//=> {the(): void; great(arg: string): void; escape: boolean};
+```
+
+A more applicable example which could make its way into your library code follows.
+
+@example
+```
+import type {UnionToIntersection} from 'type-fest';
+
+class CommandOne {
+	commands: {
+		a1: () => undefined,
+		b1: () => undefined,
+	}
+}
+
+class CommandTwo {
+	commands: {
+		a2: (argA: string) => undefined,
+		b2: (argB: string) => undefined,
+	}
+}
+
+const union = [new CommandOne(), new CommandTwo()].map(instance => instance.commands);
+type Union = typeof union;
+//=> {a1(): void; b1(): void} | {a2(argA: string): void; b2(argB: string): void}
+
+type Intersection = UnionToIntersection<Union>;
+//=> {a1(): void; b1(): void; a2(argA: string): void; b2(argB: string): void}
+```
+
+@category Type
+*/
+type UnionToIntersection<Union> = (
+	// `extends unknown` is always going to be the case and is used to convert the
+	// `Union` into a [distributive conditional
+	// type](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#distributive-conditional-types).
+	Union extends unknown
+		// The union type is used as the only argument to a function since the union
+		// of function arguments is an intersection.
+		? (distributedUnion: Union) => void
+		// This won't happen.
+		: never
+		// Infer the `Intersection` type since TypeScript represents the positional
+		// arguments of unions of functions as an intersection of the union.
+) extends ((mergedIntersection: infer Intersection) => void)
+	? Intersection
+	: never;
+
 type Numeric$1 = number | bigint;
 
 /**
@@ -229,6 +343,32 @@ type LiteralToPrimitive<T> = T extends number
 						: T extends undefined
 							? undefined
 							: never;
+
+/**
+Get keys of the given type as strings.
+
+Number keys are converted to strings.
+
+Use-cases:
+- Get string keys from a type which may have number keys.
+- Makes it possible to index using strings retrieved from template types.
+
+@example
+```
+import type {StringKeyOf} from 'type-fest';
+
+type Foo = {
+	1: number,
+	stringKey: string,
+};
+
+type StringKeysOfFoo = StringKeyOf<Foo>;
+//=> '1' | 'stringKey'
+```
+
+@category Object
+*/
+type StringKeyOf<BaseType> = `${Extract<keyof BaseType, string | number>}`;
 
 /**
 Returns a boolean for whether the given type is `never`.
@@ -532,43 +672,55 @@ type IsLiteral$1<T extends Primitive$1> = IsNotFalse<IsLiteralUnion<T>>;
 type Multi<T> = T | T[];
 type Numeric = number | bigint;
 type NumberLike = number | `${number}`;
-type Maybe<T> = T | undefined;
-type Nullable<T> = T | null;
 type Nullish = null | undefined;
-type NullishFalse = Simplify<Nullish | false>;
+type Nullable<T> = T | null;
+type Maybe<T> = T | Nullish;
+/**
+ * simple common primitves
+ * (may be serializable or literally typed)
+ * @see {@link primitive} for any primitives
+ */
+type Primitive = Simplify<string | boolean | number | Nullish>;
 /** any non-nullish value */
-interface Unknown {
+interface Defined {
 }
 /** any non-object value */
-type primitive = Simplify<Primitive | symbol>;
-/** js primitves (without symbol) */
-type Primitive = Simplify<string | boolean | Numeric | Nullish>;
-/** objects or primitves (without symbol) */
-type JsValue = Simplify<Primitive | object>;
+type primitive = Simplify<Primitive | bigint | symbol>;
+/** any js value (primitves or objects) */
+type JsValue = Simplify<primitive | object>;
 /** plain js objects */
 type JsObject<value = JsValue> = {
     [key: string]: value;
 };
 /**
- * If possible, creates a union type from a given object's keys;
- * else falls back to `string` by default.
+ * More reliably extract and create types from a given type's keys by joining
+ * any union types into an intersection (so that `never` is not returned)
+ * and omitting the index signature (so that literal keys may be resolved).
  */
-type KeyOf<T, Fallback = string> = Type<keyof T extends never ? Fallback : keyof OmitIndexSignature<T> extends never ? keyof T : keyof OmitIndexSignature<T>>;
+type KeyOf<T, Fallback = string, Target = Normalize<T>> = StringKeyOf<Target> extends never ? Fallback : StringKeyOf<Target>;
 /**
  * If possible, creates a union type from a given object's values;
- * else falls back to any js value.
+ * else falls back to any js value by default.
  */
-type ValueOf<T, Fallback = JsValue> = Type<keyof T extends never ? Fallback : T[keyof T] extends never ? Fallback : T[keyof T]>;
+type ValueOf<T, Fallback = JsValue, Target = Normalize<T>> = KeyOf<T> extends keyof Target ? Target[KeyOf<T>] : Fallback;
 /**
- * Generic that allows for both the literal
- * and base types without sacrificing completions.
+ * Like {@link Keys}, but recursively extracts all keys, including nested ones.
+ */
+type KeyOfDeep<T, Current = Normalize<T>, Nested extends keyof Current = ConditionalKeys<Current, JsObject>> = KeyOf<T> | (Nested extends never ? never : KeyOfDeep<Current[Nested]>);
+/**
+ * Like {@link Values}, but recursively extracts all value types, including nested ones.
+ */
+type ValueOfDeep<T, Current = Normalize<T>, Nested extends keyof Current = ConditionalKeys<Current, JsObject>> = ValueOf<T> | (Nested extends never ? never : ValueOfDeep<Current[Nested]>);
+/**
+ * Generic that allows for both the literal and
+ * base types without sacrificing completions.
  * (base type automatically inferred from given literal)
  */
-type Union<T> = Type<T | (IsLiteral<T> extends true ? LiteralToPrimitive<T> & Unknown : Narrow<T>)>;
+type Union<T> = Type<T | (IsLiteral<T> extends true ? LiteralToPrimitive<T> & Defined : Narrow<T>)>;
 /**
- * Narrows down a type to its base type as much as possible.
+ * Narrow down a type to a base type.
  */
-type Narrow<T> = Type<T extends Promise<infer Resolved> ? Promise<Narrow<Resolved>> : T extends (infer Item)[] ? Narrow<Item>[] : T extends Set<infer Item> ? Set<Narrow<Item>> : T extends Map<infer K, infer V> ? Map<Narrow<K>, Narrow<V>> : T extends Function ? Function : T extends JsObject ? JsObject : T extends object ? object : T extends primitive ? LiteralToPrimitive<T> : Unknown>;
+type Narrow<T> = Type<T extends Promise<infer Resolved> ? Promise<Narrow<Resolved>> : T extends (infer Item)[] ? Narrow<Item>[] : T extends Set<infer Item> ? Set<Narrow<Item>> : T extends Map<infer K, infer V> ? Map<Narrow<K>, Narrow<V>> : T extends Element ? Element : T extends Function ? Function : T extends JsObject ? JsObject : T extends object ? object : T extends primitive ? LiteralToPrimitive<T> : Defined>;
 /**
  * @internal
  * Utility type that is only used to contain long type definitions
@@ -577,8 +729,14 @@ type Narrow<T> = Type<T extends Promise<infer Resolved> ? Promise<Narrow<Resolve
 type Type<T> = T;
 /**
  * @internal
+ * Ensure a type can be resolved as a single type by joining
+ * any unions into intersections, and omits the index signature
+ */
+type Normalize<T> = OmitIndexSignature<UnionToIntersection<T>>;
+/**
+ * @internal
  * Wrapped `IsLiteral` from type-fest
  */
 type IsLiteral<T> = T extends primitive ? IsLiteral$1<T> : false;
 
-export { JsValue as J, KeyOf as K, Multi as M, Numeric as N, OmitIndexSignature as O, Primitive as P, Simplify as S, Type as T, Unknown as U, ValueOf as V, NumberLike as a, Maybe as b, Nullable as c, Nullish as d, NullishFalse as e, JsObject as f, Union as g, Narrow as h, primitive as p };
+export { BuiltIns as B, Defined as D, JsValue as J, KeyOf as K, Multi as M, Numeric as N, OmitIndexSignature as O, Primitive as P, Type as T, Union as U, ValueOf as V, NumberLike as a, Nullish as b, Nullable as c, Maybe as d, JsObject as e, KeyOfDeep as f, ValueOfDeep as g, Narrow as h, primitive as p };
