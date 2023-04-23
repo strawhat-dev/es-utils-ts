@@ -37,11 +37,6 @@
     "type-fest": "^3.8.0",
     "typescript": "^5.0.4"
   },
-  "pnpm": {
-    "overrides": {
-      "tsup>rollup": "3.20.4"
-    }
-  },
   "np": {
     "branch": "main",
     "tests": false
