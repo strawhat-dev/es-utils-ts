@@ -1,4 +1,6 @@
-import type { PartialDeep } from 'type-fest';
+/* eslint-disable @typescript-eslint/ban-types */
+import type { Merge, PartialDeep, Simplify } from 'type-fest';
+import type { SimplifyDeep } from 'type-fest/source/merge-deep.js';
 import type {
   JsObject,
   KeyOf,
@@ -11,41 +13,127 @@ import type {
   ValueOfDeep,
 } from '@/types';
 
-export type MapArgs<T, Deep extends boolean> = Type<
-  [MapFn<T, Deep>] | [{ deep?: Deep }, MapFn<T, Deep>]
+export type FindKey = <T extends object>(
+  obj: T,
+  predicate?: (value: Union<ValueOf<T>>, key: Union<KeyOf<T>>) => unknown
+) => KeyOf<T> | undefined;
+
+export interface Extender {
+  <T extends JsObject>(props: Readonly<T>): Merge<JsObject, Readonly<T>>;
+
+  <T1 extends JsObject, T2 extends JsObject>(
+    obj: Readonly<T1>,
+    props: Readonly<T2>
+  ): ExtendedResult<T1, Readonly<T2>>;
+
+  <T1 extends object, T2 extends JsObject>(
+    obj: T1,
+    props: Readonly<T2>
+  ): ExtendedResult<T1, Readonly<T2>>;
+
+  <
+    T1 extends JsObject,
+    T2 extends JsObject,
+    Writable extends boolean = false,
+    Configurable extends boolean = false
+  >(
+    obj: Readonly<T1>,
+    props: Readonly<T2>,
+    options: { writable?: Writable; configurable?: Configurable }
+  ): ExtendedResult<
+    T1,
+    Writable & Configurable extends true ? T2 : Readonly<T2>
+  >;
+
+  <
+    T1 extends object,
+    T2 extends JsObject,
+    Writable extends boolean = false,
+    Configurable extends boolean = false
+  >(
+    obj: T1,
+    props: Readonly<T2>,
+    options: { writable?: Writable; configurable?: Configurable }
+  ): ExtendedResult<
+    T1,
+    Writable & Configurable extends true ? T2 : Readonly<T2>
+  >;
+}
+
+export interface Mapper {
+  <T extends JsObject>(
+    obj: Readonly<T>,
+    callback: MapCallback<Readonly<T>>
+  ): MappedResult<T>;
+
+  <T extends object>(obj: T, callback: MapCallback<T>): MappedResult<T>;
+
+  <T extends JsObject, Deep extends boolean = false>(
+    obj: Readonly<T>,
+    options: { deep?: Deep },
+    callback: MapCallback<Readonly<T>, Deep>
+  ): MappedResult<T, Deep>;
+
+  <T extends object, Deep extends boolean = false>(
+    obj: T,
+    options: { deep?: Deep },
+    callback: MapCallback<T, Deep>
+  ): MappedResult<T, Deep>;
+}
+
+export interface Filterer {
+  <T extends JsObject>(obj: Readonly<T>): T;
+
+  <T extends object>(obj: T): T;
+
+  <T extends JsObject>(
+    obj: Readonly<T>,
+    predicate: FilterPredicate<Readonly<T>>
+  ): FilteredResult<T>;
+
+  <T extends object>(obj: T, predicate: FilterPredicate<T>): FilteredResult<T>;
+
+  <
+    T extends JsObject,
+    Deep extends boolean = false,
+    WithRest extends boolean = false
+  >(
+    obj: Readonly<T>,
+    options: { deep?: Deep; withRest?: WithRest },
+    predicate: FilterPredicate<Readonly<T>, Deep>
+  ): FilteredResult<T, Deep, WithRest>;
+
+  <
+    T extends object,
+    Deep extends boolean = false,
+    WithRest extends boolean = false
+  >(
+    obj: T,
+    options: { deep?: Deep; withRest?: WithRest },
+    predicate: FilterPredicate<T, Deep>
+  ): FilteredResult<T, Deep, WithRest>;
+}
+
+type ExtendedResult<T1, T2> = Type<
+  T1 extends Function ? T1 & Simplify<T2> : Merge<T1, T2>
 >;
 
-export type FilterArgs<
-  T,
-  Deep extends boolean,
-  WithRest extends boolean
-> = Type<
-  | []
-  | [FilterFn<T, Deep>]
-  | [{ deep?: Deep; withRest?: WithRest }, FilterFn<T, Deep>]
->;
-
-export type MappedResult<T, Deep> = Type<
+type MappedResult<T, Deep = false> = SimplifyDeep<
   (Deep extends true ? PartialDeep<T> : Partial<T>) & JsObject
 >;
 
-export type FilteredResult<T, Deep, WithRest> = Type<
+type FilteredResult<T, Deep = false, WithRest = false> = Type<
   WithRest extends true
     ? [MappedResult<T, Deep>, MappedResult<T, Deep>]
     : MappedResult<T, Deep>
 >;
 
-export type MapFn<T, Deep> = (
+type MapCallback<T, Deep = false> = (
   key: Union<Deep extends true ? KeyOfDeep<T> : KeyOf<T>>,
   value: Union<Deep extends true ? ValueOfDeep<T> : ValueOf<T>>
 ) => (false | Nullish) | Multi<JsObject> | Multi<[unknown, unknown]>;
 
-export type FilterFn<T, Deep> = (entry: {
+type FilterPredicate<T, Deep = false> = (entry: {
   key: Union<Deep extends true ? KeyOfDeep<T> : KeyOf<T>>;
   value: Union<Deep extends true ? ValueOfDeep<T> : ValueOf<T>>;
 }) => unknown;
-
-export type FindKeyFn<T> = (
-  value: Union<ValueOf<T>>,
-  key: Union<KeyOf<T>>
-) => unknown;

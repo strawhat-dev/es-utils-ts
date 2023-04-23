@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import type {
   ConditionalKeys,
@@ -11,30 +12,33 @@ import type {
 } from 'type-fest';
 
 // simple common type utilities
-export type Multi<T> = T | T[];
 export type Numeric = number | bigint;
 export type NumberLike = number | `${number}`;
 export type Nullish = null | undefined;
 export type Nullable<T> = T | null;
 export type Maybe<T> = T | Nullish;
+export type Multi<T> = T | T[];
+export type AsyncFunction<T = unknown, args extends unknown[] = any[]> = (
+  ...args: args
+) => Promise<T>;
 
 /**
- * simple common primitves
- * (may be serializable or literally typed)
+ * *common primitves*
+ * (may be serializable or literally typed).
  * @see {@link primitive} for any primitives
  */
 export type Primitive = Simplify<string | boolean | number | Nullish>;
 
-/** any non-nullish value */
+/** any **non-nullish** value. */
 export interface Defined {}
 
-/** any non-object value */
+/** any **non-object** value. */
 export type primitive = Simplify<Primitive | bigint | symbol>;
 
-/** any js value (primitves or objects) */
+/** any js value *(primitves or objects)*. */
 export type JsValue = Simplify<primitive | object>;
 
-/** plain js objects */
+/** **plain** js objects. */
 export type JsObject<value = JsValue> = { [key: string]: value };
 
 /**
@@ -49,7 +53,7 @@ export type KeyOf<
 > = StringKeyOf<Target> extends never ? Fallback : StringKeyOf<Target>;
 
 /**
- * If possible, creates a union type from a given object's values;
+ * Create a union type from a given object's values if possible;
  * else falls back to any js value by default.
  */
 export type ValueOf<
@@ -59,7 +63,7 @@ export type ValueOf<
 > = KeyOf<T> extends keyof Target ? Target[KeyOf<T>] : Fallback;
 
 /**
- * Like {@link Keys}, but recursively extracts all keys, including nested ones.
+ * Like {@link KeyOf}, but recursively extracts all keys, including nested ones.
  */
 export type KeyOfDeep<
   T,
@@ -68,7 +72,7 @@ export type KeyOfDeep<
 > = KeyOf<T> | (Nested extends never ? never : KeyOfDeep<Current[Nested]>);
 
 /**
- * Like {@link Values}, but recursively extracts all value types, including nested ones.
+ * Like {@link ValueOf}, but recursively extracts all value types, including nested ones.
  */
 export type ValueOfDeep<
   T,
@@ -97,8 +101,6 @@ export type Narrow<T> = Type<
     ? Set<Narrow<Item>>
     : T extends Map<infer K, infer V>
     ? Map<Narrow<K>, Narrow<V>>
-    : T extends Element
-    ? Element
     : T extends Function
     ? Function
     : T extends JsObject
@@ -112,10 +114,16 @@ export type Narrow<T> = Type<
 
 /**
  * @internal
- * Utility type that is only used to contain long type definitions
+ * Utility type only used to contain long type definitions
  * within angle brackets without leaving hanging indents.
  */
 export type Type<T> = T;
+
+/**
+ * @internal
+ * Utility type to quickly check whether `T1` extends `T2`.
+ */
+export type Extends<T1, T2> = T1 extends T2 ? true : false;
 
 /**
  * @internal
