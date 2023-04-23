@@ -68,5 +68,23 @@ declare const assert: {
     readonly isWeakMap: (value: unknown) => value is WeakMap<object, unknown>;
     readonly isWeakSet: (value: unknown) => value is WeakSet<object>;
 };
+declare const isArray: (arg: any) => arg is any[];
+declare const isArrayBuffer: (value: unknown) => value is ArrayBufferLike;
+declare const isAsyncFunction: (value: unknown) => value is AsyncFunction;
+declare const isDate: (value: unknown) => value is Date;
+declare const isElement: (value: unknown) => value is Element | Document;
+declare const isError: (value: unknown) => value is Error;
+declare const isFunction: (value: unknown) => value is Function;
+declare const isIterable: (value: unknown) => value is Iterable<unknown>;
+declare const isIterator: (value: unknown) => value is Iterator<unknown, any, undefined>;
+declare const isMap: (value: unknown) => value is Map<unknown, unknown>;
+declare const isObject: (value: unknown) => value is JsObject;
+declare const isPrimitive: (value: unknown) => value is primitive;
+declare const isPromise: (value: unknown) => value is Promise<unknown>;
+declare const isRegExp: (value: unknown) => value is RegExp;
+declare const isSet: (value: unknown) => value is Set<unknown>;
+declare const isTypedArray: (value: unknown) => value is TypedArray;
+declare const isWeakMap: (value: unknown) => value is WeakMap<object, unknown>;
+declare const isWeakSet: (value: unknown) => value is WeakSet<object>;
 
-export { assert, not, nullish, type };
+export { assert, isArray, isArrayBuffer, isAsyncFunction, isDate, isElement, isError, isFunction, isIterable, isIterator, isMap, isObject, isPrimitive, isPromise, isRegExp, isSet, isTypedArray, isWeakMap, isWeakSet, not, nullish, type };

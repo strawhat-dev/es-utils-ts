@@ -28,5 +28,25 @@ var assert = {
   isWeakMap: (value) => type(value) === "WeakMap",
   isWeakSet: (value) => type(value) === "WeakSet"
 };
+var {
+  isArray,
+  isArrayBuffer,
+  isAsyncFunction,
+  isDate,
+  isElement,
+  isError,
+  isFunction,
+  isIterable,
+  isIterator,
+  isMap,
+  isObject,
+  isPrimitive,
+  isPromise,
+  isRegExp,
+  isSet,
+  isTypedArray,
+  isWeakMap,
+  isWeakSet
+} = assert;
 
-export { assert, not, nullish, type };
+export { assert, isArray, isArrayBuffer, isAsyncFunction, isDate, isElement, isError, isFunction, isIterable, isIterator, isMap, isObject, isPrimitive, isPromise, isRegExp, isSet, isTypedArray, isWeakMap, isWeakSet, not, nullish, type };

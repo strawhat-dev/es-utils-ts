@@ -1,4 +1,4 @@
-import { assert, not } from './chunk-DE7BSBPC.js';
+import { isPrimitive, not, isObject } from './chunk-U6T4ST3Q.js';
 import { deepmerge } from 'deepmerge-ts';
 
 var clear = (obj) => {
@@ -11,7 +11,7 @@ var deepcopy = (obj, hash = /* @__PURE__ */ new WeakMap()) => {
   const target = Array.isArray(obj) ? [] : {};
   hash.set(obj, target);
   return Object.entries(obj).reduce((acc, [key, value]) => {
-    acc[key] = assert.isPrimitive(value) ? value : deepcopy(value, hash);
+    acc[key] = isPrimitive(value) ? value : deepcopy(value, hash);
     return acc;
   }, target);
 };
@@ -32,11 +32,11 @@ var map = (obj, ...args) => {
   const callback = args.pop();
   const { deep } = { ...args.pop() };
   return Object.entries(obj || {}).reduce((acc, [key, value]) => {
-    const entry = deep && assert.isObject(value) ? [key, map(value, { deep }, callback)] : callback(key, value);
+    const entry = deep && isObject(value) ? [key, map(value, { deep }, callback)] : callback(key, value);
     if (!entry)
       return acc;
     const entries = Array.isArray(entry) ? entry : [entry];
-    if (assert.isObject(entries[0]))
+    if (isObject(entries[0]))
       return deepmerge(acc, ...entries);
     (Array.isArray(entries[0]) ? entries : [entries]).forEach(
       ([k, v]) => not(k) || (acc[k] = v)
@@ -50,7 +50,7 @@ var filter = (obj, ...args) => {
     predicate: ({ value }) => typeof value !== "undefined"
   };
   const { opts, predicate } = args.reduce((acc, arg) => {
-    if (assert.isObject(arg))
+    if (isObject(arg))
       acc.opts = arg;
     else if (typeof arg === "function")
       acc.predicate = arg;
@@ -59,7 +59,7 @@ var filter = (obj, ...args) => {
   const { deep, withRest } = opts;
   const [filtered, rest] = Object.entries(obj || {}).reduce(
     ([acc, omit], [key, value]) => {
-      (predicate({ key, value }) ? acc : omit)[key] = deep && assert.isObject(value) ? filter(value, { deep }, predicate) : value;
+      (predicate({ key, value }) ? acc : omit)[key] = deep && isObject(value) ? filter(value, { deep }, predicate) : value;
       return [acc, omit];
     },
     [{}, {}]
