@@ -62,3 +62,24 @@ export const assert = {
   isWeakMap: (value): value is WeakMap<object, unknown> => type(value) === 'WeakMap',
   isWeakSet: (value): value is WeakSet<object> => type(value) === 'WeakSet',
 } as const satisfies JsObject<(value: unknown) => boolean>;
+
+export const {
+  isArray,
+  isArrayBuffer,
+  isAsyncFunction,
+  isDate,
+  isElement,
+  isError,
+  isFunction,
+  isIterable,
+  isIterator,
+  isMap,
+  isObject,
+  isPrimitive,
+  isPromise,
+  isRegExp,
+  isSet,
+  isTypedArray,
+  isWeakMap,
+  isWeakSet,
+} = assert;

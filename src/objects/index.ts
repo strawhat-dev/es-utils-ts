@@ -2,7 +2,7 @@
 import type { Extender, Filterer, FindKey, Mapper } from '@/objects/types';
 
 import { deepmerge } from 'deepmerge-ts';
-import { assert, not } from '@/assertions';
+import { isObject, isPrimitive, not } from '@/assertions';
 
 export const clear = (obj: object) => {
   Object.keys(obj).forEach((k) => delete obj[k]);
@@ -14,7 +14,7 @@ export const deepcopy = <T extends object>(obj: T, hash = new WeakMap()): T => {
   const target = Array.isArray(obj) ? [] : {};
   hash.set(obj, target);
   return Object.entries(obj).reduce((acc, [key, value]) => {
-    acc[key] = assert.isPrimitive(value) ? value : deepcopy(value, hash);
+    acc[key] = isPrimitive(value) ? value : deepcopy(value, hash);
     return acc;
   }, target) as T;
 };
@@ -39,14 +39,14 @@ export const map: Mapper = (obj: object, ...args: unknown[]) => {
   const { deep } = { ...(args.pop() as { deep?: boolean }) };
   return Object.entries(obj || {}).reduce((acc, [key, value]) => {
     const entry = (
-      deep && assert.isObject(value)
+      deep && isObject(value)
         ? [key, map(value, { deep }, callback as never)]
         : callback(key, value)
     ) as unknown;
 
     if (!entry) return acc;
     const entries = Array.isArray(entry) ? entry : [entry];
-    if (assert.isObject(entries[0])) return deepmerge(acc, ...entries);
+    if (isObject(entries[0])) return deepmerge(acc, ...entries);
     (Array.isArray(entries[0]) ? entries : [entries]).forEach(
       ([k, v]) => not(k) || (acc[k] = v)
     );
@@ -62,7 +62,7 @@ export const filter: Filterer = (obj: object, ...args: unknown[]) => {
   };
 
   const { opts, predicate } = args.reduce<typeof defaults>((acc, arg) => {
-    if (assert.isObject(arg)) acc.opts = arg as never;
+    if (isObject(arg)) acc.opts = arg as never;
     else if (typeof arg === 'function') acc.predicate = arg as never;
     return acc;
   }, defaults);
@@ -71,7 +71,7 @@ export const filter: Filterer = (obj: object, ...args: unknown[]) => {
   const [filtered, rest] = Object.entries(obj || {}).reduce(
     ([acc, omit], [key, value]) => {
       (predicate({ key, value } as never) ? acc : omit)[key] =
-        deep && assert.isObject(value)
+        deep && isObject(value)
           ? filter(value, { deep }, predicate as never)
           : value;
 
