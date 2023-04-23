@@ -669,26 +669,27 @@ stripLeading(str, 'abc');
 */
 type IsLiteral$1<T extends Primitive$1> = IsNotFalse<IsLiteralUnion<T>>;
 
-type Multi<T> = T | T[];
 type Numeric = number | bigint;
 type NumberLike = number | `${number}`;
 type Nullish = null | undefined;
 type Nullable<T> = T | null;
 type Maybe<T> = T | Nullish;
+type Multi<T> = T | T[];
+type AsyncFunction<T = unknown, args extends unknown[] = any[]> = (...args: args) => Promise<T>;
 /**
- * simple common primitves
- * (may be serializable or literally typed)
+ * *common primitves*
+ * (may be serializable or literally typed).
  * @see {@link primitive} for any primitives
  */
 type Primitive = Simplify<string | boolean | number | Nullish>;
-/** any non-nullish value */
+/** any **non-nullish** value. */
 interface Defined {
 }
-/** any non-object value */
+/** any **non-object** value. */
 type primitive = Simplify<Primitive | bigint | symbol>;
-/** any js value (primitves or objects) */
+/** any js value *(primitves or objects)*. */
 type JsValue = Simplify<primitive | object>;
-/** plain js objects */
+/** **plain** js objects. */
 type JsObject<value = JsValue> = {
     [key: string]: value;
 };
@@ -699,16 +700,16 @@ type JsObject<value = JsValue> = {
  */
 type KeyOf<T, Fallback = string, Target = Normalize<T>> = StringKeyOf<Target> extends never ? Fallback : StringKeyOf<Target>;
 /**
- * If possible, creates a union type from a given object's values;
+ * Create a union type from a given object's values if possible;
  * else falls back to any js value by default.
  */
 type ValueOf<T, Fallback = JsValue, Target = Normalize<T>> = KeyOf<T> extends keyof Target ? Target[KeyOf<T>] : Fallback;
 /**
- * Like {@link Keys}, but recursively extracts all keys, including nested ones.
+ * Like {@link KeyOf}, but recursively extracts all keys, including nested ones.
  */
 type KeyOfDeep<T, Current = Normalize<T>, Nested extends keyof Current = ConditionalKeys<Current, JsObject>> = KeyOf<T> | (Nested extends never ? never : KeyOfDeep<Current[Nested]>);
 /**
- * Like {@link Values}, but recursively extracts all value types, including nested ones.
+ * Like {@link ValueOf}, but recursively extracts all value types, including nested ones.
  */
 type ValueOfDeep<T, Current = Normalize<T>, Nested extends keyof Current = ConditionalKeys<Current, JsObject>> = ValueOf<T> | (Nested extends never ? never : ValueOfDeep<Current[Nested]>);
 /**
@@ -720,13 +721,18 @@ type Union<T> = Type<T | (IsLiteral<T> extends true ? LiteralToPrimitive<T> & De
 /**
  * Narrow down a type to a base type.
  */
-type Narrow<T> = Type<T extends Promise<infer Resolved> ? Promise<Narrow<Resolved>> : T extends (infer Item)[] ? Narrow<Item>[] : T extends Set<infer Item> ? Set<Narrow<Item>> : T extends Map<infer K, infer V> ? Map<Narrow<K>, Narrow<V>> : T extends Element ? Element : T extends Function ? Function : T extends JsObject ? JsObject : T extends object ? object : T extends primitive ? LiteralToPrimitive<T> : Defined>;
+type Narrow<T> = Type<T extends Promise<infer Resolved> ? Promise<Narrow<Resolved>> : T extends (infer Item)[] ? Narrow<Item>[] : T extends Set<infer Item> ? Set<Narrow<Item>> : T extends Map<infer K, infer V> ? Map<Narrow<K>, Narrow<V>> : T extends Function ? Function : T extends JsObject ? JsObject : T extends object ? object : T extends primitive ? LiteralToPrimitive<T> : Defined>;
 /**
  * @internal
- * Utility type that is only used to contain long type definitions
+ * Utility type only used to contain long type definitions
  * within angle brackets without leaving hanging indents.
  */
 type Type<T> = T;
+/**
+ * @internal
+ * Utility type to quickly check whether `T1` extends `T2`.
+ */
+type Extends<T1, T2> = T1 extends T2 ? true : false;
 /**
  * @internal
  * Ensure a type can be resolved as a single type by joining
@@ -739,4 +745,4 @@ type Normalize<T> = OmitIndexSignature<UnionToIntersection<T>>;
  */
 type IsLiteral<T> = T extends primitive ? IsLiteral$1<T> : false;
 
-export { BuiltIns as B, Defined as D, JsValue as J, KeyOf as K, Multi as M, Numeric as N, OmitIndexSignature as O, Primitive as P, Type as T, Union as U, ValueOf as V, NumberLike as a, Nullish as b, Nullable as c, Maybe as d, JsObject as e, KeyOfDeep as f, ValueOfDeep as g, Narrow as h, primitive as p };
+export { AsyncFunction as A, BuiltIns as B, Defined as D, Extends as E, JsValue as J, KeyOf as K, Maybe as M, Numeric as N, OmitIndexSignature as O, Primitive as P, Simplify as S, Type as T, Union as U, ValueOf as V, NumberLike as a, Nullish as b, Nullable as c, Multi as d, JsObject as e, KeyOfDeep as f, ValueOfDeep as g, Narrow as h, primitive as p };

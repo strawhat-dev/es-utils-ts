@@ -1,5 +1,5 @@
-import * as type_fest_source_enforce_optional_js from 'type-fest/source/enforce-optional.js';
-import { B as BuiltIns, T as Type, e as JsObject, U as Union, f as KeyOfDeep, K as KeyOf, g as ValueOfDeep, V as ValueOf, b as Nullish, M as Multi, O as OmitIndexSignature, d as Maybe } from '../types-3dcf6e43.js';
+import { S as Simplify, O as OmitIndexSignature, B as BuiltIns, U as Union, V as ValueOf, K as KeyOf, e as JsObject, T as Type, f as KeyOfDeep, g as ValueOfDeep, b as Nullish, d as Multi } from '../types-9825c360.js';
+import { SimplifyDeep } from 'type-fest/source/merge-deep.js';
 
 /**
 Pick only index signatures from the given object type, leaving out all explicitly defined properties.
@@ -103,6 +103,95 @@ type PickIndexSignature<ObjectType> = {
 		? KeyType
 		: never]: ObjectType[KeyType];
 };
+
+// Returns `never` if the key is optional otherwise return the key type.
+type RequiredFilter<Type, Key extends keyof Type> = undefined extends Type[Key]
+	? Type[Key] extends undefined
+		? Key
+		: never
+	: Key;
+
+// Returns `never` if the key is required otherwise return the key type.
+type OptionalFilter<Type, Key extends keyof Type> = undefined extends Type[Key]
+	? Type[Key] extends undefined
+		? never
+		: Key
+	: never;
+
+/**
+Enforce optional keys (by adding the `?` operator) for keys that have a union with `undefined`.
+
+@example
+```
+import type {EnforceOptional} from 'type-fest';
+
+type Foo = {
+	a: string;
+	b?: string;
+	c: undefined;
+	d: number | undefined;
+};
+
+type FooBar = EnforceOptional<Foo>;
+// => {
+// 	a: string;
+// 	b?: string;
+// 	c: undefined;
+// 	d?: number;
+// }
+```
+
+@internal
+@category Object
+*/
+type EnforceOptional<ObjectType> = Simplify<{
+	[Key in keyof ObjectType as RequiredFilter<ObjectType, Key>]: ObjectType[Key]
+} & {
+	[Key in keyof ObjectType as OptionalFilter<ObjectType, Key>]?: Exclude<ObjectType[Key], undefined>
+}>;
+
+// Merges two objects without worrying about index signatures.
+type SimpleMerge<Destination, Source> = {
+	[Key in keyof Destination as Key extends keyof Source ? never : Key]: Destination[Key];
+} & Source;
+
+/**
+Merge two types into a new type. Keys of the second type overrides keys of the first type.
+
+@example
+```
+import type {Merge} from 'type-fest';
+
+interface Foo {
+	[x: string]: unknown;
+	[x: number]: unknown;
+	foo: string;
+	bar: symbol;
+}
+
+type Bar = {
+	[x: number]: number;
+	[x: symbol]: unknown;
+	bar: Date;
+	baz: boolean;
+};
+
+export type FooBar = Merge<Foo, Bar>;
+// => {
+// 	[x: string]: unknown;
+// 	[x: number]: number;
+// 	[x: symbol]: unknown;
+// 	foo: string;
+// 	bar: Date;
+// 	baz: boolean;
+// }
+```
+
+@category Object
+*/
+type Merge<Destination, Source> = EnforceOptional<
+SimpleMerge<PickIndexSignature<Destination>, PickIndexSignature<Source>>
+& SimpleMerge<OmitIndexSignature<Destination>, OmitIndexSignature<Source>>>;
 
 /**
 @see PartialDeep
@@ -214,32 +303,58 @@ type PartialObjectDeep<ObjectType extends object, Options extends PartialDeepOpt
 	[KeyType in keyof ObjectType]?: PartialDeep<ObjectType[KeyType], Options>
 };
 
-type MapArgs<T, Deep extends boolean> = Type<[
-    MapFn<T, Deep>
-] | [{
-    deep?: Deep;
-}, MapFn<T, Deep>]>;
-type FilterArgs<T, Deep extends boolean, WithRest extends boolean> = Type<[] | [FilterFn<T, Deep>] | [{
-    deep?: Deep;
-    withRest?: WithRest;
-}, FilterFn<T, Deep>]>;
-type MappedResult<T, Deep> = Type<(Deep extends true ? PartialDeep<T> : Partial<T>) & JsObject>;
-type FilteredResult<T, Deep, WithRest> = Type<WithRest extends true ? [MappedResult<T, Deep>, MappedResult<T, Deep>] : MappedResult<T, Deep>>;
-type MapFn<T, Deep> = (key: Union<Deep extends true ? KeyOfDeep<T> : KeyOf<T>>, value: Union<Deep extends true ? ValueOfDeep<T> : ValueOf<T>>) => (false | Nullish) | Multi<JsObject> | Multi<[unknown, unknown]>;
-type FilterFn<T, Deep> = (entry: {
+type FindKey = <T extends object>(obj: T, predicate?: (value: Union<ValueOf<T>>, key: Union<KeyOf<T>>) => unknown) => KeyOf<T> | undefined;
+interface Extender {
+    <T extends JsObject>(props: Readonly<T>): Merge<JsObject, Readonly<T>>;
+    <T1 extends JsObject, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
+    <T1 extends object, T2 extends JsObject>(obj: T1, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
+    <T1 extends JsObject, T2 extends JsObject, Writable extends boolean = false, Configurable extends boolean = false>(obj: Readonly<T1>, props: Readonly<T2>, options: {
+        writable?: Writable;
+        configurable?: Configurable;
+    }): ExtendedResult<T1, Writable & Configurable extends true ? T2 : Readonly<T2>>;
+    <T1 extends object, T2 extends JsObject, Writable extends boolean = false, Configurable extends boolean = false>(obj: T1, props: Readonly<T2>, options: {
+        writable?: Writable;
+        configurable?: Configurable;
+    }): ExtendedResult<T1, Writable & Configurable extends true ? T2 : Readonly<T2>>;
+}
+interface Mapper {
+    <T extends JsObject>(obj: Readonly<T>, callback: MapCallback<Readonly<T>>): MappedResult<T>;
+    <T extends object>(obj: T, callback: MapCallback<T>): MappedResult<T>;
+    <T extends JsObject, Deep extends boolean = false>(obj: Readonly<T>, options: {
+        deep?: Deep;
+    }, callback: MapCallback<Readonly<T>, Deep>): MappedResult<T, Deep>;
+    <T extends object, Deep extends boolean = false>(obj: T, options: {
+        deep?: Deep;
+    }, callback: MapCallback<T, Deep>): MappedResult<T, Deep>;
+}
+interface Filterer {
+    <T extends JsObject>(obj: Readonly<T>): T;
+    <T extends object>(obj: T): T;
+    <T extends JsObject>(obj: Readonly<T>, predicate: FilterPredicate<Readonly<T>>): FilteredResult<T>;
+    <T extends object>(obj: T, predicate: FilterPredicate<T>): FilteredResult<T>;
+    <T extends JsObject, Deep extends boolean = false, WithRest extends boolean = false>(obj: Readonly<T>, options: {
+        deep?: Deep;
+        withRest?: WithRest;
+    }, predicate: FilterPredicate<Readonly<T>, Deep>): FilteredResult<T, Deep, WithRest>;
+    <T extends object, Deep extends boolean = false, WithRest extends boolean = false>(obj: T, options: {
+        deep?: Deep;
+        withRest?: WithRest;
+    }, predicate: FilterPredicate<T, Deep>): FilteredResult<T, Deep, WithRest>;
+}
+type ExtendedResult<T1, T2> = Type<T1 extends Function ? T1 & Simplify<T2> : Merge<T1, T2>>;
+type MappedResult<T, Deep = false> = SimplifyDeep<(Deep extends true ? PartialDeep<T> : Partial<T>) & JsObject>;
+type FilteredResult<T, Deep = false, WithRest = false> = Type<WithRest extends true ? [MappedResult<T, Deep>, MappedResult<T, Deep>] : MappedResult<T, Deep>>;
+type MapCallback<T, Deep = false> = (key: Union<Deep extends true ? KeyOfDeep<T> : KeyOf<T>>, value: Union<Deep extends true ? ValueOfDeep<T> : ValueOf<T>>) => (false | Nullish) | Multi<JsObject> | Multi<[unknown, unknown]>;
+type FilterPredicate<T, Deep = false> = (entry: {
     key: Union<Deep extends true ? KeyOfDeep<T> : KeyOf<T>>;
     value: Union<Deep extends true ? ValueOfDeep<T> : ValueOf<T>>;
 }) => unknown;
-type FindKeyFn<T> = (value: Union<ValueOf<T>>, key: Union<KeyOf<T>>) => unknown;
 
 declare const clear: (obj: object) => object;
-declare const deepcopy: <T extends object>(obj: T, hashmap?: WeakMap<object, any>) => T;
-declare const extend: <T1 extends object, T2 extends JsObject, Writable extends boolean, Configurable extends boolean>(target: T1, props?: Readonly<T2> | undefined, options?: {
-    writable?: Writable | undefined;
-    configurable?: Configurable | undefined;
-} | undefined) => T1 extends Function ? T1 & (Writable & Configurable extends true ? T2 : Readonly<T2>) : ((PickIndexSignature<T1> extends infer T_20 ? { [Key_1 in keyof T_20 as Key_1 extends keyof PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_1]: PickIndexSignature<T1>[Key_1]; } : never) & PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> & (OmitIndexSignature<T1> extends infer T_21 ? { [Key_2 in keyof T_21 as Key_2 extends keyof OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_2]: OmitIndexSignature<T1>[Key_2]; } : never) & OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> extends infer T_15 ? { [Key in keyof T_15 as type_fest_source_enforce_optional_js.RequiredFilter<(PickIndexSignature<T1> extends infer T_16 ? { [Key_1 in keyof T_16 as Key_1 extends keyof PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_1]: PickIndexSignature<T1>[Key_1]; } : never) & PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> & (OmitIndexSignature<T1> extends infer T_17 ? { [Key_2 in keyof T_17 as Key_2 extends keyof OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_2]: OmitIndexSignature<T1>[Key_2]; } : never) & OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>>, Key>]: ((PickIndexSignature<T1> extends infer T_18 ? { [Key_1 in keyof T_18 as Key_1 extends keyof PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_1]: PickIndexSignature<T1>[Key_1]; } : never) & PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> & (OmitIndexSignature<T1> extends infer T_19 ? { [Key_2 in keyof T_19 as Key_2 extends keyof OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_2]: OmitIndexSignature<T1>[Key_2]; } : never) & OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>>)[Key]; } : never) & ((PickIndexSignature<T1> extends infer T_27 ? { [Key_1 in keyof T_27 as Key_1 extends keyof PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_1]: PickIndexSignature<T1>[Key_1]; } : never) & PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> & (OmitIndexSignature<T1> extends infer T_28 ? { [Key_2 in keyof T_28 as Key_2 extends keyof OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_2]: OmitIndexSignature<T1>[Key_2]; } : never) & OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> extends infer T_22 ? { [Key_3 in keyof T_22 as type_fest_source_enforce_optional_js.OptionalFilter<(PickIndexSignature<T1> extends infer T_23 ? { [Key_1 in keyof T_23 as Key_1 extends keyof PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_1]: PickIndexSignature<T1>[Key_1]; } : never) & PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> & (OmitIndexSignature<T1> extends infer T_24 ? { [Key_2 in keyof T_24 as Key_2 extends keyof OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_2]: OmitIndexSignature<T1>[Key_2]; } : never) & OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>>, Key_3>]?: Exclude<((PickIndexSignature<T1> extends infer T_25 ? { [Key_1 in keyof T_25 as Key_1 extends keyof PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_1]: PickIndexSignature<T1>[Key_1]; } : never) & PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> & (OmitIndexSignature<T1> extends infer T_26 ? { [Key_2 in keyof T_26 as Key_2 extends keyof OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_2]: OmitIndexSignature<T1>[Key_2]; } : never) & OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>>)[Key_3], undefined> | undefined; } : never) extends infer T ? { [KeyType_1 in keyof T]: (((PickIndexSignature<T1> extends infer T_6 ? { [Key_1 in keyof T_6 as Key_1 extends keyof PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_1]: PickIndexSignature<T1>[Key_1]; } : never) & PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> & (OmitIndexSignature<T1> extends infer T_7 ? { [Key_2 in keyof T_7 as Key_2 extends keyof OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_2]: OmitIndexSignature<T1>[Key_2]; } : never) & OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> extends infer T_1 ? { [Key in keyof T_1 as type_fest_source_enforce_optional_js.RequiredFilter<(PickIndexSignature<T1> extends infer T_2 ? { [Key_1 in keyof T_2 as Key_1 extends keyof PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_1]: PickIndexSignature<T1>[Key_1]; } : never) & PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> & (OmitIndexSignature<T1> extends infer T_3 ? { [Key_2 in keyof T_3 as Key_2 extends keyof OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_2]: OmitIndexSignature<T1>[Key_2]; } : never) & OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>>, Key>]: ((PickIndexSignature<T1> extends infer T_4 ? { [Key_1 in keyof T_4 as Key_1 extends keyof PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_1]: PickIndexSignature<T1>[Key_1]; } : never) & PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> & (OmitIndexSignature<T1> extends infer T_5 ? { [Key_2 in keyof T_5 as Key_2 extends keyof OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_2]: OmitIndexSignature<T1>[Key_2]; } : never) & OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>>)[Key]; } : never) & ((PickIndexSignature<T1> extends infer T_13 ? { [Key_1 in keyof T_13 as Key_1 extends keyof PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_1]: PickIndexSignature<T1>[Key_1]; } : never) & PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> & (OmitIndexSignature<T1> extends infer T_14 ? { [Key_2 in keyof T_14 as Key_2 extends keyof OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_2]: OmitIndexSignature<T1>[Key_2]; } : never) & OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> extends infer T_8 ? { [Key_3 in keyof T_8 as type_fest_source_enforce_optional_js.OptionalFilter<(PickIndexSignature<T1> extends infer T_9 ? { [Key_1 in keyof T_9 as Key_1 extends keyof PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_1]: PickIndexSignature<T1>[Key_1]; } : never) & PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> & (OmitIndexSignature<T1> extends infer T_10 ? { [Key_2 in keyof T_10 as Key_2 extends keyof OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_2]: OmitIndexSignature<T1>[Key_2]; } : never) & OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>>, Key_3>]?: Exclude<((PickIndexSignature<T1> extends infer T_11 ? { [Key_1 in keyof T_11 as Key_1 extends keyof PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_1]: PickIndexSignature<T1>[Key_1]; } : never) & PickIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> & (OmitIndexSignature<T1> extends infer T_12 ? { [Key_2 in keyof T_12 as Key_2 extends keyof OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>> ? never : Key_2]: OmitIndexSignature<T1>[Key_2]; } : never) & OmitIndexSignature<Writable & Configurable extends true ? T2 : Readonly<T2>>)[Key_3], undefined> | undefined; } : never))[KeyType_1]; } : never;
-declare const findkey: <T extends object>(obj: T, predicate?: FindKeyFn<T>) => Maybe<KeyOf<T>>;
-declare const map: <T extends JsObject, Deep extends boolean>(obj: T, ...args: MapArgs<T, Deep>) => MappedResult<T, Deep>;
-declare const filter: <T extends JsObject, Deep extends boolean, WithRest extends boolean>(obj: T, ...args: FilterArgs<T, Deep, WithRest>) => FilteredResult<T, Deep, WithRest>;
+declare const deepcopy: <T extends object>(obj: T, hash?: WeakMap<object, any>) => T;
+declare const findkey: FindKey;
+declare const extend: Extender;
+declare const map: Mapper;
+declare const filter: Filterer;
 
 export { clear, deepcopy, extend, filter, findkey, map };
