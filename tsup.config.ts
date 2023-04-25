@@ -2,6 +2,7 @@ import { defineConfig } from 'tsup';
 import { globbySync as glob } from 'globby';
 
 export default defineConfig({
+  entry: glob('src/**/!(types).ts'),
   outDir: 'dist',
   format: 'esm',
   target: 'es2020',
@@ -12,5 +13,4 @@ export default defineConfig({
   treeshake: true,
   dts: { resolve: true },
   skipNodeModulesBundle: true,
-  entry: glob('src/**/!(types).ts', { ignore: ['**/*.d.ts'] }),
 });

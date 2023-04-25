@@ -2,7 +2,7 @@
 module.exports = {
   root: true,
   env: { es2022: true, node: true },
-  ignorePatterns: ['.eslintrc.cjs', 'tsup.config.ts', 'dist', '*.d.ts'],
+  ignorePatterns: ['.eslintrc.cjs', 'tsup.config.ts', 'dist'],
   extends: ['plugin:@typescript-eslint/recommended', 'prettier'],
   plugins: ['@typescript-eslint', 'tree-shaking'],
   parser: '@typescript-eslint/parser',
