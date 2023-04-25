@@ -1,6 +1,15 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-ignore
+import rfdc from 'rfdc/default';
 import equal from 'deep-equal';
 
-export { default as deepclone } from 'rfdc/default';
+export const deepclone = rfdc as <T>(source: T) => T;
+
+export const deepcompare = (
+  a: unknown,
+  b: unknown,
+  { strict = true }: { strict?: boolean } = {}
+) => equal(a, b, { strict });
 
 export {
   deepmerge,
@@ -8,9 +17,3 @@ export {
   deepmergeInto,
   deepmergeIntoCustom,
 } from 'deepmerge-ts';
-
-export const deepcompare = (
-  a: unknown,
-  b: unknown,
-  { strict = true }: { strict?: boolean } = {}
-) => equal(a, b, { strict });
