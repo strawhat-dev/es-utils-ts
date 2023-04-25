@@ -1,4 +1,4 @@
-import { S as Simplify, O as OmitIndexSignature, B as BuiltIns, U as Union, V as ValueOf, K as KeyOf, e as JsObject, T as Type, f as KeyOfDeep, g as ValueOfDeep, b as Nullish, d as Multi } from '../types-9825c360.js';
+import { S as Simplify, O as OmitIndexSignature, B as BuiltIns, e as JsObject, U as Union, V as ValueOf, K as KeyOf, T as Type, f as KeyOfDeep, g as ValueOfDeep, b as Nullish, d as Multi } from '../types-eaf0d995.js';
 import { SimplifyDeep } from 'type-fest/source/merge-deep.js';
 
 /**
@@ -303,43 +303,43 @@ type PartialObjectDeep<ObjectType extends object, Options extends PartialDeepOpt
 	[KeyType in keyof ObjectType]?: PartialDeep<ObjectType[KeyType], Options>
 };
 
-type FindKey = <T extends object>(obj: T, predicate?: (value: Union<ValueOf<T>>, key: Union<KeyOf<T>>) => unknown) => KeyOf<T> | undefined;
 interface Extender {
     <T extends JsObject>(props: Readonly<T>): Merge<JsObject, Readonly<T>>;
     <T1 extends JsObject, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
-    <T1 extends object, T2 extends JsObject>(obj: T1, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
+    <T1 extends object, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
     <T1 extends JsObject, T2 extends JsObject, Writable extends boolean = false, Configurable extends boolean = false>(obj: Readonly<T1>, props: Readonly<T2>, options: {
         writable?: Writable;
         configurable?: Configurable;
     }): ExtendedResult<T1, Writable & Configurable extends true ? T2 : Readonly<T2>>;
-    <T1 extends object, T2 extends JsObject, Writable extends boolean = false, Configurable extends boolean = false>(obj: T1, props: Readonly<T2>, options: {
+    <T1 extends object, T2 extends JsObject, Writable extends boolean = false, Configurable extends boolean = false>(obj: Readonly<T1>, props: Readonly<T2>, options: {
         writable?: Writable;
         configurable?: Configurable;
     }): ExtendedResult<T1, Writable & Configurable extends true ? T2 : Readonly<T2>>;
 }
+type FindKey = <T extends object>(obj: Readonly<T>, predicate?: (value: Union<ValueOf<Readonly<T>>>, key: Union<KeyOf<Readonly<T>>>) => unknown) => KeyOf<Readonly<T>> | undefined;
 interface Mapper {
     <T extends JsObject>(obj: Readonly<T>, callback: MapCallback<Readonly<T>>): MappedResult<T>;
-    <T extends object>(obj: T, callback: MapCallback<T>): MappedResult<T>;
+    <T extends object>(obj: Readonly<T>, callback: MapCallback<Readonly<T>>): MappedResult<T>;
     <T extends JsObject, Deep extends boolean = false>(obj: Readonly<T>, options: {
         deep?: Deep;
     }, callback: MapCallback<Readonly<T>, Deep>): MappedResult<T, Deep>;
-    <T extends object, Deep extends boolean = false>(obj: T, options: {
+    <T extends object, Deep extends boolean = false>(obj: Readonly<T>, options: {
         deep?: Deep;
-    }, callback: MapCallback<T, Deep>): MappedResult<T, Deep>;
+    }, callback: MapCallback<Readonly<T>, Deep>): MappedResult<T, Deep>;
 }
 interface Filterer {
     <T extends JsObject>(obj: Readonly<T>): T;
-    <T extends object>(obj: T): T;
+    <T extends object>(obj: Readonly<T>): T;
     <T extends JsObject>(obj: Readonly<T>, predicate: FilterPredicate<Readonly<T>>): FilteredResult<T>;
-    <T extends object>(obj: T, predicate: FilterPredicate<T>): FilteredResult<T>;
+    <T extends object>(obj: Readonly<T>, predicate: FilterPredicate<Readonly<T>>): FilteredResult<T>;
     <T extends JsObject, Deep extends boolean = false, WithRest extends boolean = false>(obj: Readonly<T>, options: {
         deep?: Deep;
         withRest?: WithRest;
     }, predicate: FilterPredicate<Readonly<T>, Deep>): FilteredResult<T, Deep, WithRest>;
-    <T extends object, Deep extends boolean = false, WithRest extends boolean = false>(obj: T, options: {
+    <T extends object, Deep extends boolean = false, WithRest extends boolean = false>(obj: Readonly<T>, options: {
         deep?: Deep;
         withRest?: WithRest;
-    }, predicate: FilterPredicate<T, Deep>): FilteredResult<T, Deep, WithRest>;
+    }, predicate: FilterPredicate<Readonly<T>, Deep>): FilteredResult<T, Deep, WithRest>;
 }
 type ExtendedResult<T1, T2> = Type<T1 extends Function ? T1 & Simplify<T2> : Merge<T1, T2>>;
 type MappedResult<T, Deep = false> = SimplifyDeep<(Deep extends true ? PartialDeep<T> : Partial<T>) & JsObject>;
@@ -351,10 +351,9 @@ type FilterPredicate<T, Deep = false> = (entry: {
 }) => unknown;
 
 declare const clear: (obj: object) => object;
-declare const deepcopy: <T extends object>(obj: T, hash?: WeakMap<object, any>) => T;
-declare const findkey: FindKey;
 declare const extend: Extender;
+declare const findkey: FindKey;
 declare const map: Mapper;
 declare const filter: Filterer;
 
-export { clear, deepcopy, extend, filter, findkey, map };
+export { clear, extend, filter, findkey, map };

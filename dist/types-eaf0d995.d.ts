@@ -675,7 +675,6 @@ type Nullish = null | undefined;
 type Nullable<T> = T | null;
 type Maybe<T> = T | Nullish;
 type Multi<T> = T | T[];
-type AsyncFunction<T = unknown, args extends unknown[] = any[]> = (...args: args) => Promise<T>;
 /**
  * *common primitves*
  * (may be serializable or literally typed).
@@ -690,7 +689,7 @@ type primitive = Simplify<Primitive | bigint | symbol>;
 /** any js value *(primitves or objects)*. */
 type JsValue = Simplify<primitive | object>;
 /** **plain** js objects. */
-type JsObject<value = JsValue> = {
+type JsObject<value = unknown> = {
     [key: string]: value;
 };
 /**
@@ -745,4 +744,4 @@ type Normalize<T> = OmitIndexSignature<UnionToIntersection<T>>;
  */
 type IsLiteral<T> = T extends primitive ? IsLiteral$1<T> : false;
 
-export { AsyncFunction as A, BuiltIns as B, Defined as D, Extends as E, JsValue as J, KeyOf as K, Maybe as M, Numeric as N, OmitIndexSignature as O, Primitive as P, Simplify as S, Type as T, Union as U, ValueOf as V, NumberLike as a, Nullish as b, Nullable as c, Multi as d, JsObject as e, KeyOfDeep as f, ValueOfDeep as g, Narrow as h, primitive as p };
+export { BuiltIns as B, Defined as D, Extends as E, JsValue as J, KeyOf as K, Maybe as M, Numeric as N, OmitIndexSignature as O, Primitive as P, Simplify as S, Type as T, Union as U, ValueOf as V, NumberLike as a, Nullish as b, Nullable as c, Multi as d, JsObject as e, KeyOfDeep as f, ValueOfDeep as g, Narrow as h, primitive as p };
