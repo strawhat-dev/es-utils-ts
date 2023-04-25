@@ -46,7 +46,7 @@ export type TypeName = Union<
 
 export type AssertionOptions = {
   /**
-   * Set to `throw` to throw the error on failed assertions
+   * Set to `throw` to throw on failed assertions
    * or pass a callback function to handle the error.
    * @defaultValue `console.error`
    */

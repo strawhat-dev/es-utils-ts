@@ -11,6 +11,8 @@ export const deepcompare = (
   { strict = true }: { strict?: boolean } = {}
 ) => equal(a, b, { strict });
 
+export { default as range } from 'just-range';
+export { default as inspect } from 'object-inspect';
 export {
   deepmerge,
   deepmergeCustom,

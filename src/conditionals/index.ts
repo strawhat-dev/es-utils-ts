@@ -3,7 +3,7 @@ import type { AsyncFunction } from 'type-fest/source/async-return-type.js';
 import type { JsObject, KeyOf, Nullish, primitive } from '@/types';
 import type { AssertionOptions, AsyncGeneratorFunction, GeneratorFunction, MultiTypeQueryFunction, TypeName } from '@/conditionals/types';
 
-import { deepcompare } from '@/externals';
+import { deepcompare, inspect } from '@/externals';
 
 /**
  * Used internally for some type checking methods in this module
@@ -129,9 +129,8 @@ function createAssertion(assertion: (value: unknown) => boolean, expected = asse
     if (assertion(value)) return true;
     if (!quiet) {
       const code = 'AssertionError';
-      const actual = type(value);
-      const cause = { code, expected, actual, value };
-      const err = Error(`[${code}] expected instance of ${expected}; received ${actual}`, { cause });
+      const cause = { code, value, expected, actual: type(value) };
+      const err = Error(`[${code}] expected instance of ${expected}; received ${inspect(value)}`, { cause });
       if (onError === 'throw') throw err;
       else if (typeof onError === 'function') onError(err);
     }
