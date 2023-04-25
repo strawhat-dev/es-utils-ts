@@ -94,7 +94,7 @@ type Replace<
 		: `${Head}${Replacement}${Tail}`
 	: Input;
 
-type TypeName = Union<'Array Iterator' | 'Array' | 'ArrayBuffer' | 'AsyncFunction' | 'AsyncGenerator' | 'AsyncGeneratorFunction' | 'BigInt' | 'BigInt64Array' | 'BigUint64Array' | 'Boolean' | 'Date' | 'Error' | 'Float32Array' | 'Float64Array' | 'Function' | 'Generator' | 'GeneratorFunction' | 'Int16Array' | 'Int32Array' | 'Int8Array' | 'Map Iterator' | 'Map' | 'Null' | 'Number' | 'Object' | 'Promise' | 'RegExp' | 'Set Iterator' | 'Set' | 'SharedArrayBuffer' | 'String' | 'Symbol' | 'Uint16Array' | 'Uint32Array' | 'Uint8Array' | 'Uint8ClampedArray' | 'Undefined' | 'WeakMap' | 'WeakSet'>;
+type TypeName = Union<'Array Iterator' | 'Array' | 'ArrayBuffer' | 'AsyncFunction' | 'AsyncGenerator' | 'AsyncGeneratorFunction' | 'BigInt' | 'BigInt64Array' | 'BigUint64Array' | 'Boolean' | 'Date' | 'Error' | 'Float32Array' | 'Float64Array' | 'Function' | 'Generator' | 'GeneratorFunction' | 'Int16Array' | 'Int32Array' | 'Int8Array' | 'Map Iterator' | 'Map' | 'Null' | 'Number' | 'Object' | 'Promise' | 'RegExp' | 'Request' | 'Set Iterator' | 'Set' | 'SharedArrayBuffer' | 'String' | 'Symbol' | 'Uint16Array' | 'Uint32Array' | 'Uint8Array' | 'Uint8ClampedArray' | 'Undefined' | 'WeakMap' | 'WeakSet'>;
 type AssertionOptions = {
     /**
      * Set to `throw` to throw on failed assertions
@@ -156,6 +156,7 @@ declare const isObject: (value: unknown) => value is JsObject;
 declare const isPrimitive: (value: unknown) => value is primitive;
 declare const isPromise: (value: unknown) => value is Promise<unknown>;
 declare const isRegExp: (value: unknown) => value is RegExp;
+declare const isRequest: (value: unknown) => value is Request;
 declare const isSet: (value: unknown) => value is Set<unknown>;
 declare const isTypedArray: (value: unknown) => value is TypedArray;
 declare const isWeakMap: (value: unknown) => value is WeakMap<object, unknown>;
@@ -191,6 +192,7 @@ declare const assert: Readonly<{
     readonly isPrimitive: (value: unknown, opts?: AssertionOptions) => boolean;
     readonly isPromise: (value: unknown, opts?: AssertionOptions) => boolean;
     readonly isRegExp: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isRequest: (value: unknown, opts?: AssertionOptions) => boolean;
     readonly isSet: (value: unknown, opts?: AssertionOptions) => boolean;
     readonly isTypedArray: (value: unknown, opts?: AssertionOptions) => boolean;
     readonly isWeakMap: (value: unknown, opts?: AssertionOptions) => boolean;
@@ -208,4 +210,4 @@ declare const assert: Readonly<{
 /** @internal */
 type AssertionType = Replace<KeyOf<typeof assert>, 'is', ''>;
 
-export { AssertionType, assert, is, isArrayBuffer, isAsyncFunction, isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isConstructor, isDate, isElement, isError, isGeneratorFunction, isIterable, isIterator, isMap, isObject, isPrimitive, isPromise, isRegExp, isSet, isTypedArray, isWeakMap, isWeakSet, not, nullish, type };
+export { AssertionType, assert, is, isArrayBuffer, isAsyncFunction, isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isConstructor, isDate, isElement, isError, isGeneratorFunction, isIterable, isIterator, isMap, isObject, isPrimitive, isPromise, isRegExp, isRequest, isSet, isTypedArray, isWeakMap, isWeakSet, not, nullish, type };

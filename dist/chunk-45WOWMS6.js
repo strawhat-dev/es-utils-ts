@@ -28,6 +28,7 @@ var isObject = /* @__PURE__ */ __name((value) => type(value) === "Object", "isOb
 var isPrimitive = /* @__PURE__ */ __name((value) => value !== Object(value), "isPrimitive");
 var isPromise = /* @__PURE__ */ __name((value) => type(value) === "Promise", "isPromise");
 var isRegExp = /* @__PURE__ */ __name((value) => type(value) === "RegExp", "isRegExp");
+var isRequest = /* @__PURE__ */ __name((value) => type(value) === "Request", "isRequest");
 var isSet = /* @__PURE__ */ __name((value) => type(value) === "Set", "isSet");
 var isTypedArray = /* @__PURE__ */ __name((value) => ArrayBuffer.isView(value) && !(value instanceof DataView), "isTypedArray");
 var isWeakMap = /* @__PURE__ */ __name((value) => type(value) === "WeakMap", "isWeakMap");
@@ -54,6 +55,7 @@ var assert = Object.freeze({
   isPrimitive: createAssertion(isPrimitive),
   isPromise: createAssertion(isPromise),
   isRegExp: createAssertion(isRegExp),
+  isRequest: createAssertion(isRequest),
   isSet: createAssertion(isSet),
   isTypedArray: createAssertion(isTypedArray),
   isWeakMap: createAssertion(isWeakMap),
@@ -100,4 +102,4 @@ function createAssertion(assertion, expected = assertion.name.slice(2)) {
 }
 __name(createAssertion, "createAssertion");
 
-export { assert, is, isArrayBuffer, isAsyncFunction, isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isConstructor, isDate, isElement, isError, isGeneratorFunction, isIterable, isIterator, isMap, isObject, isPrimitive, isPromise, isRegExp, isSet, isTypedArray, isWeakMap, isWeakSet, not, nullish, type };
+export { assert, is, isArrayBuffer, isAsyncFunction, isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isConstructor, isDate, isElement, isError, isGeneratorFunction, isIterable, isIterator, isMap, isObject, isPrimitive, isPromise, isRegExp, isRequest, isSet, isTypedArray, isWeakMap, isWeakSet, not, nullish, type };
