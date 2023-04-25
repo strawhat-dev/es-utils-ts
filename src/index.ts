@@ -1,5 +1,6 @@
 export type * from '@/types';
 
-export * from '@/assertions';
+export * from '@/conditionals';
+export * from '@/externals';
 export * from '@/objects';
 export * from '@/promises';

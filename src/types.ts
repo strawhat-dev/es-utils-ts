@@ -18,9 +18,6 @@ export type Nullish = null | undefined;
 export type Nullable<T> = T | null;
 export type Maybe<T> = T | Nullish;
 export type Multi<T> = T | T[];
-export type AsyncFunction<T = unknown, args extends unknown[] = any[]> = (
-  ...args: args
-) => Promise<T>;
 
 /**
  * *common primitves*
@@ -39,7 +36,7 @@ export type primitive = Simplify<Primitive | bigint | symbol>;
 export type JsValue = Simplify<primitive | object>;
 
 /** **plain** js objects. */
-export type JsObject<value = JsValue> = { [key: string]: value };
+export type JsObject<value = unknown> = { [key: string]: value };
 
 /**
  * More reliably extract and create types from a given type's keys by joining
