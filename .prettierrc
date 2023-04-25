@@ -1,0 +1,6 @@
+{
+  "singleQuote": true,
+  "overrides": [
+    { "files": "src/conditionals/index.ts", "options": { "printWidth": 150 } }
+  ]
+}

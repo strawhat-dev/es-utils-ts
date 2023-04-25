@@ -20,5 +20,5 @@
     "baseUrl": ".",
     "paths": { "@/*": ["src/*.js", "src/*/index.js"] }
   },
-  "include": ["src/**/*.ts", "tsup.config.ts", ".eslintrc.cjs"]
+  "include": ["src/**/*.ts", "tsup.config.ts"]
 }
