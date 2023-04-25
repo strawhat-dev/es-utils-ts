@@ -23,7 +23,7 @@
   "scripts": {
     "build": "eslint && tsup",
     "dev": "tsup --watch",
-    "clean": "pnpm --shell-mode dlx rimraf dist pnpm-lock.yaml node_modules"
+    "clean": "pnpm -c dlx rimraf dist pnpm-lock.yaml node_modules"
   },
   "peerDependencies": {
     "deep-equal": "^2.2.0",
@@ -45,7 +45,7 @@
     "globby": "^13.1.4",
     "prettier": "^2.8.8",
     "tsup": "^6.7.0",
-    "type-fest": "^3.8.0",
+    "type-fest": "^3.9.0",
     "typescript": "^5.0.4"
   }
 }
