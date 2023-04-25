@@ -46,10 +46,17 @@ export type TypeName = Union<
 
 export type AssertionOptions = {
   /**
-   * If `true` throw an error for failed assertions.
-   * By default, errors are printed to `stderr` using `console.error`
+   * Set to `throw` to throw the error on failed assertions
+   * or pass a callback function to handle the error.
+   * @defaultValue `console.error`
    */
-  throwOnError?: boolean;
+  onError?: 'throw' | ((err: Error) => unknown);
+  /**
+   * Suppress any errors and return a boolean instead.
+   * (overrides `onError` when set to `true`)
+   * @defaultValue `false`
+   */
+  quiet?: boolean;
 };
 
 export type GeneratorFunction = (...args: any[]) => Generator;

@@ -115,7 +115,7 @@ const querycallback = (value: unknown) => {
     if (typeof query === 'boolean') return query;
     if (isConstructor(query)) return value instanceof query;
     if (typeof query === 'string' && `is${query}` in assert) {
-      return assert[`is${query}`](value);
+      return assert[`is${query}`](value, { quiet: true });
     }
 
     return deepcompare(value, query);
@@ -124,14 +124,18 @@ const querycallback = (value: unknown) => {
 
 /** @internal */
 function createAssertion(assertion: (value: unknown) => boolean, expected = assertion.name.slice(2)) {
-  return (value: unknown, { throwOnError }: AssertionOptions) => {
+  return (value: unknown, opts: AssertionOptions = {}) => {
+    const { quiet, onError = console.error } = opts;
     if (assertion(value)) return true;
-    const code = 'AssertionError';
-    const actual = type(value);
-    const cause = { code, expected, actual, value };
-    const err = Error(`[${code}] expected instance of ${expected}; received ${actual}`, { cause });
-    if (throwOnError) throw err;
-    console.error(err);
+    if (!quiet) {
+      const code = 'AssertionError';
+      const actual = type(value);
+      const cause = { code, expected, actual, value };
+      const err = Error(`[${code}] expected instance of ${expected}; received ${actual}`, { cause });
+      if (onError === 'throw') throw err;
+      else if (typeof onError === 'function') onError(err);
+    }
+
     return false;
   };
 }
