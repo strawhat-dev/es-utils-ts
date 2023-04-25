@@ -1,4 +1,4 @@
-import { deepcompare } from './chunk-YSSCRFKI.js';
+import { default2, deepcompare } from './chunk-3OAH732U.js';
 import { __name } from './chunk-HXRSFH6L.js';
 
 // src/conditionals/index.ts
@@ -88,9 +88,8 @@ function createAssertion(assertion, expected = assertion.name.slice(2)) {
       return true;
     if (!quiet) {
       const code = "AssertionError";
-      const actual = type(value);
-      const cause = { code, expected, actual, value };
-      const err = Error(`[${code}] expected instance of ${expected}; received ${actual}`, { cause });
+      const cause = { code, value, expected, actual: type(value) };
+      const err = Error(`[${code}] expected instance of ${expected}; received ${default2(value)}`, { cause });
       if (onError === "throw")
         throw err;
       else if (typeof onError === "function")

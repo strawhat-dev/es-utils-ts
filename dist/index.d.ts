@@ -3,6 +3,8 @@ export { AssertionType, assert, is, isArrayBuffer, isAsyncFunction, isAsyncGener
 export { deepclone, deepcompare } from './externals.js';
 export { clear, extend, filter, findkey, map } from './objects/index.js';
 export { cdn, sleep } from './promises.js';
+export { default as range } from 'just-range';
+export { default as inspect } from 'object-inspect';
 export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from 'deepmerge-ts';
 import 'type-fest/source/async-return-type.js';
 import 'type-fest/source/merge-deep.js';
