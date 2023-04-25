@@ -50,6 +50,7 @@ export const isObject = (value: unknown): value is JsObject => type(value) === '
 export const isPrimitive = (value: unknown): value is primitive => value !== Object(value);
 export const isPromise = (value: unknown): value is Promise<unknown> => type(value) === 'Promise';
 export const isRegExp = (value: unknown): value is RegExp => type(value) === 'RegExp';
+export const isRequest = (value: unknown): value is Request => type(value) === 'Request';
 export const isSet = (value: unknown): value is Set<unknown> => type(value) === 'Set';
 export const isTypedArray = (value: unknown): value is TypedArray => ArrayBuffer.isView(value) && !(value instanceof DataView);
 export const isWeakMap = (value: unknown): value is WeakMap<object, unknown> => type(value) === 'WeakMap';
@@ -89,6 +90,7 @@ export const assert = Object.freeze({
   isPrimitive: createAssertion(isPrimitive),
   isPromise: createAssertion(isPromise),
   isRegExp: createAssertion(isRegExp),
+  isRequest: createAssertion(isRequest),
   isSet: createAssertion(isSet),
   isTypedArray: createAssertion(isTypedArray),
   isWeakMap: createAssertion(isWeakMap),

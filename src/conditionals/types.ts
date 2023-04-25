@@ -30,6 +30,7 @@ export type TypeName = Union<
   | 'Object'
   | 'Promise'
   | 'RegExp'
+  | 'Request'
   | 'Set Iterator'
   | 'Set'
   | 'SharedArrayBuffer'
