@@ -97,10 +97,17 @@ type Replace<
 type TypeName = Union<'Array Iterator' | 'Array' | 'ArrayBuffer' | 'AsyncFunction' | 'AsyncGenerator' | 'AsyncGeneratorFunction' | 'BigInt' | 'BigInt64Array' | 'BigUint64Array' | 'Boolean' | 'Date' | 'Error' | 'Float32Array' | 'Float64Array' | 'Function' | 'Generator' | 'GeneratorFunction' | 'Int16Array' | 'Int32Array' | 'Int8Array' | 'Map Iterator' | 'Map' | 'Null' | 'Number' | 'Object' | 'Promise' | 'RegExp' | 'Set Iterator' | 'Set' | 'SharedArrayBuffer' | 'String' | 'Symbol' | 'Uint16Array' | 'Uint32Array' | 'Uint8Array' | 'Uint8ClampedArray' | 'Undefined' | 'WeakMap' | 'WeakSet'>;
 type AssertionOptions = {
     /**
-     * If `true` throw an error for failed assertions.
-     * By default, errors are printed to `stderr` using `console.error`
+     * Set to `throw` to throw the error on failed assertions
+     * or pass a callback function to handle the error.
+     * @defaultValue `console.error`
      */
-    throwOnError?: boolean;
+    onError?: 'throw' | ((err: Error) => unknown);
+    /**
+     * Suppress any errors and return a boolean instead.
+     * (overrides `onError` when set to `true`)
+     * @defaultValue `false`
+     */
+    quiet?: boolean;
 };
 type GeneratorFunction = (...args: any[]) => Generator;
 type AsyncGeneratorFunction = (...args: any[]) => AsyncGenerator;
@@ -167,36 +174,36 @@ declare const is: MultiTypeQueryFunction;
  * - does not rely on platform specific *(e.g. node.js)* methods such as `util.types.isArrayBuffer`
  */
 declare const assert: Readonly<{
-    readonly isArrayBuffer: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isAsyncFunction: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isAsyncGeneratorFunction: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isAsyncIterable: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isAsyncIterator: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isConstructor: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isDate: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isElement: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isError: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isGeneratorFunction: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isIterable: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isIterator: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isMap: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isObject: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isPrimitive: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isPromise: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isRegExp: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isSet: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isTypedArray: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isWeakMap: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isWeakSet: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isArray: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isBigInt: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isBoolean: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isFunction: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isNull: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isNumber: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isString: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isSymbol: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
-    readonly isUndefined: (value: unknown, { throwOnError }: AssertionOptions) => boolean;
+    readonly isArrayBuffer: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isAsyncFunction: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isAsyncGeneratorFunction: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isAsyncIterable: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isAsyncIterator: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isConstructor: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isDate: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isElement: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isError: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isGeneratorFunction: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isIterable: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isIterator: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isMap: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isObject: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isPrimitive: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isPromise: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isRegExp: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isSet: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isTypedArray: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isWeakMap: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isWeakSet: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isArray: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isBigInt: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isBoolean: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isFunction: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isNull: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isNumber: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isString: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isSymbol: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isUndefined: (value: unknown, opts?: AssertionOptions) => boolean;
 }>;
 /** @internal */
 type AssertionType = Replace<KeyOf<typeof assert>, 'is', ''>;
