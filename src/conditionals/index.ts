@@ -127,12 +127,12 @@ const querycallback = (value: unknown) => {
 /** @internal */
 function createAssertion(assertion: (value: unknown) => boolean, expected = assertion.name.slice(2)) {
   return (value: unknown, opts: AssertionOptions = {}) => {
-    const { quiet, onError = console.error } = opts;
     if (assertion(value)) return true;
-    if (!quiet) {
+    const { quiet, onError = console.error } = opts;
+    if (onError && !quiet) {
       const code = 'AssertionError';
       const cause = { code, value, expected, actual: type(value) };
-      const err = Error(`[${code}] expected instance of ${expected}; received ${inspect(value)}`, { cause });
+      const err = new Error(`[${code}] expected instance of ${expected}; received ${inspect(value)}`, { cause });
       if (onError === 'throw') throw err;
       else if (typeof onError === 'function') onError(err);
     }
