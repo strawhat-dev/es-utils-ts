@@ -329,7 +329,7 @@ interface Filterer {
     }, predicate: FilterPredicate<Readonly<T>, Deep>): FilteredResult<T, Deep, WithRest>;
 }
 interface Extender {
-    <T extends JsObject>(props: Readonly<T>): Merge<JsObject, Readonly<T>>;
+    <T extends JsObject>(props: Readonly<T>): Readonly<T>;
     <T1 extends JsObject, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
     <T1 extends object, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
     <T1 extends JsObject, T2 extends JsObject, Writable extends boolean = false, Configurable extends boolean = false>(obj: Readonly<T1>, props: Readonly<T2>, options: PropertyOptions<Writable, Configurable>): ExtendedResult<T1, Writable & Configurable extends true ? T2 : Readonly<T2>>;
