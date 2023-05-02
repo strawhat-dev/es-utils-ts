@@ -3,57 +3,46 @@ import type { JsObject } from '@/types';
 import type { Extender, Filterer, FindKey, Mapper } from '@/objects/types';
 
 import { deepmergeInto } from '@/externals';
-import { is, isObject, not } from '@/conditionals';
+import { isObject, not } from '@/conditionals';
 
 export const clear = (obj: object) => {
-  Object.keys(obj).forEach((k) => delete obj[k]);
+  for (const key in Object.keys(obj)) delete obj[key];
   return obj;
 };
 
-export const extend: Extender = (...args: unknown[]) => {
-  const [target, props, options] = args.length === 1 ? [{}, args.pop()] : args;
-  return Object.defineProperties(
-    target,
-    Object.entries(props as never).reduce(
-      (acc, [prop, value]) => ((acc[prop] = { ...options!, value }), acc),
-      {}
-    )
-  ) as never;
-};
-
 export const findkey: FindKey = (obj, predicate = (value) => !not(value)) => {
-  return Object.keys(obj || {}).find((key) =>
-    predicate(obj[key], key as never)
-  ) as never;
+  for (const key of Object.keys(obj || {})) {
+    if (predicate(obj[key], key as never)) return key as never;
+  }
 };
 
 export const map: Mapper = (obj: object, ...args: unknown[]) => {
+  const result = {};
   const callback = args.pop() as (...args: unknown[]) => unknown;
   const { deep } = { ...(args.pop() as { deep?: boolean }) };
-  return Object.entries(obj || {}).reduce((acc, [key, value]) => {
-    const result = (
+  for (const key of Object.keys(obj || {})) {
+    const value = obj[key];
+    const entry = (
       deep && isObject(value)
         ? [key, map(value, { deep }, callback as never)]
         : callback(key, value)
     ) as unknown;
 
-    if (!is(result).anyOf('Array', 'Object')) return acc;
-
     const entries = (
-      Array.isArray(result) && typeof result[0] === 'object' ? result : [result]
+      Array.isArray(entry) && typeof entry[0] === 'object' ? entry : [entry]
     ) as (JsObject | [unknown, unknown])[];
 
     entries.forEach((entry) =>
-      (Array.isArray(entry) ? assignEntry : deepmergeInto)(acc, entry)
+      (isObject(entry) ? deepmergeInto : assignEntry)(result, entry)
     );
+  }
 
-    return acc;
-  }, {});
+  return result;
 };
 
 export const filter: Filterer = (obj: object, ...args: unknown[]) => {
   const defaults = {
-    opts: { deep: !args.length, withRest: false },
+    opts: { deep: !args.length, withRest: false as boolean | JsObject },
     predicate: ({ value }: never) => typeof value !== 'undefined',
   };
 
@@ -63,30 +52,42 @@ export const filter: Filterer = (obj: object, ...args: unknown[]) => {
     return acc;
   }, defaults);
 
+  const result = {};
+  opts.withRest &&= {};
   const { deep, withRest } = opts;
-  const [filtered, rest] = Object.entries(obj || {}).reduce(
-    ([acc, omit], [key, value]) => {
-      if (deep && isObject(value)) {
-        const [resolved, omitted] = filter(
-          value,
-          { deep, withRest: true },
-          predicate as never
-        );
+  for (const key of Object.keys(obj || {})) {
+    const value = obj[key];
+    if (!(deep && isObject(value))) {
+      if (predicate({ key, value } as never)) result[key] = value;
+      else if (withRest) withRest[key] = value;
+    } else {
+      const entry = filter(
+        value,
+        { deep, withRest: !!withRest },
+        predicate as never
+      ) as never;
 
-        acc[key] = resolved;
-        Object.keys(omitted).length && (omit[key] = omitted);
-      } else {
-        (predicate({ key, value } as never) ? acc : omit)[key] = value;
-      }
+      const [resolved, omitted] = withRest ? entry : [entry, {}];
+      result[key] = resolved;
+      Object.keys(omitted).length && (withRest[key] = omitted);
+    }
+  }
 
-      return [acc, omit];
-    },
-    [{}, {}]
-  );
+  return withRest ? [result, withRest] : result;
+};
 
-  return withRest ? [filtered, rest] : filtered;
+export const extend: Extender = (...args: unknown[]) => {
+  const [target, props, options] = args.length === 1 ? [{}, args.pop()] : args;
+  const source = {};
+  for (const key of Object.keys(props!)) {
+    source[key] = { ...options!, value: props![key] };
+  }
+
+  return Object.defineProperties(target, source) as never;
 };
 
 /** @internal */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const assignEntry = (obj: object, [k, v]: any) => not(k) || (obj[k] = v);
+const assignEntry = (obj: object, entry: any) => {
+  not(entry?.[0]) || (obj[entry[0]] = entry[1]);
+};
