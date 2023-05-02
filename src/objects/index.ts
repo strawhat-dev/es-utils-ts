@@ -6,7 +6,7 @@ import { deepmergeInto } from '@/externals';
 import { isObject, not } from '@/conditionals';
 
 export const clear = (obj: object) => {
-  for (const key in Object.keys(obj)) delete obj[key];
+  for (const key of Object.keys(obj)) delete obj[key];
   return obj;
 };
 

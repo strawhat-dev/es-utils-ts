@@ -4,7 +4,7 @@ import { __name } from './chunk-HXRSFH6L.js';
 
 // src/objects/index.ts
 var clear = /* @__PURE__ */ __name((obj) => {
-  for (const key in Object.keys(obj))
+  for (const key of Object.keys(obj))
     delete obj[key];
   return obj;
 }, "clear");
