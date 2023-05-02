@@ -1,4 +1,4 @@
-import { S as Simplify, O as OmitIndexSignature, B as BuiltIns, e as JsObject, U as Union, V as ValueOf, K as KeyOf, T as Type, f as KeyOfDeep, g as ValueOfDeep, b as Nullish, d as Multi } from '../types-eaf0d995.js';
+import { S as Simplify, O as OmitIndexSignature, B as BuiltIns, U as Union, V as ValueOf, K as KeyOf, e as JsObject, T as Type, f as KeyOfDeep, g as ValueOfDeep, b as Nullish, d as Multi } from '../types-1940722b.js';
 import { SimplifyDeep } from 'type-fest/source/merge-deep.js';
 
 /**
@@ -303,19 +303,6 @@ type PartialObjectDeep<ObjectType extends object, Options extends PartialDeepOpt
 	[KeyType in keyof ObjectType]?: PartialDeep<ObjectType[KeyType], Options>
 };
 
-interface Extender {
-    <T extends JsObject>(props: Readonly<T>): Merge<JsObject, Readonly<T>>;
-    <T1 extends JsObject, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
-    <T1 extends object, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
-    <T1 extends JsObject, T2 extends JsObject, Writable extends boolean = false, Configurable extends boolean = false>(obj: Readonly<T1>, props: Readonly<T2>, options: {
-        writable?: Writable;
-        configurable?: Configurable;
-    }): ExtendedResult<T1, Writable & Configurable extends true ? T2 : Readonly<T2>>;
-    <T1 extends object, T2 extends JsObject, Writable extends boolean = false, Configurable extends boolean = false>(obj: Readonly<T1>, props: Readonly<T2>, options: {
-        writable?: Writable;
-        configurable?: Configurable;
-    }): ExtendedResult<T1, Writable & Configurable extends true ? T2 : Readonly<T2>>;
-}
 type FindKey = <T extends object>(obj: Readonly<T>, predicate?: (value: Union<ValueOf<Readonly<T>>>, key: Union<KeyOf<Readonly<T>>>) => unknown) => KeyOf<Readonly<T>> | undefined;
 interface Mapper {
     <T extends JsObject>(obj: Readonly<T>, callback: MapCallback<Readonly<T>>): MappedResult<T>;
@@ -341,6 +328,13 @@ interface Filterer {
         withRest?: WithRest;
     }, predicate: FilterPredicate<Readonly<T>, Deep>): FilteredResult<T, Deep, WithRest>;
 }
+interface Extender {
+    <T extends JsObject>(props: Readonly<T>): Merge<JsObject, Readonly<T>>;
+    <T1 extends JsObject, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
+    <T1 extends object, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
+    <T1 extends JsObject, T2 extends JsObject, Writable extends boolean = false, Configurable extends boolean = false>(obj: Readonly<T1>, props: Readonly<T2>, options: PropertyOptions<Writable, Configurable>): ExtendedResult<T1, Writable & Configurable extends true ? T2 : Readonly<T2>>;
+    <T1 extends object, T2 extends JsObject, Writable extends boolean = false, Configurable extends boolean = false>(obj: Readonly<T1>, props: Readonly<T2>, options: PropertyOptions<Writable, Configurable>): ExtendedResult<T1, Writable & Configurable extends true ? T2 : Readonly<T2>>;
+}
 type ExtendedResult<T1, T2> = Type<T1 extends Function ? T1 & Simplify<T2> : Merge<T1, T2>>;
 type MappedResult<T, Deep = false> = SimplifyDeep<(Deep extends true ? PartialDeep<T> : Partial<T>) & JsObject>;
 type FilteredResult<T, Deep = false, WithRest = false> = Type<WithRest extends true ? [MappedResult<T, Deep>, MappedResult<T, Deep>] : MappedResult<T, Deep>>;
@@ -349,11 +343,31 @@ type FilterPredicate<T, Deep = false> = (entry: {
     key: Union<Deep extends true ? KeyOfDeep<T> : KeyOf<T>>;
     value: Union<Deep extends true ? ValueOfDeep<T> : ValueOf<T>>;
 }) => unknown;
+type PropertyOptions<Writable, Configurable> = {
+    /**
+     * if `true`, the value associated with the property
+     * may be changed with an assignment operator.
+     * @defaultValue `false`
+     */
+    writable?: Writable;
+    /**
+     * if `true`, the type of this property descriptor may be changed
+     * and/or the property may be deleted from the corresponding object.
+     * @defaultValue `false`
+     */
+    configurable?: Configurable;
+    /**
+     * if `true`, this property shows up during enumeration
+     * of the properties on the corresponding object.
+     * @defaultValue `false`
+     */
+    enumerable?: boolean;
+};
 
 declare const clear: (obj: object) => object;
-declare const extend: Extender;
 declare const findkey: FindKey;
 declare const map: Mapper;
 declare const filter: Filterer;
+declare const extend: Extender;
 
 export { clear, extend, filter, findkey, map };

@@ -689,7 +689,7 @@ type primitive = Simplify<Primitive | bigint | symbol>;
 /** any js value *(primitves or objects)*. */
 type JsValue = Simplify<primitive | object>;
 /** **plain** js objects. */
-type JsObject<value = unknown> = {
+type JsObject<value = JsValue> = {
     [key: string]: value;
 };
 /**

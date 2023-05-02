@@ -1,4 +1,4 @@
-import { a as NumberLike } from './types-eaf0d995.js';
+import { a as NumberLike } from './types-1940722b.js';
 
 /**
  * Schedules a `Promise` that resolves after a delay of `ms` milliseconds.

@@ -1,4 +1,4 @@
-import { U as Union, b as Nullish, e as JsObject, p as primitive, K as KeyOf } from '../types-eaf0d995.js';
+import { U as Union, b as Nullish, e as JsObject, p as primitive, K as KeyOf } from '../types-1940722b.js';
 import { AsyncFunction } from 'type-fest/source/async-return-type.js';
 
 /**
@@ -152,7 +152,7 @@ declare const isGeneratorFunction: (value: unknown) => value is GeneratorFunctio
 declare const isIterable: (value: unknown) => value is Iterable<unknown>;
 declare const isIterator: (value: unknown) => value is Iterator<unknown, any, undefined>;
 declare const isMap: (value: unknown) => value is Map<unknown, unknown>;
-declare const isObject: (value: unknown) => value is JsObject;
+declare const isObject: (value: unknown) => value is JsObject<unknown>;
 declare const isPrimitive: (value: unknown) => value is primitive;
 declare const isPromise: (value: unknown) => value is Promise<unknown>;
 declare const isRegExp: (value: unknown) => value is RegExp;
