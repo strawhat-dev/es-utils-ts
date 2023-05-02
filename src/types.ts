@@ -36,7 +36,7 @@ export type primitive = Simplify<Primitive | bigint | symbol>;
 export type JsValue = Simplify<primitive | object>;
 
 /** **plain** js objects. */
-export type JsObject<value = unknown> = { [key: string]: value };
+export type JsObject<value = JsValue> = { [key: string]: value };
 
 /**
  * More reliably extract and create types from a given type's keys by joining

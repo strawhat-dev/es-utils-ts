@@ -46,7 +46,7 @@ export const isGeneratorFunction = (value: unknown): value is GeneratorFunction 
 export const isIterable = (value: unknown): value is Iterable<unknown> => !!value?.[Symbol.iterator];
 export const isIterator = (value: unknown): value is Iterator<unknown> => /(^Generator|Iterator)$/.test(type(value));
 export const isMap = (value: unknown): value is Map<unknown, unknown> => type(value) === 'Map';
-export const isObject = (value: unknown): value is JsObject => type(value) === 'Object';
+export const isObject = (value: unknown): value is JsObject<unknown> => type(value) === 'Object';
 export const isPrimitive = (value: unknown): value is primitive => value !== Object(value);
 export const isPromise = (value: unknown): value is Promise<unknown> => type(value) === 'Promise';
 export const isRegExp = (value: unknown): value is RegExp => type(value) === 'RegExp';
