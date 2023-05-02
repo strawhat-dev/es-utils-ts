@@ -1,7 +1,7 @@
 {
   "name": "es-utils-ts",
   "description": "ESM-first simple typed utilities",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "license": "ISC",
   "type": "module",
   "sideEffects": false,
