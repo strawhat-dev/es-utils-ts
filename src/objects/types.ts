@@ -82,7 +82,7 @@ export interface Filterer {
 }
 
 export interface Extender {
-  <T extends JsObject>(props: Readonly<T>): Merge<JsObject, Readonly<T>>;
+  <T extends JsObject>(props: Readonly<T>): Readonly<T>;
 
   <T1 extends JsObject, T2 extends JsObject>(
     obj: Readonly<T1>,
