@@ -14,7 +14,7 @@ module.exports = {
   },
   rules: {
     'tree-shaking/no-side-effects-in-initialization': [
-      2,
+      1,
       { noSideEffectsWhenCalled: [{ function: 'Object.freeze' }] },
     ],
   },
