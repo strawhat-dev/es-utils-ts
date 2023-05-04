@@ -1,6 +1,9 @@
 {
   "singleQuote": true,
   "overrides": [
-    { "files": "src/conditionals/index.ts", "options": { "printWidth": 150 } }
+    {
+      "options": { "printWidth": 150 },
+      "files": "src/conditionals/type-checking.ts"
+    }
   ]
 }
