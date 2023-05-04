@@ -7,6 +7,9 @@ dependencies:
   deepmerge-ts:
     specifier: ^5.1.0
     version: 5.1.0
+  escape-string-regexp:
+    specifier: ^5.0.0
+    version: 5.0.0
   just-range:
     specifier: ^4.2.0
     version: 4.2.0
@@ -55,8 +58,8 @@ devDependencies:
     specifier: ^6.7.0
     version: 6.7.0(typescript@5.0.4)
   type-fest:
-    specifier: ^3.9.0
-    version: 3.9.0
+    specifier: ^3.10.0
+    version: 3.10.0(typescript@5.0.4)
   typescript:
     specifier: ^5.0.4
     version: 5.0.4
@@ -810,6 +813,11 @@ packages:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
     dev: true
+
+  /escape-string-regexp@5.0.0:
+    resolution: {integrity: sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==}
+    engines: {node: '>=12'}
+    dev: false
 
   /eslint-config-prettier@8.8.0(eslint@8.39.0):
     resolution: {integrity: sha512-wLbQiFre3tdGgpDv67NQKnJuTlcUVYHas3k+DZCc2U2BadthoEY4B7hLPvAxaqdyOGCzuLfii2fqGph10va7oA==}
@@ -1670,8 +1678,8 @@ packages:
       glob: 7.2.3
     dev: true
 
-  /rollup@3.21.2:
-    resolution: {integrity: sha512-c4vC+JZ3bbF4Kqq2TtM7zSKtSyMybFOjqmomFax3xpfYaPZDZ4iz8NMIuBRMjnXOcKYozw7bC6vhJjiWD6JpzQ==}
+  /rollup@3.21.4:
+    resolution: {integrity: sha512-N5LxpvDolOm9ueiCp4NfB80omMDqb45ShtsQw2+OT3f11uJ197dv703NZvznYHP6RWR85wfxanXurXKG3ux2GQ==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
     hasBin: true
     optionalDependencies:
@@ -1847,7 +1855,7 @@ packages:
       joycon: 3.1.1
       postcss-load-config: 3.1.4
       resolve-from: 5.0.0
-      rollup: 3.21.2
+      rollup: 3.21.4
       source-map: 0.8.0-beta.0
       sucrase: 3.32.0
       tree-kill: 1.2.2
@@ -1879,9 +1887,13 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /type-fest@3.9.0:
-    resolution: {integrity: sha512-hR8JP2e8UiH7SME5JZjsobBlEiatFoxpzCP+R3ZeCo7kAaG1jXQE5X/buLzogM6GJu8le9Y4OcfNuIQX0rZskA==}
+  /type-fest@3.10.0(typescript@5.0.4):
+    resolution: {integrity: sha512-hmAPf1datm+gt3c2mvu0sJyhFy6lTkIGf0GzyaZWxRLnabQfPUqg6tF95RPg6sLxKI7nFLGdFxBcf2/7+GXI+A==}
     engines: {node: '>=14.16'}
+    peerDependencies:
+      typescript: '>=4.7.0'
+    dependencies:
+      typescript: 5.0.4
     dev: true
 
   /typescript@5.0.4:
