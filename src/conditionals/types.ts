@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Union } from '@/types';
-import type { AssertionType } from '@/conditionals';
+import type { AssertionType } from './type-checking.js';
 
 export type TypeName = Union<
   | 'Array Iterator'
@@ -69,7 +69,7 @@ export type MultiTypeQueryFunction = (value: unknown) => {
   everyOf: MultiTypeQuery;
 };
 
-/** @internal */
+// private
 interface MultiTypeQuery {
   (...queries: unknown[]): boolean;
   (...queries: AssertionType[]): boolean;
