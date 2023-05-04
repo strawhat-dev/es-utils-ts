@@ -21,7 +21,7 @@ export type FindKey = <T extends object>(
   ) => unknown
 ) => KeyOf<Readonly<T>> | undefined;
 
-export interface Mapper {
+export type Mapper = {
   <T extends JsObject>(
     obj: Readonly<T>,
     callback: MapCallback<Readonly<T>>
@@ -43,9 +43,9 @@ export interface Mapper {
     options: { deep?: Deep },
     callback: MapCallback<Readonly<T>, Deep>
   ): MappedResult<T, Deep>;
-}
+};
 
-export interface Filterer {
+export type Filterer = {
   <T extends JsObject>(obj: Readonly<T>): T;
 
   <T extends object>(obj: Readonly<T>): T;
@@ -79,9 +79,9 @@ export interface Filterer {
     options: { deep?: Deep; withRest?: WithRest },
     predicate: FilterPredicate<Readonly<T>, Deep>
   ): FilteredResult<T, Deep, WithRest>;
-}
+};
 
-export interface Extender {
+export type Extender = {
   <T extends JsObject>(props: Readonly<T>): Readonly<T>;
 
   <T1 extends JsObject, T2 extends JsObject>(
@@ -121,7 +121,7 @@ export interface Extender {
     T1,
     Writable & Configurable extends true ? T2 : Readonly<T2>
   >;
-}
+};
 
 // private
 type ExtendedResult<T1, T2> = Type<

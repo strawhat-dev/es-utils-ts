@@ -1,9 +1,31 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { JsObject } from '@/types';
-import type { Extender, Filterer, FindKey, Mapper } from '@/objects/types';
+import type { Extender, Filterer, FindKey, Mapper } from './types.js';
 
 import { deepmergeInto } from '@/externals';
 import { isObject, not } from '@/conditionals';
+
+/**
+ * Convenience wrapper for `Object.defineProperties` with better type support. Instead of
+ * a `PropertyDescriptorMap`, the properties may be more semantically assigned, with
+ * the values to be assigned being the direct property for a given property name, and
+ * the `configurable`, `enumerable`, and `writable` options all `false` by default.
+ *
+ * The `configurable`, `enumerable`, and `writable` options may still be provided as the third argument,
+ * and the resulting object will be correctly typed accordingly (i.e. `readonly` vs non-`readonly`).
+ *
+ * Note: This would apply to all of the given properties however,
+ * as opposed to a per-property basis with `Object.defineProperties`.
+ */
+export const extend: Extender = (...args: unknown[]) => {
+  const descriptorMap = {};
+  const [target, props, options] = args.length === 1 ? [{}, args.pop()] : args;
+  for (const key of Object.keys(props!)) {
+    descriptorMap[key] = { ...options!, value: props![key] };
+  }
+
+  return Object.defineProperties(target, descriptorMap) as never;
+};
 
 export const clear = (obj: object) => {
   for (const key of Object.keys(obj)) delete obj[key];
@@ -68,26 +90,15 @@ export const filter: Filterer = (obj: object, ...args: unknown[]) => {
       ) as never;
 
       const [resolved, omitted] = withRest ? entry : [entry, {}];
+      if (Object.keys(omitted).length) withRest[key] = omitted;
       result[key] = resolved;
-      Object.keys(omitted).length && (withRest[key] = omitted);
     }
   }
 
   return withRest ? [result, withRest] : result;
 };
 
-export const extend: Extender = (...args: unknown[]) => {
-  const [target, props, options] = args.length === 1 ? [{}, args.pop()] : args;
-  const source = {};
-  for (const key of Object.keys(props!)) {
-    source[key] = { ...options!, value: props![key] };
-  }
-
-  return Object.defineProperties(target, source) as never;
-};
-
 /** @internal */
+// prettier-ignore
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const assignEntry = (obj: object, entry: any) => {
-  not(entry?.[0]) || (obj[entry[0]] = entry[1]);
-};
+const assignEntry = (obj: object, entry: any) => not(entry?.[0]) || (obj[entry[0]] = entry[1]);
