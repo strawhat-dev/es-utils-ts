@@ -36,7 +36,7 @@
   "devDependencies": {
     "@types/deep-equal": "^1.0.1",
     "@types/eslint": "^8.37.0",
-    "@types/node": "^18.16.3",
+    "@types/node": "^20.0.0",
     "@types/object-inspect": "^1.8.1",
     "@typescript-eslint/eslint-plugin": "^5.59.2",
     "@typescript-eslint/parser": "^5.59.2",
