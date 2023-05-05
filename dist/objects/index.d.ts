@@ -1,5 +1,5 @@
 import '../conditional-keys.d-ac881611.js';
-import { S as Simplify, O as OmitIndexSignature, U as Union, V as ValueOf, K as KeyOf, e as JsObject, T as Type, f as KeyOfDeep, g as ValueOfDeep, b as Nullish, d as Multi } from '../types-5f7dc540.js';
+import { S as Simplify, O as OmitIndexSignature, e as JsObject, K as KeyOf, U as Union, V as ValueOf, T as Type, f as KeyOfDeep, g as ValueOfDeep, b as Nullish, d as Multi } from '../types-5f7dc540.js';
 import { P as PartialDeep } from '../partial-deep.d-c532d293.js';
 import { SimplifyDeep } from 'type-fest/source/merge-deep.js';
 
@@ -195,8 +195,13 @@ type Merge<Destination, Source> = EnforceOptional<
 SimpleMerge<PickIndexSignature<Destination>, PickIndexSignature<Source>>
 & SimpleMerge<OmitIndexSignature<Destination>, OmitIndexSignature<Source>>>;
 
-type FindKey = <T extends object>(obj: Readonly<T>, predicate?: (value: Union<ValueOf<Readonly<T>>>, key: Union<KeyOf<Readonly<T>>>) => unknown) => KeyOf<Readonly<T>> | undefined;
-type Mapper = {
+type ClearFn = <T extends object>(obj: Readonly<T>) => Partial<T>;
+type PopFn = {
+    <T extends JsObject, Key extends KeyOf<T>>(obj: Readonly<T>, key: Key): T[Key];
+    <T extends object, Key extends keyof T>(obj: Readonly<T>, key: Key): T[Key];
+};
+type FindKeyFn = <T extends object>(obj: Readonly<T>, predicate?: (value: Union<ValueOf<Readonly<T>>>, key: Union<KeyOf<Readonly<T>>>) => unknown) => KeyOf<Readonly<T>> | undefined;
+type MapFn = {
     <T extends JsObject>(obj: Readonly<T>, callback: MapCallback<Readonly<T>>): MappedResult<T>;
     <T extends object>(obj: Readonly<T>, callback: MapCallback<Readonly<T>>): MappedResult<T>;
     <T extends JsObject, Deep extends boolean = false>(obj: Readonly<T>, options: {
@@ -206,7 +211,7 @@ type Mapper = {
         deep?: Deep;
     }, callback: MapCallback<Readonly<T>, Deep>): MappedResult<T, Deep>;
 };
-type Filterer = {
+type FilterFn = {
     <T extends JsObject>(obj: Readonly<T>): T;
     <T extends object>(obj: Readonly<T>): T;
     <T extends JsObject>(obj: Readonly<T>, predicate: FilterPredicate<Readonly<T>>): FilteredResult<T>;
@@ -220,7 +225,7 @@ type Filterer = {
         withRest?: WithRest;
     }, predicate: FilterPredicate<Readonly<T>, Deep>): FilteredResult<T, Deep, WithRest>;
 };
-type Extender = {
+type ExtendFn = {
     <T extends JsObject>(props: Readonly<T>): Readonly<T>;
     <T1 extends JsObject, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
     <T1 extends object, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
@@ -268,10 +273,19 @@ type PropertyOptions<Writable, Configurable> = {
  * Note: This would apply to all of the given properties however,
  * as opposed to a per-property basis with `Object.defineProperties`.
  */
-declare const extend: Extender;
-declare const clear: (obj: object) => object;
-declare const findkey: FindKey;
-declare const map: Mapper;
-declare const filter: Filterer;
+declare const extend: ExtendFn;
+declare const clear: ClearFn;
+declare const pop: PopFn;
+declare const findkey: FindKeyFn;
+declare const map: MapFn;
+declare const filter: FilterFn;
+declare const object: Readonly<{
+    readonly clear: ClearFn;
+    readonly extend: ExtendFn;
+    readonly filter: FilterFn;
+    readonly findkey: FindKeyFn;
+    readonly map: MapFn;
+    readonly pop: PopFn;
+}>;
 
-export { clear, extend, filter, findkey, map };
+export { clear, extend, filter, findkey, map, object, pop };

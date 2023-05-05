@@ -17,6 +17,11 @@ var clear = /* @__PURE__ */ __name((obj) => {
     delete obj[key];
   return obj;
 }, "clear");
+var pop = /* @__PURE__ */ __name((obj, key) => {
+  const value = obj[key];
+  delete obj[key];
+  return value;
+}, "pop");
 var findkey = /* @__PURE__ */ __name((obj, predicate = (value) => !not(value)) => {
   for (const key of Object.keys(obj || {})) {
     if (predicate(obj[key], key))
@@ -73,6 +78,14 @@ var filter = /* @__PURE__ */ __name((obj, ...args) => {
   }
   return withRest ? [result, withRest] : result;
 }, "filter");
+var object = Object.freeze({
+  clear,
+  extend,
+  filter,
+  findkey,
+  map,
+  pop
+});
 var assignEntry = /* @__PURE__ */ __name((obj, entry) => not(entry?.[0]) || (obj[entry[0]] = entry[1]), "assignEntry");
 
-export { clear, extend, filter, findkey, map };
+export { clear, extend, filter, findkey, map, object, pop };
