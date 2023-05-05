@@ -2,7 +2,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { CreateLinkOptions, HTMLElementProps, HTMLTag } from './types.js';
 
+import { pop } from '@/objects';
 import { trimLines } from '@/lib';
+import { isObject } from '@/conditionals';
 
 /**
  * Like `querySelectorAll` but returns an array of elements where
@@ -28,7 +30,6 @@ export const querySelectorMatchAll = (
   return result;
 };
 
-// prettier-ignore
 /**
  * Convenience wrapper for `document.create` which allows for the
  * more semantic assignment of properties from the second argument,
@@ -45,7 +46,13 @@ export const createElement = <T extends HTMLTag>(
   tag: T,
   properties?: HTMLElementProps<T>,
   document = globalThis['document']
-): HTMLElementTagNameMap[T] => Object.assign(document.createElement(tag), properties);
+) => {
+  const el = document.createElement(tag);
+  const style = isObject(properties?.['style']) && pop(properties!, 'style');
+  Object.assign(el, properties);
+  Object.assign(el.style, style);
+  return el;
+};
 
 /**
  * Note: Intended for browser usage since the `document` object
