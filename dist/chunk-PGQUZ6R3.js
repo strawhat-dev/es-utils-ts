@@ -17,7 +17,9 @@ var clear = /* @__PURE__ */ __name((obj) => {
     delete obj[key];
   return obj;
 }, "clear");
-var pop = /* @__PURE__ */ __name((obj, key) => {
+var pop = /* @__PURE__ */ __name((obj, key = Object.keys(obj).at(-1)) => {
+  if (!obj || !key)
+    return;
   const value = obj[key];
   delete obj[key];
   return value;
