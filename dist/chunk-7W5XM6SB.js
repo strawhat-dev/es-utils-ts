@@ -1,3 +1,4 @@
+import { trimLines } from './chunk-DDDNNU76.js';
 import { __name } from './chunk-HXRSFH6L.js';
 
 // src/browser/index.ts
@@ -14,5 +15,21 @@ var createLink = /* @__PURE__ */ __name((href, options = {}, document = globalTh
   newtab && (newtab = { target: "_blank", rel: "noreferrer noopener" });
   return createElement("a", { href, textContent, ...newtab }, document);
 }, "createLink");
+var createHTMLDoc = /* @__PURE__ */ __name((body = "", { head = "" } = {}) => trimLines(
+  /* html */
+  `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    ${head}
+  </head>
+  <body>
+    ${body}
+  </body>
+</html>
+`
+), "createHTMLDoc");
 
-export { createElement, createLink, querySelectorMatchAll };
+export { createElement, createHTMLDoc, createLink, querySelectorMatchAll };

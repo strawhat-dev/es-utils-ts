@@ -205,5 +205,13 @@ declare const createElement: <T extends keyof HTMLElementTagNameMap>(tag: T, pro
  * @returns an `HTMLAnchorElement` created from the given `href` & `options`
  */
 declare const createLink: (href: string, options?: CreateLinkOptions, document?: Document) => HTMLAnchorElement;
+/**
+ * Generates an html string using the everyday
+ * boilerplate code most html templates should have already.
+ * Body and header contents may also optionally be inserted if provided.
+ */
+declare const createHTMLDoc: (body?: string, { head }?: {
+    head?: string | undefined;
+}) => string;
 
-export { HTMLElementProps, HTMLTag, createElement, createLink, querySelectorMatchAll };
+export { HTMLElementProps, HTMLTag, createElement, createHTMLDoc, createLink, querySelectorMatchAll };
