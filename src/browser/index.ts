@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { CreateLinkOptions, HTMLElementProps, HTMLTag } from './types.js';
 
-export type { HTMLElementProps, HTMLTag };
+import { trimLines } from '@/lib';
 
 /**
  * Like `querySelectorAll` but returns an array of elements where
@@ -64,3 +64,25 @@ export const createLink = (
   (newtab as {}) &&= { target: '_blank', rel: 'noreferrer noopener' };
   return createElement('a', { href, textContent, ...(newtab as {}) }, document);
 };
+
+// prettier-ignore
+/**
+ * Generates an html string using the everyday
+ * boilerplate code most html templates should have already.
+ * Body and header contents may also optionally be inserted if provided.
+ */
+export const createHTMLDoc = (body = '', { head = '' } = {}) => trimLines(/* html */ `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    ${head}
+  </head>
+  <body>
+    ${body}
+  </body>
+</html>
+`);
+
+export type { HTMLElementProps, HTMLTag };
