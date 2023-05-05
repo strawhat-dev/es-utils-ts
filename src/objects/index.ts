@@ -39,7 +39,8 @@ export const clear: ClearFn = (obj) => {
   return obj;
 };
 
-export const pop: PopFn = (obj: object, key: string) => {
+export const pop: PopFn = (obj: object, key = Object.keys(obj).at(-1)) => {
+  if (!obj || !key) return;
   const value = obj[key];
   delete obj[key];
   return value;
