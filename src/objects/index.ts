@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { JsObject } from '@/types';
-import type { Extender, Filterer, FindKey, Mapper } from './types.js';
+import type {
+  ClearFn,
+  ExtendFn,
+  FilterFn,
+  FindKeyFn,
+  MapFn,
+  PopFn,
+} from './types.js';
 
 import { deepmergeInto } from '@/externals';
 import { isObject, not } from '@/conditionals';
@@ -17,7 +24,7 @@ import { isObject, not } from '@/conditionals';
  * Note: This would apply to all of the given properties however,
  * as opposed to a per-property basis with `Object.defineProperties`.
  */
-export const extend: Extender = (...args: unknown[]) => {
+export const extend: ExtendFn = (...args: unknown[]) => {
   const descriptorMap = {};
   const [target, props, options] = args.length === 1 ? [{}, args.pop()] : args;
   for (const key of Object.keys(props!)) {
@@ -27,18 +34,24 @@ export const extend: Extender = (...args: unknown[]) => {
   return Object.defineProperties(target, descriptorMap) as never;
 };
 
-export const clear = (obj: object) => {
+export const clear: ClearFn = (obj) => {
   for (const key of Object.keys(obj)) delete obj[key];
   return obj;
 };
 
-export const findkey: FindKey = (obj, predicate = (value) => !not(value)) => {
+export const pop: PopFn = (obj: object, key: string) => {
+  const value = obj[key];
+  delete obj[key];
+  return value;
+};
+
+export const findkey: FindKeyFn = (obj, predicate = (value) => !not(value)) => {
   for (const key of Object.keys(obj || {})) {
     if (predicate(obj[key], key as never)) return key as never;
   }
 };
 
-export const map: Mapper = (obj: object, ...args: unknown[]) => {
+export const map: MapFn = (obj: object, ...args: unknown[]) => {
   const result = {};
   const callback = args.pop() as (...args: unknown[]) => unknown;
   const { deep } = { ...(args.pop() as { deep?: boolean }) };
@@ -62,7 +75,7 @@ export const map: Mapper = (obj: object, ...args: unknown[]) => {
   return result;
 };
 
-export const filter: Filterer = (obj: object, ...args: unknown[]) => {
+export const filter: FilterFn = (obj: object, ...args: unknown[]) => {
   const defaults = {
     opts: { deep: !args.length, withRest: false as boolean | JsObject },
     predicate: ({ value }: never) => typeof value !== 'undefined',
@@ -97,6 +110,15 @@ export const filter: Filterer = (obj: object, ...args: unknown[]) => {
 
   return withRest ? [result, withRest] : result;
 };
+
+export const object = Object.freeze({
+  clear,
+  extend,
+  filter,
+  findkey,
+  map,
+  pop,
+} as const);
 
 /** @internal */
 // prettier-ignore

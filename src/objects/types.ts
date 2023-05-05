@@ -13,7 +13,18 @@ import type {
   ValueOfDeep,
 } from '@/types';
 
-export type FindKey = <T extends object>(
+export type ClearFn = <T extends object>(obj: Readonly<T>) => Partial<T>;
+
+export type PopFn = {
+  <T extends JsObject, Key extends KeyOf<T>>(
+    obj: Readonly<T>,
+    key: Key
+  ): T[Key];
+
+  <T extends object, Key extends keyof T>(obj: Readonly<T>, key: Key): T[Key];
+};
+
+export type FindKeyFn = <T extends object>(
   obj: Readonly<T>,
   predicate?: (
     value: Union<ValueOf<Readonly<T>>>,
@@ -21,7 +32,7 @@ export type FindKey = <T extends object>(
   ) => unknown
 ) => KeyOf<Readonly<T>> | undefined;
 
-export type Mapper = {
+export type MapFn = {
   <T extends JsObject>(
     obj: Readonly<T>,
     callback: MapCallback<Readonly<T>>
@@ -45,7 +56,7 @@ export type Mapper = {
   ): MappedResult<T, Deep>;
 };
 
-export type Filterer = {
+export type FilterFn = {
   <T extends JsObject>(obj: Readonly<T>): T;
 
   <T extends object>(obj: Readonly<T>): T;
@@ -81,7 +92,7 @@ export type Filterer = {
   ): FilteredResult<T, Deep, WithRest>;
 };
 
-export type Extender = {
+export type ExtendFn = {
   <T extends JsObject>(props: Readonly<T>): Readonly<T>;
 
   <T1 extends JsObject, T2 extends JsObject>(
