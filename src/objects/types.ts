@@ -13,9 +13,85 @@ import type {
   ValueOfDeep,
 } from '@/types';
 
-export type ClearFn = <T extends object>(obj: Readonly<T>) => Partial<T>;
+export type ExtendFn = {
+  <T extends JsObject>(props: Readonly<T>): Readonly<T>;
+
+  <T1 extends JsObject, T2 extends JsObject>(
+    obj: Readonly<T1>,
+    props: Readonly<T2>
+  ): ExtendedResult<T1, Readonly<T2>>;
+
+  <T1 extends object, T2 extends JsObject>(
+    obj: Readonly<T1>,
+    props: Readonly<T2>
+  ): ExtendedResult<T1, Readonly<T2>>;
+
+  <T1 extends JsObject, T2 extends JsObject, Options extends ExtendOptions>(
+    obj: Readonly<T1>,
+    props: Readonly<T2>,
+    options: Options
+  ): ExtendedResult<
+    T1,
+    Options['configurable'] & Options['writable'] extends true
+      ? T2
+      : Readonly<T2>
+  >;
+
+  <T1 extends object, T2 extends JsObject, Options extends ExtendOptions>(
+    obj: Readonly<T1>,
+    props: Readonly<T2>,
+    options: Options
+  ): ExtendedResult<
+    T1,
+    Options['configurable'] & Options['writable'] extends true
+      ? T2
+      : Readonly<T2>
+  >;
+};
+
+export type ExtendOptions = {
+  /**
+   * if `true`, returns a new object instead of mutating (deep copy).
+   * @defaultValue `false`
+   */
+  copy?: boolean;
+  /**
+   * if `true`, this property shows up during enumeration
+   * of the properties on the corresponding object.
+   * @defaultValue `false`
+   */
+  enumerable?: boolean;
+  /**
+   * if `true`, the value associated with the property
+   * may be changed with an assignment operator.
+   * @defaultValue `false`
+   */
+  writable?: boolean;
+  /**
+   * if `true`, the type of this property descriptor may be changed
+   * and/or the property may be deleted from the corresponding object.
+   * @defaultValue `false`
+   */
+  configurable?: boolean;
+};
+
+type ExtendedResult<T1, T2> = Type<
+  T1 extends Function ? T1 & Simplify<T2> : Merge<T1, T2>
+>;
+
+export type ExtendedKeysFn = <T extends object>(obj: T) => Union<KeyOf<T>>;
+
+export type KeysDispatcher = <Options extends KeyIterationOptions>(
+  options?: Options
+) => <T extends object>(
+  obj: T
+) => Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>;
 
 export type PopFn = {
+  <T extends JsObject>(obj: Readonly<T>): T[KeyOf<T>];
+
+  <T extends object>(obj: Readonly<T>): T[keyof T];
+
   <T extends JsObject, Key extends KeyOf<T>>(
     obj: Readonly<T>,
     key: Key
@@ -24,13 +100,50 @@ export type PopFn = {
   <T extends object, Key extends keyof T>(obj: Readonly<T>, key: Key): T[Key];
 };
 
-export type FindKeyFn = <T extends object>(
+export type ClearFn = <T extends object>(
   obj: Readonly<T>,
-  predicate?: (
-    value: Union<ValueOf<Readonly<T>>>,
-    key: Union<KeyOf<Readonly<T>>>
-  ) => unknown
-) => KeyOf<Readonly<T>> | undefined;
+  options?: Omit<KeyIterationOptions, 'inherited'>
+) => Partial<T>;
+
+export type FindKeyFn = {
+  <T extends object>(obj: Readonly<T>): KeyOf<Readonly<T>> | undefined;
+
+  <T extends object>(
+    obj: Readonly<T>,
+    predicate: (
+      value: Union<ValueOf<Readonly<T>>>,
+      key: Union<KeyOf<Readonly<T>>>
+    ) => unknown
+  ): KeyOf<Readonly<T>> | undefined;
+
+  <T extends object, Options extends ObjectIterationOptions>(
+    obj: Readonly<T>,
+    predicate: (
+      value: Union<ResolvedValues<T, Options>>,
+      key: Union<ResolvedKeys<T, Options>>
+    ) => unknown,
+    options: Options
+  ): Type<
+    | (Options['inherited'] extends true
+        ? Union<ResolvedKeys<T, Options>>
+        : ResolvedKeys<T, Options>)
+    | undefined
+  >;
+
+  <T extends object, Options extends ObjectIterationOptions>(
+    obj: Readonly<T>,
+    options: Options,
+    predicate: (
+      value: Union<ResolvedValues<T, Options>>,
+      key: Union<ResolvedKeys<T, Options>>
+    ) => unknown
+  ): Type<
+    | (Options['inherited'] extends true
+        ? Union<ResolvedKeys<T, Options>>
+        : ResolvedKeys<T, Options>)
+    | undefined
+  >;
+};
 
 export type MapFn = {
   <T extends JsObject>(
@@ -43,18 +156,40 @@ export type MapFn = {
     callback: MapCallback<Readonly<T>>
   ): MappedResult<T>;
 
-  <T extends JsObject, Deep extends boolean = false>(
+  <T extends JsObject, Options extends ObjectIterationOptions>(
     obj: Readonly<T>,
-    options: { deep?: Deep },
-    callback: MapCallback<Readonly<T>, Deep>
-  ): MappedResult<T, Deep>;
+    callback: MapCallback<Readonly<T>, Options>,
+    options: Options
+  ): MappedResult<T, Options>;
 
-  <T extends object, Deep extends boolean = false>(
+  <T extends object, Options extends ObjectIterationOptions>(
     obj: Readonly<T>,
-    options: { deep?: Deep },
-    callback: MapCallback<Readonly<T>, Deep>
-  ): MappedResult<T, Deep>;
+    callback: MapCallback<Readonly<T>, Options>,
+    options: Options
+  ): MappedResult<T, Options>;
+
+  <T extends JsObject, Options extends ObjectIterationOptions>(
+    obj: Readonly<T>,
+    options: Options,
+    callback: MapCallback<Readonly<T>, Options>
+  ): MappedResult<T, Options>;
+
+  <T extends object, Options extends ObjectIterationOptions>(
+    obj: Readonly<T>,
+    options: Options,
+    callback: MapCallback<Readonly<T>, Options>
+  ): MappedResult<T, Options>;
 };
+
+type MapCallback<T, Options extends ObjectIterationOptions = {}> = (
+  key: Union<ResolvedKeys<T, Options>>,
+  value: Union<ResolvedValues<T, Options>>
+) => (false | Nullish) | Multi<JsObject<unknown>> | Multi<[unknown, unknown]>;
+
+type MappedResult<
+  T,
+  Options extends ObjectIterationOptions = {}
+> = SimplifyDeep<ResolvedResult<T, Options> & JsObject>;
 
 export type FilterFn = {
   <T extends JsObject>(obj: Readonly<T>): T;
@@ -71,111 +206,87 @@ export type FilterFn = {
     predicate: FilterPredicate<Readonly<T>>
   ): FilteredResult<T>;
 
-  <
-    T extends JsObject,
-    Deep extends boolean = false,
-    WithRest extends boolean = false
-  >(
+  <T extends JsObject, Options extends FilterOptions>(
     obj: Readonly<T>,
-    options: { deep?: Deep; withRest?: WithRest },
-    predicate: FilterPredicate<Readonly<T>, Deep>
-  ): FilteredResult<T, Deep, WithRest>;
+    predicate: FilterPredicate<Readonly<T>, Options>,
+    options: Options
+  ): FilteredResult<T, Options>;
 
-  <
-    T extends object,
-    Deep extends boolean = false,
-    WithRest extends boolean = false
-  >(
+  <T extends object, Options extends FilterOptions>(
     obj: Readonly<T>,
-    options: { deep?: Deep; withRest?: WithRest },
-    predicate: FilterPredicate<Readonly<T>, Deep>
-  ): FilteredResult<T, Deep, WithRest>;
+    predicate: FilterPredicate<Readonly<T>, Options>,
+    options: Options
+  ): FilteredResult<T, Options>;
+
+  <T extends JsObject, Options extends FilterOptions>(
+    obj: Readonly<T>,
+    options: Options,
+    predicate: FilterPredicate<Readonly<T>, Options>
+  ): FilteredResult<T, Options>;
+
+  <T extends object, Options extends FilterOptions>(
+    obj: Readonly<T>,
+    options: Options,
+    predicate: FilterPredicate<Readonly<T>, Options>
+  ): FilteredResult<T, Options>;
 };
 
-export type ExtendFn = {
-  <T extends JsObject>(props: Readonly<T>): Readonly<T>;
-
-  <T1 extends JsObject, T2 extends JsObject>(
-    obj: Readonly<T1>,
-    props: Readonly<T2>
-  ): ExtendedResult<T1, Readonly<T2>>;
-
-  <T1 extends object, T2 extends JsObject>(
-    obj: Readonly<T1>,
-    props: Readonly<T2>
-  ): ExtendedResult<T1, Readonly<T2>>;
-
-  <
-    T1 extends JsObject,
-    T2 extends JsObject,
-    Writable extends boolean = false,
-    Configurable extends boolean = false
-  >(
-    obj: Readonly<T1>,
-    props: Readonly<T2>,
-    options: PropertyOptions<Writable, Configurable>
-  ): ExtendedResult<
-    T1,
-    Writable & Configurable extends true ? T2 : Readonly<T2>
-  >;
-
-  <
-    T1 extends object,
-    T2 extends JsObject,
-    Writable extends boolean = false,
-    Configurable extends boolean = false
-  >(
-    obj: Readonly<T1>,
-    props: Readonly<T2>,
-    options: PropertyOptions<Writable, Configurable>
-  ): ExtendedResult<
-    T1,
-    Writable & Configurable extends true ? T2 : Readonly<T2>
-  >;
+type FilterOptions = ObjectIterationOptions & {
+  /**
+   * if `true`, return a tuple of the results along
+   * with the rest of items that were filtered out instead
+   * @defaultValue `false`
+   */
+  withRest?: boolean;
 };
 
-// private
-type ExtendedResult<T1, T2> = Type<
-  T1 extends Function ? T1 & Simplify<T2> : Merge<T1, T2>
->;
-
-type MappedResult<T, Deep = false> = SimplifyDeep<
-  (Deep extends true ? PartialDeep<T> : Partial<T>) & JsObject
->;
-
-type FilteredResult<T, Deep = false, WithRest = false> = Type<
-  WithRest extends true
-    ? [MappedResult<T, Deep>, MappedResult<T, Deep>]
-    : MappedResult<T, Deep>
->;
-
-type MapCallback<T, Deep = false> = (
-  key: Union<Deep extends true ? KeyOfDeep<T> : KeyOf<T>>,
-  value: Union<Deep extends true ? ValueOfDeep<T> : ValueOf<T>>
-) => (false | Nullish) | Multi<JsObject> | Multi<[unknown, unknown]>;
-
-type FilterPredicate<T, Deep = false> = (entry: {
-  key: Union<Deep extends true ? KeyOfDeep<T> : KeyOf<T>>;
-  value: Union<Deep extends true ? ValueOfDeep<T> : ValueOf<T>>;
+type FilterPredicate<T, Options extends FilterOptions = {}> = (entry: {
+  key: Union<ResolvedKeys<T, Options>>;
+  value: Union<ResolvedValues<T, Options>>;
 }) => unknown;
 
-type PropertyOptions<Writable, Configurable> = {
+type FilteredResult<T, Options extends FilterOptions = {}> = SimplifyDeep<
+  Options['withRest'] extends true
+    ? [ResolvedResult<T, Options>, ResolvedResult<T, Options>]
+    : ResolvedResult<T, Options>
+>;
+
+// common
+type ResolvedResult<
+  T,
+  Options extends ObjectIterationOptions = {}
+> = Options['deep'] extends true ? PartialDeep<T> : Partial<T>;
+
+type ResolvedKeys<
+  T,
+  Opts extends ObjectIterationOptions = {}
+> = Opts['deep'] extends true ? KeyOfDeep<Readonly<T>> : KeyOf<Readonly<T>>;
+
+type ResolvedValues<
+  T,
+  Opts extends ObjectIterationOptions = {}
+> = Opts['deep'] extends true ? ValueOfDeep<Readonly<T>> : ValueOf<Readonly<T>>;
+
+type ObjectIterationOptions = KeyIterationOptions & {
   /**
-   * if `true`, the value associated with the property
-   * may be changed with an assignment operator.
+   * if `true`, recursively iterate into nested keys and values.
+   * *(plain objects only)*
    * @defaultValue `false`
    */
-  writable?: Writable;
+  deep?: boolean;
+};
+
+type KeyIterationOptions = {
   /**
-   * if `true`, the type of this property descriptor may be changed
-   * and/or the property may be deleted from the corresponding object.
+   * if `true`, inherited keys *(i.e. those from its prototype chain)*
+   * are also included while traversing this object
    * @defaultValue `false`
    */
-  configurable?: Configurable;
+  inherited?: boolean;
   /**
-   * if `true`, this property shows up during enumeration
-   * of the properties on the corresponding object.
+   * if `true`, non-enumerable keys
+   * are also included while traversing this object
    * @defaultValue `false`
    */
-  enumerable?: boolean;
+  nonEnumerable?: boolean;
 };
