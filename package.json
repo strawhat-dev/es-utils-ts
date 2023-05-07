@@ -1,14 +1,23 @@
 {
   "name": "es-utils-ts",
-  "description": "ESM-first simple typed utilities",
+  "author": "strawhat-dev",
+  "description": "esm-first simple typed utilities",
+  "repository": "github:strawhat-dev/es-utils-ts",
   "version": "0.0.23",
   "license": "ISC",
   "type": "module",
   "sideEffects": false,
   "module": "./dist/index.js",
-  "exports": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "repository": "github:strawhat-dev/es-utils-ts",
+  "types": "./dist/types.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./externals": "./dist/externals.js",
+    "./conditionals": "./dist/conditionals/index.js",
+    "./html": "./dist/html/index.js",
+    "./lib": "./dist/lib/index.js",
+    "./objects": "./dist/objects/index.js",
+    "./types": "./dist/types.d.ts"
+  },
   "engines": {
     "node": ">=14.16"
   },
