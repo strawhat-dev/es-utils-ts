@@ -1,6 +1,14 @@
 import { not } from './chunk-HL4E3HPN.js';
 import { __name } from './chunk-JXJLGDKJ.js';
 
+// src/lib/promises.ts
+var ESM_CDN_URL = "https://esm.run";
+var sleep = /* @__PURE__ */ __name(async (ms) => new Promise((res) => setTimeout(res, +ms)), "sleep");
+var cdn = /* @__PURE__ */ __name(async (name) => {
+  const mod2 = await import(`${ESM_CDN_URL}/${name}`);
+  return mod2?.default || mod2;
+}, "cdn");
+
 // src/lib/range.ts
 var range = /* @__PURE__ */ __name((start = 0, stop, step) => {
   if (not(stop))
@@ -60,14 +68,6 @@ var iRange = /* @__PURE__ */ __name((start = 0, stop, step) => {
     }
   });
 }, "iRange");
-
-// src/lib/promises.ts
-var ESM_CDN_URL = "https://esm.run";
-var sleep = /* @__PURE__ */ __name(async (ms) => new Promise((res) => setTimeout(res, +ms)), "sleep");
-var cdn = /* @__PURE__ */ __name(async (name) => {
-  const mod2 = await import(`${ESM_CDN_URL}/${name}`);
-  return mod2?.default || mod2;
-}, "cdn");
 
 // src/lib/index.ts
 var trimLines = /* @__PURE__ */ __name((s) => s.split(/\r?\n/).filter((line) => line.trim()).join("\n"), "trimLines");
