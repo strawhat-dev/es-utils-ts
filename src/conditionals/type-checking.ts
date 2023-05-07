@@ -17,14 +17,14 @@ export const type = (value: unknown): TypeName => Object.prototype.toString.call
 export const isArrayBuffer = (value: unknown): value is ArrayBufferLike => /^(Shared)?ArrayBuffer$/.test(type(value));
 export const isAsyncFunction = (value: unknown): value is AsyncFunction => type(value) === 'AsyncFunction';
 export const isAsyncGeneratorFunction = (value: unknown): value is AsyncGeneratorFunction => type(value) === 'AsyncGeneratorFunction';
-export const isAsyncIterable = (value: unknown): value is AsyncIterable<any> => !!value?.[Symbol.asyncIterator];
+export const isAsyncIterable = (value: unknown): value is AsyncIterable<any> => !!value?.[Symbol.iterator as keyof {}];
 export const isAsyncIterator = (value: unknown): value is AsyncIterator<any> => /^Async.*(Generator|Iterator)$/.test(type(value));
-export const isConstructor = (value: unknown): value is Constructor<any> => !!value && value['prototype']?.constructor === value;
+export const isConstructor = (value: unknown): value is Constructor<any> => value?.['prototype' as keyof {}]?.['constructor'] === (value ?? '');
 export const isDate = (value: unknown): value is Date => type(value) === 'Date';
 export const isElement = (value: unknown): value is Element | Document => value instanceof Element || value instanceof Document;
 export const isError = (value: unknown): value is Error => type(value) === 'Error';
 export const isGeneratorFunction = (value: unknown): value is GeneratorFunction => type(value) === 'GeneratorFunction';
-export const isIterable = (value: unknown): value is Iterable<any> => !!value?.[Symbol.iterator];
+export const isIterable = (value: unknown): value is Iterable<any> => !!value?.[Symbol.iterator as keyof {}];
 export const isIterator = (value: unknown): value is Iterator<any> => /(^Generator|Iterator)$/.test(type(value));
 export const isMap = (value: unknown): value is Map<any, any> => type(value) === 'Map';
 export const isObject = (value: unknown): value is JsObject<any> => type(value) === 'Object';
@@ -98,7 +98,7 @@ const querycallback = (value: unknown) => {
     if (typeof query === 'boolean') return query;
     if (isConstructor(query)) return value instanceof query;
     if (typeof query === 'string' && `is${query}` in assert) {
-      return assert[`is${query}`](value, { quiet: true });
+      return assert[`is${query as AssertionType}`](value, { quiet: true });
     }
 
     return deepcompare(value, query);

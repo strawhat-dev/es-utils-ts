@@ -47,8 +47,8 @@ export const irange = ((...args) => {
 export const Range = (start = 0, stop?: number, step?: number) => {
   if (not(stop)) [start, stop] = [0, start];
   if (not(step)) step = stop < start ? -1 : 1;
-  return new Proxy({} as object, {
-    has(_, n: string) {
+  return new Proxy({} as {}, {
+    has(_, n: never) {
       if (!/^\d+$/.test(n)) return false;
       if (+n % step!) return false;
       if (!step) return +n === start;
@@ -74,8 +74,8 @@ export const Range = (start = 0, stop?: number, step?: number) => {
 export const iRange = (start = 0, stop?: number, step?: number) => {
   if (not(stop)) [start, stop] = [0, start];
   if (not(step)) step = stop < start ? -1 : 1;
-  return new Proxy({} as object, {
-    has(_, n: string) {
+  return new Proxy({} as {}, {
+    has(_, n: never) {
       if (!/^\d+$/.test(n)) return false;
       if (+n % step!) return false;
       if (!step) return +n === start;

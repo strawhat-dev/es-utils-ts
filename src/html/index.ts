@@ -41,13 +41,14 @@ export const querySelectorMatchAll = (
  *
  * @returns some `HTMLElement` created from the given `tag` & `properties`
  */
+// prettier-ignore
 export const createElement = <T extends HTMLTag>(
   tag: T,
   properties?: HTMLElementProps<T>,
   document = globalThis['document']
 ) => {
   const el = document.createElement(tag);
-  const style = isObject(properties?.['style']) && pop(properties!, 'style');
+  const style = isObject(properties?.['style' as never]) && pop(properties!, 'style');
   Object.assign(el, properties);
   Object.assign(el.style, style);
   return el;
@@ -71,12 +72,12 @@ export const createLink = (
   return createElement('a', { href, textContent, ...(newtab as {}) }, document);
 };
 
-// prettier-ignore
 /**
  * Generates an html string using the everyday
  * boilerplate code most html templates should have already.
  * Body and header contents may also optionally be inserted if provided.
  */
+// prettier-ignore
 export const createHTMLDoc = ({ head = '', body = '' } = {}) => trimLines(/* html */ `
 <!DOCTYPE html>
 <html lang="en">

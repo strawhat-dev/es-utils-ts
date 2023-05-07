@@ -1,14 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type { JsObject } from '@/types';
+import type { JsObject, KeyOf } from '@/types';
 import type {
   ClearFn,
   ExtendFn,
   ExtendOptions,
   FilterFn,
   FindKeyFn,
-  KeysDispatcher,
   MapFn,
   PopFn,
   PropsFn,
@@ -30,12 +28,14 @@ export const keysIn = <T extends object>(obj: T) => {
  * @returns an array of **all** of the object's properties, including those that are *inherited* and *non-enumerable*
  */
 export const props: PropsFn = (obj, options = {}) => {
-  const traverse = options.objectPrototype
-    ? Object.getPrototypeOf
-    : (obj: object) => {
-        const proto = Object.getPrototypeOf(obj);
-        if (proto !== Object.prototype) return proto;
-      };
+  const traverse = (
+    options.objectPrototype
+      ? Object.getPrototypeOf
+      : (obj) => {
+          const proto = Object.getPrototypeOf(obj);
+          if (proto !== Object.prototype) return proto;
+        }
+  ) as typeof Object.getPrototypeOf;
 
   const result = new Set();
   do for (const prop of Object.getOwnPropertyNames(obj)) result.add(prop);
@@ -47,7 +47,10 @@ export const props: PropsFn = (obj, options = {}) => {
  * Delete a property while retrieving its value at the same time.
  * @returns the value deleted from the object
  */
-export const pop: PopFn = (obj: object, key = Object.keys(obj ?? {}).pop()) => {
+export const pop: PopFn = (
+  obj: JsObject,
+  key = Object.keys(obj ?? {}).pop()
+) => {
   if (nullish(obj)) return;
   const value = obj[key!];
   delete obj[key!];
@@ -62,7 +65,7 @@ export const pop: PopFn = (obj: object, key = Object.keys(obj ?? {}).pop()) => {
 export const clear: ClearFn = (obj, options) => {
   if (nullish(obj)) return {};
   const keys = keysDispatch(options);
-  for (const key of keys(obj)) delete obj[key];
+  for (const key of keys(obj)) delete (obj as JsObject)[key];
   return obj;
 };
 
@@ -79,22 +82,22 @@ export const clear: ClearFn = (obj, options) => {
  * as opposed to a per-property basis with `Object.defineProperties`.
  */
 export const extend: ExtendFn = (...args: unknown[]) => {
-  const descriptorMap = {};
+  const descriptorMap: PropertyDescriptorMap = {};
   const [target, props, options] = args.length === 1 ? [{}, args.pop()] : args;
   const { copy, ...descriptors } = { ...(options as ExtendOptions) };
   for (const key in props!) {
-    descriptorMap[key] = { ...descriptors, value: props![key] };
+    descriptorMap[key] = { ...descriptors, value: (props as JsObject)[key] };
   }
 
   return Object.defineProperties(
     copy ? deepcopy(target) : target,
     descriptorMap
-  ) as never;
+  ) as object;
 };
 
-export const findkey: FindKeyFn = (obj: object, ...args: unknown[]) => {
+export const findkey: FindKeyFn = (obj: JsObject, ...args: unknown[]) => {
   const { opts, callback } = parseRestArgs(args, {
-    callback: (value: never) => !not(value),
+    callback: (value: unknown) => !not(value),
   });
 
   const { deep, ...keyopts } = opts;
@@ -108,7 +111,8 @@ export const findkey: FindKeyFn = (obj: object, ...args: unknown[]) => {
   }
 };
 
-export const map: MapFn = (obj: object, ...args: unknown[]) => {
+// prettier-ignore
+export const map: MapFn = (obj: JsObject, ...args: unknown[]) => {
   const result = {};
   const { opts, callback } = parseRestArgs(args);
   const { deep, ...keyopts } = opts;
@@ -119,11 +123,11 @@ export const map: MapFn = (obj: object, ...args: unknown[]) => {
       deep && isObject(value)
         ? [key, map(value, { deep, keys }, callback as never)]
         : callback(key, value)
-    ) as unknown;
+    );
 
     const entries = (
       Array.isArray(entry) && typeof entry[0] === 'object' ? entry : [entry]
-    ) as (JsObject | [unknown, unknown])[];
+    );
 
     entries.forEach((entry) =>
       (isObject(entry) ? deepmergeInto : assignEntry)(result, entry)
@@ -133,15 +137,19 @@ export const map: MapFn = (obj: object, ...args: unknown[]) => {
   return result;
 };
 
-export const filter: FilterFn = (obj: object, ...args: unknown[]) => {
-  const result = {};
+export const filter: FilterFn = (obj: JsObject, ...args: unknown[]) => {
+  const result: JsObject = {};
   const { opts, callback } = parseRestArgs(args, {
     opts: { deep: !args.length, withRest: false },
-    callback: ({ value }: never) => typeof value !== 'undefined',
+    callback: ({ value }: { value: unknown }) => typeof value !== 'undefined',
   });
 
-  (opts as {})['withRest'] &&= {};
-  const { deep, withRest, ...keyopts } = opts;
+  (opts['withRest'] as {}) &&= {};
+  const { deep, withRest, ...keyopts } = opts as unknown as {
+    deep: boolean;
+    withRest: JsObject;
+  };
+
   const keys = keysDispatch(keyopts);
   for (const key of keys(obj ?? {})) {
     const value = obj[key];
@@ -153,7 +161,7 @@ export const filter: FilterFn = (obj: object, ...args: unknown[]) => {
         value,
         { deep, keys, withRest: !!withRest },
         callback as never
-      ) as never;
+      );
 
       const [resolved, omitted] = withRest ? entry : [entry, {}];
       if (Object.keys(omitted).length) withRest[key] = omitted;
@@ -177,7 +185,7 @@ export const object = Object.freeze({
 
 /** @internal */
 // prettier-ignore
-const assignEntry = (obj: object, entry: any) => not(entry?.[0]) || (obj[entry[0]] = entry[1]);
+const assignEntry = (obj: JsObject<unknown>, entry: [string, unknown]) => not(entry?.[0]) || (obj[entry[0]] = entry[1]);
 
 /** @internal */
 const parseRestArgs = (
@@ -185,7 +193,7 @@ const parseRestArgs = (
   init: { opts?: JsObject<boolean>; callback?: Function } = {}
 ) => {
   for (const arg of args) {
-    if (typeof arg === 'object') init.opts = arg as never;
+    if (isObject(arg)) init.opts = arg;
     else if (typeof arg === 'function') init.callback = arg;
   }
 
@@ -200,12 +208,12 @@ const keysDispatch = ((opts) => {
 
   if (opts['keys']) return opts['keys'];
 
-  if (opts.nonEnumerable) {
-    if (opts.inherited) return props;
+  if (opts['nonEnumerable']) {
+    if (opts['inherited']) return props;
     return Object.getOwnPropertyNames;
   }
 
-  if (opts.inherited) return keysIn;
+  if (opts['inherited']) return keysIn;
 
   return Object.keys;
-}) as KeysDispatcher;
+}) as (opts?: JsObject<boolean>) => <T>(obj: T) => KeyOf<T>;

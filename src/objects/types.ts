@@ -12,12 +12,6 @@ import type {
   ValueOfDeep,
 } from '@/types';
 
-export type KeysDispatcher = <Options extends KeyIterationOptions>(
-  options?: Options
-) => <T extends object>(
-  obj: T
-) => Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>;
-
 export type PropsFn = <T extends object>(
   obj: T,
   options?: PropsOptions
