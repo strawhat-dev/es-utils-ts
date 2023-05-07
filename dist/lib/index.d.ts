@@ -35,7 +35,7 @@ declare const irange: (start?: number, stop?: number, step?: number) => number[]
  * @example
  * if (score in Range(90, 100)) return 'A';
  */
-declare const Range: (start?: number, stop?: number, step?: number) => object;
+declare const Range: (start?: number, stop?: number, step?: number) => {};
 /**
  * Allows one to semantically check if a given number
  * falls within an ***inclusive*** range similarly to *Python* by
@@ -46,7 +46,7 @@ declare const Range: (start?: number, stop?: number, step?: number) => object;
  * @example
  * if (score in iRange(90, 100)) return 'A';
  */
-declare const iRange: (start?: number, stop?: number, step?: number) => object;
+declare const iRange: (start?: number, stop?: number, step?: number) => {};
 
 /** trims a given string while also removing all empty lines */
 declare const trimLines: (s: string) => string;

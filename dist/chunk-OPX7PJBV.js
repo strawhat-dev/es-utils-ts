@@ -1,4 +1,4 @@
-import { nullish, not, isObject } from './chunk-HL4E3HPN.js';
+import { nullish, not, isObject } from './chunk-OLDJUYBR.js';
 import { __name, deepcopy, deepmergeInto } from './chunk-JXJLGDKJ.js';
 
 // src/objects/index.ts
@@ -122,7 +122,7 @@ var object = Object.freeze({
 var assignEntry = /* @__PURE__ */ __name((obj, entry) => not(entry?.[0]) || (obj[entry[0]] = entry[1]), "assignEntry");
 var parseRestArgs = /* @__PURE__ */ __name((args, init = {}) => {
   for (const arg of args) {
-    if (typeof arg === "object")
+    if (isObject(arg))
       init.opts = arg;
     else if (typeof arg === "function")
       init.callback = arg;
@@ -137,12 +137,12 @@ var keysDispatch = /* @__PURE__ */ __name((opts) => {
     return Object.keys;
   if (opts["keys"])
     return opts["keys"];
-  if (opts.nonEnumerable) {
-    if (opts.inherited)
+  if (opts["nonEnumerable"]) {
+    if (opts["inherited"])
       return props;
     return Object.getOwnPropertyNames;
   }
-  if (opts.inherited)
+  if (opts["inherited"])
     return keysIn;
   return Object.keys;
 }, "keysDispatch");

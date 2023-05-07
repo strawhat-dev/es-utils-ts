@@ -5,9 +5,9 @@ var type = /* @__PURE__ */ __name((value) => Object.prototype.toString.call(valu
 var isArrayBuffer = /* @__PURE__ */ __name((value) => /^(Shared)?ArrayBuffer$/.test(type(value)), "isArrayBuffer");
 var isAsyncFunction = /* @__PURE__ */ __name((value) => type(value) === "AsyncFunction", "isAsyncFunction");
 var isAsyncGeneratorFunction = /* @__PURE__ */ __name((value) => type(value) === "AsyncGeneratorFunction", "isAsyncGeneratorFunction");
-var isAsyncIterable = /* @__PURE__ */ __name((value) => !!value?.[Symbol.asyncIterator], "isAsyncIterable");
+var isAsyncIterable = /* @__PURE__ */ __name((value) => !!value?.[Symbol.iterator], "isAsyncIterable");
 var isAsyncIterator = /* @__PURE__ */ __name((value) => /^Async.*(Generator|Iterator)$/.test(type(value)), "isAsyncIterator");
-var isConstructor = /* @__PURE__ */ __name((value) => !!value && value["prototype"]?.constructor === value, "isConstructor");
+var isConstructor = /* @__PURE__ */ __name((value) => value?.["prototype"]?.["constructor"] === (value ?? ""), "isConstructor");
 var isDate = /* @__PURE__ */ __name((value) => type(value) === "Date", "isDate");
 var isElement = /* @__PURE__ */ __name((value) => value instanceof Element || value instanceof Document, "isElement");
 var isError = /* @__PURE__ */ __name((value) => type(value) === "Error", "isError");
