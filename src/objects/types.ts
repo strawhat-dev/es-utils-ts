@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import type { Merge, PartialDeep, Simplify } from 'type-fest';
 import type { SimplifyDeep } from 'type-fest/source/merge-deep.js';
 import type {
@@ -89,25 +88,26 @@ export type ExtendFn = {
 
 export type ExtendOptions = {
   /**
-   * if `true`, returns a new object instead of mutating (deep copy).
+   * if `true`, return a new object instead
+   * of mutating the current one. *(deep copy)*
    * @defaultValue `false`
    */
   copy?: boolean;
   /**
-   * if `true`, this property shows up during enumeration
-   * of the properties on the corresponding object.
+   * if `true`, properties show up during the
+   * enumeration of the corresponding object.
    * @defaultValue `false`
    */
   enumerable?: boolean;
   /**
-   * if `true`, the value associated with the property
-   * may be changed with an assignment operator.
+   * if `true`, the values associated may
+   * be changed with an assignment operator.
    * @defaultValue `false`
    */
   writable?: boolean;
   /**
-   * if `true`, the type of this property descriptor may be changed
-   * and/or the property may be deleted from the corresponding object.
+   * if `true`, the types of these property descriptors may be changed
+   * and/or the properties may be deleted from the corresponding object.
    * @defaultValue `false`
    */
   configurable?: boolean;

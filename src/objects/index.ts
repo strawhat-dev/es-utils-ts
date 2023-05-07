@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
@@ -19,7 +18,7 @@ import { isObject, not, nullish } from '@/conditionals';
 import { deepcopy, deepmergeInto } from '@/externals';
 
 /**
- * @returns an array of the object's keys, *including inherited ones*
+ * @returns an array of the object's keys, including *inherited* ones
  */
 export const keysIn = <T extends object>(obj: T) => {
   const result = [];
@@ -28,7 +27,7 @@ export const keysIn = <T extends object>(obj: T) => {
 };
 
 /**
- * @returns an array of **all** of the object's properties *(i.e. including inherited and non-enumerable ones)*
+ * @returns an array of **all** of the object's properties, including those that are *inherited* and *non-enumerable*
  */
 export const props: PropsFn = (obj, options = {}) => {
   const traverse = options.objectPrototype
@@ -68,7 +67,7 @@ export const clear: ClearFn = (obj, options) => {
 };
 
 /**
- * Convenience wrapper for `Object.defineProperties` with better type support. Instead of
+ * Wrapper for `Object.defineProperties` with better type support. Instead of
  * a `PropertyDescriptorMap`, the properties may be more semantically assigned, with
  * the values to be assigned being the direct property for a given property name, and
  * the `configurable`, `enumerable`, and `writable` options all `false` by default.
