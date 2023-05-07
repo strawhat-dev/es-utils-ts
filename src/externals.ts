@@ -1,5 +1,5 @@
 /**
- * @overview - Other external "essential" utilities as named exports and tree-shakeable.
+ * @overview - Other external "essential" utilities as named exports (tree-shakeable!).
  * Some may be a dependency for some internal utilities or have changed defaults.
  * Handpicked based on combination of performance, popularity, and update recency.
  * All credits goes to their respective authors.
@@ -21,8 +21,7 @@ export {
 } from 'deepmerge-ts';
 
 /**
- * *rfdc (Really Fast Deep Clone)*
- *
+ * *rfdc (Really Fast Deep Clone)* \
  * Note: Will **fail** if the object contains circular references.
  * Use {@link deepcopy} if the object can contain circular references.
  * @see {@link https://www.npmjs.com/package/rfdc}
@@ -30,8 +29,7 @@ export {
 export const deepclone = rfdc as <T>(input: T) => T;
 
 /**
- * *rfdc (Really Fast Deep Clone)* w/ circular reference support
- *
+ * *rfdc (Really Fast Deep Clone)* w/ circular reference support \
  * Note: 25% additional performance overhead with circular reference support.
  * Use {@link deepclone} if the object is guaranteed to have no circular references.
  * @see {@link https://www.npmjs.com/package/rfdc}
@@ -40,8 +38,7 @@ export const deepclone = rfdc as <T>(input: T) => T;
 export const deepcopy = Rfdc?.({ circles: true });
 
 /**
- * *deep-equal* module w/ **strict on** by default
- *
+ * *deep-equal* module w/ **strict on** by default \
  * Compare objects `a` and `b`, returning whether they
  * are equal according to a recursive equality algorithm.
  * @see {@link https://www.npmjs.com/package/deep-equal}
@@ -54,8 +51,7 @@ export const deepcompare = (
 
 // prettier-ignore
 /**
- * *object-inspect* - String representations of objects in node and the browser.
- *
+ * *object-inspect* - String representations of objects in node and the browser. \
  * *Note: indentation defaults to `2` if no options are provided*
  * @see {@link https://www.npmjs.com/package/object-inspect}
  */
