@@ -20,7 +20,7 @@ declare const deepcopy: <T>(input: T) => T;
  */
 declare const deepclone: <T>(source: T) => T;
 /**
- * *deep-equal* module w/ strict **on** by default
+ * *deep-equal* module w/ **strict on** by default
  *
  * Compare objects `a` and `b`, returning whether they
  * are equal according to a recursive equality algorithm.
