@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable tree-shaking/no-side-effects-in-initialization */
 // @ts-ignore
-import clone from 'rfdc/default';
-import rfdc from 'rfdc';
+import rfdc from 'rfdc/default';
+import Rfdc from 'rfdc';
 import deepequal from 'deep-equal';
+
+export { default as inspect } from 'object-inspect';
+
+export { default as escapeRegex } from 'escape-string-regexp';
 
 export {
   deepmerge,
@@ -12,11 +16,14 @@ export {
   deepmergeIntoCustom,
 } from 'deepmerge-ts';
 
-export { default as range } from 'just-range';
-
-export { default as inspect } from 'object-inspect';
-
-export { default as escapeRegex } from 'escape-string-regexp';
+/**
+ * *rfdc (Really Fast Deep Clone)*
+ *
+ * Note: Will **fail** if the object contains circular references.
+ * Use {@link deepcopy} if the object can contain circular references.
+ * @see {@link https://www.npmjs.com/package/rfdc}
+ */
+export const deepclone = rfdc as <T>(input: T) => T;
 
 /**
  * *rfdc (Really Fast Deep Clone)* w/ circular reference support
@@ -25,16 +32,7 @@ export { default as escapeRegex } from 'escape-string-regexp';
  * Use {@link deepclone} if the object is guaranteed to have no circular references.
  * @see {@link https://www.npmjs.com/package/rfdc}
  */
-export const deepcopy = rfdc?.({ circles: true });
-
-/**
- * *rfdc (Really Fast Deep Clone)*
- *
- * Note: Will **fail** if the object contains circular references.
- * Use {@link deepcopy} if the object can contain circular references.
- * @see {@link https://www.npmjs.com/package/rfdc}
- */
-export const deepclone = clone as <T>(source: T) => T;
+export const deepcopy = Rfdc?.({ circles: true });
 
 /**
  * *deep-equal* module w/ **strict on** by default
