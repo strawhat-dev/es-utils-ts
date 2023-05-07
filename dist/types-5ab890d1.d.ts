@@ -628,15 +628,13 @@ type ValueOf<T, Fallback = JsValue, Target = Composite<T>> = KeyOf<T> extends ke
  */
 type KeyOfDeep<T, Current = Composite<T>, Nested extends keyof Current = ConditionalKeys<Current, JsObject<any>>> = Type<KeyOf<Current> | (Nested extends never ? never : KeyOfDeep<Current[Nested]>)>;
 /**
- * Like {@link ValueOf}, but recursively extracts nested values.
- *
+ * Like {@link ValueOf}, but recursively extracts nested values. \
  * Note: Values that are being recursed into themselves
  * *(i.e. parent values containing sub-values)* are not included.
  */
 type ValueOfDeep<T, Current = Composite<T>, Nested extends keyof Current = ConditionalKeys<Current, JsObject<any>>> = Type<Current[ConditionalKeysExcept<Current, JsObject<any>>] | (Nested extends never ? never : ValueOfDeep<Current[Nested]>)>;
 /**
- * *Improved version of type-fest's {@link https://github.com/sindresorhus/type-fest/blob/main/source/literal-union.d.ts | LiteralUnion}*.
- *
+ * *Improved version of type-fest's {@link https://github.com/sindresorhus/type-fest/blob/main/source/literal-union.d.ts | LiteralUnion}*. \
  * Generic that allows for both the literal and
  * base types without sacrificing completions.
  * - base type automatically inferred from literal
