@@ -1,5 +1,5 @@
 export { cdn, sleep } from './chunk-5HFSI5XB.js';
-export { Range, iRange, irange, range } from './chunk-U42FNUK3.js';
+export { Range, iRange, irange, range } from './chunk-5WUPFGDZ.js';
 export { createElement, createHTMLDoc, createLink, querySelectorMatchAll } from './chunk-KX3VQGHC.js';
 export { clear, extend, filter, findkey, keysIn, map, object, pop, props } from './chunk-Y2FOLZE5.js';
 export { add, div, gt, gte, lt, lte, mod, mult, sub, trimLines } from './chunk-P3332SUY.js';
