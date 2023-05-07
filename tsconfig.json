@@ -3,9 +3,9 @@
     "ignoreDeprecations": "5.0",
     "lib": ["esnext", "dom", "dom.iterable"],
     "target": "es2020",
-    "module": "nodenext",
+    "module": "esnext",
     "moduleDetection": "force",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "strict": true,
     "declaration": true,
     "declarationMap": true,
@@ -18,7 +18,7 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
     "baseUrl": ".",
-    "paths": { "@/*": ["src/*.js", "src/*/index.js"] }
+    "paths": { "@/*": ["src/*"] }
   },
   "include": ["src/**/*.ts", "tsup.config.ts"]
 }

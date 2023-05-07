@@ -12,7 +12,7 @@ import type {
   MapFn,
   PopFn,
   PropsFn,
-} from './types.js';
+} from './types';
 
 import { isObject, not, nullish } from '@/conditionals';
 import { deepcopy, deepmergeInto } from '@/externals';

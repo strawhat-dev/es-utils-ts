@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Union } from '@/types';
-import type { AssertionType } from './type-checking.js';
+import type { AssertionType } from './type-checking';
 
 export type TypeName = Union<
   | 'Array Iterator'

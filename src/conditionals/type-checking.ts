@@ -2,7 +2,7 @@
 import type { Constructor, Replace, TypedArray } from 'type-fest';
 import type { AsyncFunction } from 'type-fest/source/async-return-type.js';
 import type { JsObject, KeyOf, primitive } from '@/types';
-import type { AssertionOptions, AsyncGeneratorFunction, GeneratorFunction, MultiTypeQueryFunction, TypeName } from './types.js';
+import type { AssertionOptions, AsyncGeneratorFunction, GeneratorFunction, MultiTypeQueryFunction, TypeName } from './types';
 
 import { deepcompare, inspect } from '@/externals';
 

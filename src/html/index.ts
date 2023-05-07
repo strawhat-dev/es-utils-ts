@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type { CreateLinkOptions, HTMLElementProps, HTMLTag } from './types.js';
+import type { CreateLinkOptions, HTMLElementProps, HTMLTag } from './types';
 
 import { pop } from '@/objects';
 import { trimLines } from '@/lib';

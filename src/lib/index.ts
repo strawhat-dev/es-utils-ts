@@ -1,5 +1,5 @@
-export * from './range.js';
-export * from './promises.js';
+export * from './promises';
+export * from './range';
 
 // prettier-ignore
 /** trims a given string while also removing all empty lines */
