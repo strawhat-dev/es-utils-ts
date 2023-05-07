@@ -2,7 +2,7 @@ import { defineConfig } from 'tsup';
 import { globbySync as glob } from 'globby';
 
 export default defineConfig({
-  entry: glob('src/**/!(types).ts'),
+  entry: ['src/types.ts', 'src/externals.ts', ...glob('src/**/index.ts')],
   outDir: 'dist',
   format: 'esm',
   target: 'es2020',

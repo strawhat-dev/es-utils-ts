@@ -13,6 +13,8 @@ module.exports = {
     project: ['tsconfig.json'],
   },
   rules: {
+    '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
     'tree-shaking/no-side-effects-in-initialization': [
       1,
       { noSideEffectsWhenCalled: [{ function: 'Object.freeze' }] },
