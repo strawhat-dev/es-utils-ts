@@ -1,6 +1,6 @@
 import './conditional-except.d-b0cdb712.js';
 import { AsyncFunction } from 'type-fest/source/async-return-type.js';
-import { U as Union, J as JsObject, p as primitive, K as KeyOf, N as Nullish } from './types-5ab890d1.js';
+import { T as Type, U as Union, J as JsObject, p as primitive, K as KeyOf, N as Nullish } from './types-5ab890d1.js';
 
 /**
 Matches any [typed array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray), like `Uint8Array` or `Float64Array`.
@@ -95,7 +95,7 @@ type Replace<
 		: `${Head}${Replacement}${Tail}`
 	: Input;
 
-type TypeName = Union<'Array Iterator' | 'Array' | 'ArrayBuffer' | 'AsyncFunction' | 'AsyncGenerator' | 'AsyncGeneratorFunction' | 'BigInt' | 'BigInt64Array' | 'BigUint64Array' | 'Boolean' | 'Date' | 'Error' | 'Float32Array' | 'Float64Array' | 'Function' | 'Generator' | 'GeneratorFunction' | 'Int16Array' | 'Int32Array' | 'Int8Array' | 'Map Iterator' | 'Map' | 'Null' | 'Number' | 'Object' | 'Promise' | 'RegExp' | 'Request' | 'Set Iterator' | 'Set' | 'SharedArrayBuffer' | 'String' | 'Symbol' | 'Uint16Array' | 'Uint32Array' | 'Uint8Array' | 'Uint8ClampedArray' | 'Undefined' | 'WeakMap' | 'WeakSet'>;
+type TypeName = Type<'Array Iterator' | 'Array' | 'ArrayBuffer' | 'AsyncFunction' | 'AsyncGenerator' | 'AsyncGeneratorFunction' | 'BigInt' | 'BigInt64Array' | 'BigUint64Array' | 'Boolean' | 'Date' | 'Error' | 'Float32Array' | 'Float64Array' | 'Function' | 'Generator' | 'GeneratorFunction' | 'Int16Array' | 'Int32Array' | 'Int8Array' | 'Map Iterator' | 'Map' | 'Null' | 'Number' | 'Object' | 'Promise' | 'RegExp' | 'Request' | 'Set Iterator' | 'Set' | 'SharedArrayBuffer' | 'String' | 'Symbol' | 'Uint16Array' | 'Uint32Array' | 'Uint8Array' | 'Uint8ClampedArray' | 'Undefined' | 'WeakMap' | 'WeakSet'>;
 type AssertionOptions = {
     /**
      * Set to `throw` to throw on failed assertions
@@ -126,7 +126,7 @@ interface MultiTypeQuery {
  * and provides useful completions for some common built-in types.
  * @returns `string` representing the given `value`'s type from its *prototype*
  */
-declare const type: (value: unknown) => TypeName;
+declare const type: (value: unknown) => Union<TypeName>;
 declare const isArrayBuffer: (value: unknown) => value is ArrayBufferLike;
 declare const isAsyncFunction: (value: unknown) => value is AsyncFunction;
 declare const isAsyncGeneratorFunction: (value: unknown) => value is AsyncGeneratorFunction;

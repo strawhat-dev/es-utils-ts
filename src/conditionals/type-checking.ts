@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Constructor, Replace, TypedArray } from 'type-fest';
 import type { AsyncFunction } from 'type-fest/source/async-return-type.js';
-import type { JsObject, KeyOf, primitive } from '@/types';
+import type { JsObject, KeyOf, Union, primitive } from '@/types';
 import type { AssertionOptions, AsyncGeneratorFunction, GeneratorFunction, MultiTypeQueryFunction, TypeName } from './types';
 
 import { deepcompare, inspect } from '@/externals';
@@ -11,7 +11,7 @@ import { deepcompare, inspect } from '@/externals';
  * and provides useful completions for some common built-in types.
  * @returns `string` representing the given `value`'s type from its *prototype*
  */
-export const type = (value: unknown): TypeName => Object.prototype.toString.call(value).slice(8, -1);
+export const type = (value: unknown): Union<TypeName> => Object.prototype.toString.call(value).slice(8, -1);
 
 // conditionals with type gaurding
 export const isArrayBuffer = (value: unknown): value is ArrayBufferLike => /^(Shared)?ArrayBuffer$/.test(type(value));
