@@ -15,8 +15,8 @@ import type {
   PopFn,
 } from './types.js';
 
-import { deepcopy, deepmergeInto } from '@/externals';
 import { isObject, not } from '@/conditionals';
+import { deepcopy, deepmergeInto } from '@/externals';
 
 /**
  * Convenience wrapper for `Object.defineProperties` with better type support. Instead of
