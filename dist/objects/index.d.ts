@@ -1,5 +1,5 @@
 import '../conditional-keys.d-ac881611.js';
-import { S as Simplify, O as OmitIndexSignature, e as JsObject, T as Type, U as Union, K as KeyOf, V as ValueOf, b as Nullish, d as Multi, f as KeyOfDeep, g as ValueOfDeep } from '../types-5f7dc540.js';
+import { S as Simplify, O as OmitIndexSignature, U as Union, K as KeyOf, e as JsObject, T as Type, V as ValueOf, b as Nullish, d as Multi, f as KeyOfDeep, g as ValueOfDeep } from '../types-5f7dc540.js';
 import { P as PartialDeep } from '../partial-deep.d-c532d293.js';
 import { SimplifyDeep } from 'type-fest/source/merge-deep.js';
 
@@ -195,6 +195,22 @@ type Merge<Destination, Source> = EnforceOptional<
 SimpleMerge<PickIndexSignature<Destination>, PickIndexSignature<Source>>
 & SimpleMerge<OmitIndexSignature<Destination>, OmitIndexSignature<Source>>>;
 
+type PropsFn = <T extends object>(obj: T, options?: PropsOptions) => Union<KeyOf<T>>;
+type PropsOptions = {
+    /**
+     * if `true`, include base `Object.prototype` when
+     * traversing up the prototype chain for properties
+     * @defaultValue `false`
+     */
+    objectPrototype?: boolean;
+};
+type PopFn = {
+    <T extends JsObject>(obj: Readonly<T>): T[KeyOf<T>];
+    <T extends object>(obj: Readonly<T>): T[keyof T];
+    <T extends JsObject, Key extends KeyOf<T>>(obj: Readonly<T>, key: Key): T[Key];
+    <T extends object, Key extends keyof T>(obj: Readonly<T>, key: Key): T[Key];
+};
+type ClearFn = <T extends object>(obj: Readonly<T>, options?: Omit<KeyIterationOptions, 'inherited'>) => Partial<T>;
 type ExtendFn = {
     <T extends JsObject>(props: Readonly<T>): Readonly<T>;
     <T1 extends JsObject, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
@@ -228,14 +244,6 @@ type ExtendOptions = {
     configurable?: boolean;
 };
 type ExtendedResult<T1, T2> = Type<T1 extends Function ? T1 & Simplify<T2> : Merge<T1, T2>>;
-type ExtendedKeysFn = <T extends object>(obj: T) => Union<KeyOf<T>>;
-type PopFn = {
-    <T extends JsObject>(obj: Readonly<T>): T[KeyOf<T>];
-    <T extends object>(obj: Readonly<T>): T[keyof T];
-    <T extends JsObject, Key extends KeyOf<T>>(obj: Readonly<T>, key: Key): T[Key];
-    <T extends object, Key extends keyof T>(obj: Readonly<T>, key: Key): T[Key];
-};
-type ClearFn = <T extends object>(obj: Readonly<T>, options?: Omit<KeyIterationOptions, 'inherited'>) => Partial<T>;
 type FindKeyFn = {
     <T extends object>(obj: Readonly<T>): KeyOf<Readonly<T>> | undefined;
     <T extends object>(obj: Readonly<T>, predicate: (value: Union<ValueOf<Readonly<T>>>, key: Union<KeyOf<Readonly<T>>>) => unknown): KeyOf<Readonly<T>> | undefined;
@@ -302,6 +310,25 @@ type KeyIterationOptions = {
 };
 
 /**
+ * @returns an array of the object's keys, *including inherited ones*
+ */
+declare const keysIn: <T extends object>(obj: T) => Extract<keyof T, string>[];
+/**
+ * @returns an array of **all** of the object's properties *(i.e. including inherited and non-enumerable ones)*
+ */
+declare const props: PropsFn;
+/**
+ * Delete a property while retrieving its value at the same time.
+ * @returns the value deleted from the object
+ */
+declare const pop: PopFn;
+/**
+ * Delete all properties from an object,
+ * with option to include non-enumerables as well.
+ * @returns the mutated cleared object
+ */
+declare const clear: ClearFn;
+/**
  * Convenience wrapper for `Object.defineProperties` with better type support. Instead of
  * a `PropertyDescriptorMap`, the properties may be more semantically assigned, with
  * the values to be assigned being the direct property for a given property name, and
@@ -314,37 +341,18 @@ type KeyIterationOptions = {
  * as opposed to a per-property basis with `Object.defineProperties`.
  */
 declare const extend: ExtendFn;
-/**
- * @returns an array of the object's keys, *including inherited ones*
- */
-declare const extendedkeys: ExtendedKeysFn;
-/**
- * @returns an array of **all** of the object's properties *(i.e. including inherited and non-enumerable ones)*
- */
-declare const props: ExtendedKeysFn;
-/**
- * Delete a property while retrieving its value at the same time.
- * @returns the value deleted from the object
- */
-declare const pop: PopFn;
-/**
- * Delete all properties from an object,
- * with option to include non-enumerables as well.
- * @returns the mutated cleared object
- */
-declare const clear: ClearFn;
 declare const findkey: FindKeyFn;
 declare const map: MapFn;
 declare const filter: FilterFn;
 declare const object: Readonly<{
     readonly clear: ClearFn;
     readonly extend: ExtendFn;
-    readonly extendedkeys: ExtendedKeysFn;
     readonly filter: FilterFn;
     readonly findkey: FindKeyFn;
+    readonly keysIn: <T extends object>(obj: T) => Extract<keyof T, string>[];
     readonly map: MapFn;
     readonly pop: PopFn;
-    readonly props: ExtendedKeysFn;
+    readonly props: PropsFn;
 }>;
 
-export { clear, extend, extendedkeys, filter, findkey, map, object, pop, props };
+export { clear, extend, filter, findkey, keysIn, map, object, pop, props };

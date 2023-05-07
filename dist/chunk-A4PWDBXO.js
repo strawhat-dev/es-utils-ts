@@ -1,9 +1,43 @@
 import { isObject } from './chunk-7U7BT2PX.js';
 import { deepcopy, deepmergeInto } from './chunk-XHBJGOOA.js';
-import { not } from './chunk-HZA4J3R3.js';
+import { nullish, not } from './chunk-HZA4J3R3.js';
 import { __name } from './chunk-HXRSFH6L.js';
 
 // src/objects/index.ts
+var keysIn = /* @__PURE__ */ __name((obj) => {
+  const result = [];
+  for (const key in obj)
+    result.push(key);
+  return result;
+}, "keysIn");
+var props = /* @__PURE__ */ __name((obj, options = {}) => {
+  const traverse = options.objectPrototype ? Object.getPrototypeOf : (obj2) => {
+    const proto = Object.getPrototypeOf(obj2);
+    if (proto !== Object.prototype)
+      return proto;
+  };
+  const result = /* @__PURE__ */ new Set();
+  do
+    for (const prop of Object.getOwnPropertyNames(obj))
+      result.add(prop);
+  while (obj = traverse(obj));
+  return [...result];
+}, "props");
+var pop = /* @__PURE__ */ __name((obj, key = Object.keys(obj ?? {}).pop()) => {
+  if (nullish(obj))
+    return;
+  const value = obj[key];
+  delete obj[key];
+  return value;
+}, "pop");
+var clear = /* @__PURE__ */ __name((obj, options) => {
+  if (nullish(obj))
+    return {};
+  const keys = keysDispatch(options);
+  for (const key of keys(obj))
+    delete obj[key];
+  return obj;
+}, "clear");
 var extend = /* @__PURE__ */ __name((...args) => {
   const descriptorMap = {};
   const [target, props2, options] = args.length === 1 ? [{}, args.pop()] : args;
@@ -16,42 +50,13 @@ var extend = /* @__PURE__ */ __name((...args) => {
     descriptorMap
   );
 }, "extend");
-var extendedkeys = /* @__PURE__ */ __name((obj) => {
-  const result = [];
-  for (const key in obj ?? {})
-    result.push(key);
-  return result;
-}, "extendedkeys");
-var props = /* @__PURE__ */ __name((obj) => {
-  if (!obj)
-    return [];
-  const result = /* @__PURE__ */ new Set();
-  do
-    for (const prop of Object.getOwnPropertyNames(obj))
-      result.add(prop);
-  while (obj = Object.getPrototypeOf(obj));
-  return [...result];
-}, "props");
-var pop = /* @__PURE__ */ __name((obj, key = Object.keys(obj ?? {}).pop()) => {
-  if (!obj || !key)
-    return;
-  const value = obj[key];
-  delete obj[key];
-  return value;
-}, "pop");
-var clear = /* @__PURE__ */ __name((obj, options) => {
-  const keys = keysDispatch(options);
-  for (const key of keys(obj))
-    delete obj[key];
-  return obj;
-}, "clear");
 var findkey = /* @__PURE__ */ __name((obj, ...args) => {
   const { opts, callback } = parseRestArgs(args, {
     callback: (value) => !not(value)
   });
   const { deep, ...keyopts } = opts;
   const keys = keysDispatch(keyopts);
-  for (const key of keys(obj)) {
+  for (const key of keys(obj ?? {})) {
     const value = obj[key];
     if (deep && isObject(value)) {
       const resolved = findkey(value, { deep, keys }, callback);
@@ -109,9 +114,9 @@ var filter = /* @__PURE__ */ __name((obj, ...args) => {
 var object = Object.freeze({
   clear,
   extend,
-  extendedkeys,
   filter,
   findkey,
+  keysIn,
   map,
   pop,
   props
@@ -140,8 +145,8 @@ var keysDispatch = /* @__PURE__ */ __name((opts) => {
     return Object.getOwnPropertyNames;
   }
   if (opts.inherited)
-    return extendedkeys;
+    return keysIn;
   return Object.keys;
 }, "keysDispatch");
 
-export { clear, extend, extendedkeys, filter, findkey, map, object, pop, props };
+export { clear, extend, filter, findkey, keysIn, map, object, pop, props };

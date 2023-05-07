@@ -4,7 +4,7 @@ export { AssertionType, assert, is, isArrayBuffer, isAsyncFunction, isAsyncGener
 export { not, nullish, validURL } from './conditionals/validation.js';
 export { deepclone, deepcompare, deepcopy } from './externals.js';
 export { trimLines } from './lib.js';
-export { clear, extend, extendedkeys, filter, findkey, map, object, pop, props } from './objects/index.js';
+export { clear, extend, filter, findkey, keysIn, map, object, pop, props } from './objects/index.js';
 export { cdn, sleep } from './promises.js';
 export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from 'deepmerge-ts';
 export { default as range } from 'just-range';
