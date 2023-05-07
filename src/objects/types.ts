@@ -13,6 +13,44 @@ import type {
   ValueOfDeep,
 } from '@/types';
 
+export type KeysDispatcher = <Options extends KeyIterationOptions>(
+  options?: Options
+) => <T extends object>(
+  obj: T
+) => Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>;
+
+export type PropsFn = <T extends object>(
+  obj: T,
+  options?: PropsOptions
+) => Union<KeyOf<T>>;
+
+type PropsOptions = {
+  /**
+   * if `true`, include base `Object.prototype` when
+   * traversing up the prototype chain for properties
+   * @defaultValue `false`
+   */
+  objectPrototype?: boolean;
+};
+
+export type PopFn = {
+  <T extends JsObject>(obj: Readonly<T>): T[KeyOf<T>];
+
+  <T extends object>(obj: Readonly<T>): T[keyof T];
+
+  <T extends JsObject, Key extends KeyOf<T>>(
+    obj: Readonly<T>,
+    key: Key
+  ): T[Key];
+
+  <T extends object, Key extends keyof T>(obj: Readonly<T>, key: Key): T[Key];
+};
+
+export type ClearFn = <T extends object>(
+  obj: Readonly<T>,
+  options?: Omit<KeyIterationOptions, 'inherited'>
+) => Partial<T>;
+
 export type ExtendFn = {
   <T extends JsObject>(props: Readonly<T>): Readonly<T>;
 
@@ -78,32 +116,6 @@ export type ExtendOptions = {
 type ExtendedResult<T1, T2> = Type<
   T1 extends Function ? T1 & Simplify<T2> : Merge<T1, T2>
 >;
-
-export type ExtendedKeysFn = <T extends object>(obj: T) => Union<KeyOf<T>>;
-
-export type KeysDispatcher = <Options extends KeyIterationOptions>(
-  options?: Options
-) => <T extends object>(
-  obj: T
-) => Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>;
-
-export type PopFn = {
-  <T extends JsObject>(obj: Readonly<T>): T[KeyOf<T>];
-
-  <T extends object>(obj: Readonly<T>): T[keyof T];
-
-  <T extends JsObject, Key extends KeyOf<T>>(
-    obj: Readonly<T>,
-    key: Key
-  ): T[Key];
-
-  <T extends object, Key extends keyof T>(obj: Readonly<T>, key: Key): T[Key];
-};
-
-export type ClearFn = <T extends object>(
-  obj: Readonly<T>,
-  options?: Omit<KeyIterationOptions, 'inherited'>
-) => Partial<T>;
 
 export type FindKeyFn = {
   <T extends object>(obj: Readonly<T>): KeyOf<Readonly<T>> | undefined;

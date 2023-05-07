@@ -7,16 +7,65 @@ import type {
   ClearFn,
   ExtendFn,
   ExtendOptions,
-  ExtendedKeysFn,
   FilterFn,
   FindKeyFn,
   KeysDispatcher,
   MapFn,
   PopFn,
+  PropsFn,
 } from './types.js';
 
-import { isObject, not } from '@/conditionals';
+import { isObject, not, nullish } from '@/conditionals';
 import { deepcopy, deepmergeInto } from '@/externals';
+
+/**
+ * @returns an array of the object's keys, *including inherited ones*
+ */
+export const keysIn = <T extends object>(obj: T) => {
+  const result = [];
+  for (const key in obj) result.push(key);
+  return result;
+};
+
+/**
+ * @returns an array of **all** of the object's properties *(i.e. including inherited and non-enumerable ones)*
+ */
+export const props: PropsFn = (obj, options = {}) => {
+  const traverse = options.objectPrototype
+    ? Object.getPrototypeOf
+    : (obj: object) => {
+        const proto = Object.getPrototypeOf(obj);
+        if (proto !== Object.prototype) return proto;
+      };
+
+  const result = new Set();
+  do for (const prop of Object.getOwnPropertyNames(obj)) result.add(prop);
+  while ((obj = traverse(obj)));
+  return [...result] as never;
+};
+
+/**
+ * Delete a property while retrieving its value at the same time.
+ * @returns the value deleted from the object
+ */
+export const pop: PopFn = (obj: object, key = Object.keys(obj ?? {}).pop()) => {
+  if (nullish(obj)) return;
+  const value = obj[key!];
+  delete obj[key!];
+  return value;
+};
+
+/**
+ * Delete all properties from an object,
+ * with option to include non-enumerables as well.
+ * @returns the mutated cleared object
+ */
+export const clear: ClearFn = (obj, options) => {
+  if (nullish(obj)) return {};
+  const keys = keysDispatch(options);
+  for (const key of keys(obj)) delete obj[key];
+  return obj;
+};
 
 /**
  * Convenience wrapper for `Object.defineProperties` with better type support. Instead of
@@ -44,48 +93,6 @@ export const extend: ExtendFn = (...args: unknown[]) => {
   ) as never;
 };
 
-/**
- * @returns an array of the object's keys, *including inherited ones*
- */
-export const extendedkeys: ExtendedKeysFn = (obj) => {
-  const result = [];
-  for (const key in obj ?? {}) result.push(key);
-  return result as never;
-};
-
-/**
- * @returns an array of **all** of the object's properties *(i.e. including inherited and non-enumerable ones)*
- */
-export const props: ExtendedKeysFn = (obj) => {
-  if (!obj) return [] as never;
-  const result = new Set();
-  do for (const prop of Object.getOwnPropertyNames(obj)) result.add(prop);
-  while ((obj = Object.getPrototypeOf(obj)));
-  return [...result] as never;
-};
-
-/**
- * Delete a property while retrieving its value at the same time.
- * @returns the value deleted from the object
- */
-export const pop: PopFn = (obj: object, key = Object.keys(obj ?? {}).pop()) => {
-  if (!obj || !key) return;
-  const value = obj[key];
-  delete obj[key];
-  return value;
-};
-
-/**
- * Delete all properties from an object,
- * with option to include non-enumerables as well.
- * @returns the mutated cleared object
- */
-export const clear: ClearFn = (obj, options) => {
-  const keys = keysDispatch(options);
-  for (const key of keys(obj)) delete obj[key];
-  return obj;
-};
-
 export const findkey: FindKeyFn = (obj: object, ...args: unknown[]) => {
   const { opts, callback } = parseRestArgs(args, {
     callback: (value: never) => !not(value),
@@ -93,7 +100,7 @@ export const findkey: FindKeyFn = (obj: object, ...args: unknown[]) => {
 
   const { deep, ...keyopts } = opts;
   const keys = keysDispatch(keyopts);
-  for (const key of keys(obj)) {
+  for (const key of keys(obj ?? {})) {
     const value = obj[key];
     if (deep && isObject(value)) {
       const resolved = findkey(value, { deep, keys }, callback as never);
@@ -161,9 +168,9 @@ export const filter: FilterFn = (obj: object, ...args: unknown[]) => {
 export const object = Object.freeze({
   clear,
   extend,
-  extendedkeys,
   filter,
   findkey,
+  keysIn,
   map,
   pop,
   props,
@@ -199,7 +206,7 @@ const keysDispatch = ((opts) => {
     return Object.getOwnPropertyNames;
   }
 
-  if (opts.inherited) return extendedkeys;
+  if (opts.inherited) return keysIn;
 
   return Object.keys;
 }) as KeysDispatcher;
