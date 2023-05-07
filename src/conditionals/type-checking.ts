@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Constructor, Replace, TypedArray } from 'type-fest';
 import type { AsyncFunction } from 'type-fest/source/async-return-type.js';
 import type { JsObject, KeyOf, primitive } from '@/types';
@@ -16,24 +17,24 @@ export const type = (value: unknown): TypeName => Object.prototype.toString.call
 export const isArrayBuffer = (value: unknown): value is ArrayBufferLike => /^(Shared)?ArrayBuffer$/.test(type(value));
 export const isAsyncFunction = (value: unknown): value is AsyncFunction => type(value) === 'AsyncFunction';
 export const isAsyncGeneratorFunction = (value: unknown): value is AsyncGeneratorFunction => type(value) === 'AsyncGeneratorFunction';
-export const isAsyncIterable = (value: unknown): value is AsyncIterable<unknown> => !!value?.[Symbol.asyncIterator];
-export const isAsyncIterator = (value: unknown): value is AsyncIterator<unknown> => /^Async.*(Generator|Iterator)$/.test(type(value));
-export const isConstructor = (value: unknown): value is Constructor<unknown> => !!value && value['prototype']?.constructor === value;
+export const isAsyncIterable = (value: unknown): value is AsyncIterable<any> => !!value?.[Symbol.asyncIterator];
+export const isAsyncIterator = (value: unknown): value is AsyncIterator<any> => /^Async.*(Generator|Iterator)$/.test(type(value));
+export const isConstructor = (value: unknown): value is Constructor<any> => !!value && value['prototype']?.constructor === value;
 export const isDate = (value: unknown): value is Date => type(value) === 'Date';
 export const isElement = (value: unknown): value is Element | Document => value instanceof Element || value instanceof Document;
 export const isError = (value: unknown): value is Error => type(value) === 'Error';
 export const isGeneratorFunction = (value: unknown): value is GeneratorFunction => type(value) === 'GeneratorFunction';
-export const isIterable = (value: unknown): value is Iterable<unknown> => !!value?.[Symbol.iterator];
-export const isIterator = (value: unknown): value is Iterator<unknown> => /(^Generator|Iterator)$/.test(type(value));
-export const isMap = (value: unknown): value is Map<unknown, unknown> => type(value) === 'Map';
-export const isObject = (value: unknown): value is JsObject<unknown> => type(value) === 'Object';
+export const isIterable = (value: unknown): value is Iterable<any> => !!value?.[Symbol.iterator];
+export const isIterator = (value: unknown): value is Iterator<any> => /(^Generator|Iterator)$/.test(type(value));
+export const isMap = (value: unknown): value is Map<any, any> => type(value) === 'Map';
+export const isObject = (value: unknown): value is JsObject<any> => type(value) === 'Object';
 export const isPrimitive = (value: unknown): value is primitive => value !== Object(value);
-export const isPromise = (value: unknown): value is Promise<unknown> => type(value) === 'Promise';
+export const isPromise = (value: unknown): value is Promise<any> => type(value) === 'Promise';
 export const isRegExp = (value: unknown): value is RegExp => type(value) === 'RegExp';
 export const isRequest = (value: unknown): value is Request => type(value) === 'Request';
-export const isSet = (value: unknown): value is Set<unknown> => type(value) === 'Set';
+export const isSet = (value: unknown): value is Set<any> => type(value) === 'Set';
 export const isTypedArray = (value: unknown): value is TypedArray => ArrayBuffer.isView(value) && !(value instanceof DataView);
-export const isWeakMap = (value: unknown): value is WeakMap<object, unknown> => type(value) === 'WeakMap';
+export const isWeakMap = (value: unknown): value is WeakMap<object, any> => type(value) === 'WeakMap';
 export const isWeakSet = (value: unknown): value is WeakSet<object> => type(value) === 'WeakSet';
 export const is: MultiTypeQueryFunction = (value) => ({
   anyOf: (...queries) => queries.some(querycallback(value)),
