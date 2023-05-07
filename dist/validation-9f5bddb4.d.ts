@@ -1,6 +1,6 @@
-import '../conditional-keys.d-ac881611.js';
+import './conditional-keys.d-ac881611.js';
 import { AsyncFunction } from 'type-fest/source/async-return-type.js';
-import { U as Union, e as JsObject, p as primitive, K as KeyOf } from '../types-5f7dc540.js';
+import { U as Union, J as JsObject, p as primitive, K as KeyOf, N as Nullish } from './types-54b1c1d7.js';
 
 /**
 Matches any [typed array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray), like `Uint8Array` or `Float64Array`.
@@ -198,4 +198,30 @@ declare const assert: Readonly<{
 /** @internal */
 type AssertionType = Replace<KeyOf<typeof assert>, 'is', ''>;
 
-export { AssertionType, assert, is, isArrayBuffer, isAsyncFunction, isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isConstructor, isDate, isElement, isError, isGeneratorFunction, isIterable, isIterator, isMap, isObject, isPrimitive, isPromise, isRegExp, isRequest, isSet, isTypedArray, isWeakMap, isWeakSet, type };
+/**
+ * Similarly to nullish coalescing, checks if given `value` is `undefined` or `null`.
+ * @returns `true` if `value` is `undefined` or `null`; `false` otherwise
+ */
+declare const nullish: (value: unknown) => value is Nullish;
+/**
+ * An alternative to the *logical not* operator; checks if `value` is falsy ***(excluding `''` + `0`)***.
+ * This is similar to nullish coalescing but with checks for `false` and `NaN` as well, for the common
+ * use case of wanting to check if some value is *falsy/invalid*, but would consider *empty strings* or
+ * the *number zero* to be *valid*, whereas simply using the logical not operator (e.g. `!value`) would not.
+ * @returns `true` if `value` is `false`, `undefined`, `null`, or `NaN`; `false` otherwise
+ */
+declare const not: (value: unknown) => value is false | Nullish;
+/**
+ * Utilizes `URL` constructor (as opposed to regular expressions)
+ * to check if the provided string is a valid url.
+ *
+ * Set the `http` option to `false` to allow any urls that are parsable by the `URL`
+ * constructor (e.g. `"foo:bar"`), instead of just those with a valid "http/https" protocol.
+ *
+ * *(defaults to `true` since this is the most common desired behavior)*
+ */
+declare const validURL: (value: string, options?: {
+    http: boolean;
+}) => boolean;
+
+export { AssertionType as A, not as B, validURL as C, isAsyncFunction as a, isAsyncGeneratorFunction as b, isAsyncIterable as c, isAsyncIterator as d, isConstructor as e, isDate as f, isElement as g, isError as h, isArrayBuffer as i, isGeneratorFunction as j, isIterable as k, isIterator as l, isMap as m, isObject as n, isPrimitive as o, isPromise as p, isRegExp as q, isRequest as r, isSet as s, type as t, isTypedArray as u, isWeakMap as v, isWeakSet as w, is as x, assert as y, nullish as z };

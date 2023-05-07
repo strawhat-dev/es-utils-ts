@@ -1,5 +1,5 @@
 import '../conditional-keys.d-ac881611.js';
-import { S as Simplify, O as OmitIndexSignature, U as Union, K as KeyOf, e as JsObject, T as Type, V as ValueOf, b as Nullish, d as Multi, f as KeyOfDeep, g as ValueOfDeep } from '../types-5f7dc540.js';
+import { S as Simplify, O as OmitIndexSignature, U as Union, K as KeyOf, J as JsObject, T as Type, V as ValueOf, N as Nullish, M as Multi, b as KeyOfDeep, c as ValueOfDeep } from '../types-54b1c1d7.js';
 import { P as PartialDeep } from '../partial-deep.d-c532d293.js';
 import { SimplifyDeep } from 'type-fest/source/merge-deep.js';
 
@@ -220,25 +220,26 @@ type ExtendFn = {
 };
 type ExtendOptions = {
     /**
-     * if `true`, returns a new object instead of mutating (deep copy).
+     * if `true`, return a new object instead
+     * of mutating the current one. *(deep copy)*
      * @defaultValue `false`
      */
     copy?: boolean;
     /**
-     * if `true`, this property shows up during enumeration
-     * of the properties on the corresponding object.
+     * if `true`, properties show up during the
+     * enumeration of the corresponding object.
      * @defaultValue `false`
      */
     enumerable?: boolean;
     /**
-     * if `true`, the value associated with the property
-     * may be changed with an assignment operator.
+     * if `true`, the values associated may
+     * be changed with an assignment operator.
      * @defaultValue `false`
      */
     writable?: boolean;
     /**
-     * if `true`, the type of this property descriptor may be changed
-     * and/or the property may be deleted from the corresponding object.
+     * if `true`, the types of these property descriptors may be changed
+     * and/or the properties may be deleted from the corresponding object.
      * @defaultValue `false`
      */
     configurable?: boolean;
@@ -310,11 +311,11 @@ type KeyIterationOptions = {
 };
 
 /**
- * @returns an array of the object's keys, *including inherited ones*
+ * @returns an array of the object's keys, including *inherited* ones
  */
 declare const keysIn: <T extends object>(obj: T) => Extract<keyof T, string>[];
 /**
- * @returns an array of **all** of the object's properties *(i.e. including inherited and non-enumerable ones)*
+ * @returns an array of **all** of the object's properties, including those that are *inherited* and *non-enumerable*
  */
 declare const props: PropsFn;
 /**
@@ -329,7 +330,7 @@ declare const pop: PopFn;
  */
 declare const clear: ClearFn;
 /**
- * Convenience wrapper for `Object.defineProperties` with better type support. Instead of
+ * Wrapper for `Object.defineProperties` with better type support. Instead of
  * a `PropertyDescriptorMap`, the properties may be more semantically assigned, with
  * the values to be assigned being the direct property for a given property name, and
  * the `configurable`, `enumerable`, and `writable` options all `false` by default.

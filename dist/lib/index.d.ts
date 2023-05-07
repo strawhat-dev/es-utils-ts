@@ -1,3 +1,6 @@
+import { a as NumberLike } from '../types-54b1c1d7.js';
+import '../conditional-keys.d-ac881611.js';
+
 /**
  * Note: A decreasing range (`step = -1`) will be
  * automatically inferred if not specified and `start > stop`
@@ -37,4 +40,24 @@ declare const Range: (start?: number, stop?: number, step?: number) => object;
  */
 declare const iRange: (start?: number, stop?: number, step?: number) => object;
 
-export { Range, iRange, irange, range };
+/** Schedules a `Promise` that resolves after a delay of `ms` milliseconds. */
+declare const sleep: (ms: NumberLike) => Promise<void>;
+/**
+ * Dynamically import any *esm* module using a cdn (jsdelivr).
+ * @see {@link https://www.jsdelivr.com/esm}
+ */
+declare const cdn: <T = any>(name: string) => Promise<T>;
+
+/** trims a given string while also removing all empty lines */
+declare const trimLines: (s: string) => string;
+declare const add: (a: number, b: number) => number;
+declare const sub: (a: number, b: number) => number;
+declare const mult: (a: number, b: number) => number;
+declare const div: (a: number, b: number) => number;
+declare const mod: (a: number, b: number) => number;
+declare const lt: (a: number, b: number) => boolean;
+declare const gt: (a: number, b: number) => boolean;
+declare const lte: (a: number, b: number) => boolean;
+declare const gte: (a: number, b: number) => boolean;
+
+export { Range, add, cdn, div, gt, gte, iRange, irange, lt, lte, mod, mult, range, sleep, sub, trimLines };

@@ -667,4 +667,4 @@ type Normalize<T> = OmitIndexSignature<UnionToIntersection<T>>;
  */
 type IsLiteral<T> = T extends primitive ? IsLiteral$1<T> : false;
 
-export { Defined as D, Extends as E, JsValue as J, KeyOf as K, Maybe as M, Numeric as N, OmitIndexSignature as O, Primitive as P, Simplify as S, Type as T, Union as U, ValueOf as V, NumberLike as a, Nullish as b, Nullable as c, Multi as d, JsObject as e, KeyOfDeep as f, ValueOfDeep as g, Narrow as h, primitive as p };
+export { Defined as D, Extends as E, JsObject as J, KeyOf as K, Multi as M, Nullish as N, OmitIndexSignature as O, Primitive as P, Simplify as S, Type as T, Union as U, ValueOf as V, NumberLike as a, KeyOfDeep as b, ValueOfDeep as c, Numeric as d, Nullable as e, Maybe as f, JsValue as g, Narrow as h, primitive as p };

@@ -1,6 +1,13 @@
-export { default as inspect } from 'object-inspect';
+import { Options } from 'object-inspect';
 export { default as escapeRegex } from 'escape-string-regexp';
 export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from 'deepmerge-ts';
+
+/**
+ * @overview - Other external "essential" utilities as named exports and tree-shakeable.
+ * Some may be a dependency for some internal utilities or have changed defaults.
+ * Handpicked based on combination of performance, popularity, and update recency.
+ * All credits goes to their respective authors.
+ */
 
 /**
  * *rfdc (Really Fast Deep Clone)*
@@ -28,5 +35,12 @@ declare const deepcopy: <T>(input: T) => T;
 declare const deepcompare: (a: unknown, b: unknown, options?: {
     strict: boolean;
 }) => boolean;
+/**
+ * *object-inspect* - String representations of objects in node and the browser.
+ *
+ * *Note: indentation defaults to `2` if no options are provided*
+ * @see {@link https://www.npmjs.com/package/object-inspect}
+ */
+declare const inspect: (value: unknown, opts?: Options) => string;
 
-export { deepclone, deepcompare, deepcopy };
+export { deepclone, deepcompare, deepcopy, inspect };

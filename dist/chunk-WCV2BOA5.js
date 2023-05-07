@@ -1,9 +1,9 @@
-import { pop } from './chunk-Y2FOLZE5.js';
-import { trimLines } from './chunk-P3332SUY.js';
-import { isObject } from './chunk-Y3Z756F3.js';
-import { __name } from './chunk-HXRSFH6L.js';
+import { trimLines } from './chunk-EUEVFVEX.js';
+import { pop } from './chunk-IQWGMYOO.js';
+import { isObject } from './chunk-HL4E3HPN.js';
+import { __name } from './chunk-JXJLGDKJ.js';
 
-// src/browser/index.ts
+// src/html/index.ts
 var querySelectorMatchAll = /* @__PURE__ */ __name((regex, selectors = "*", document = globalThis["document"]) => {
   const result = [];
   for (const el of document.querySelectorAll(selectors)) {
@@ -23,7 +23,7 @@ var createLink = /* @__PURE__ */ __name((href, options = {}, document = globalTh
   newtab && (newtab = { target: "_blank", rel: "noreferrer noopener" });
   return createElement("a", { href, textContent, ...newtab }, document);
 }, "createLink");
-var createHTMLDoc = /* @__PURE__ */ __name((body = "", { head = "" } = {}) => trimLines(
+var createHTMLDoc = /* @__PURE__ */ __name(({ head = "", body = "" } = {}) => trimLines(
   /* html */
   `
 <!DOCTYPE html>

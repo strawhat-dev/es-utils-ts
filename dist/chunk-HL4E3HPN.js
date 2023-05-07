@@ -1,5 +1,4 @@
-import default2, { deepcompare } from './chunk-HEWJAYP7.js';
-import { __name } from './chunk-HXRSFH6L.js';
+import { inspect, __name, deepcompare } from './chunk-JXJLGDKJ.js';
 
 // src/conditionals/type-checking.ts
 var type = /* @__PURE__ */ __name((value) => Object.prototype.toString.call(value).slice(8, -1), "type");
@@ -83,7 +82,7 @@ function createAssertion(assertion, expected = assertion.name.slice(2)) {
     if (onError && !quiet) {
       const code = "AssertionError";
       const cause = { code, value, expected, actual: type(value) };
-      const err = new Error(`[${code}] expected instance of ${expected}; received ${default2(value)}`, { cause });
+      const err = new Error(`[${code}] expected instance of ${expected}; received ${inspect(value)}`, { cause });
       if (onError === "throw")
         throw err;
       else if (typeof onError === "function")
@@ -94,4 +93,16 @@ function createAssertion(assertion, expected = assertion.name.slice(2)) {
 }
 __name(createAssertion, "createAssertion");
 
-export { assert, is, isArrayBuffer, isAsyncFunction, isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isConstructor, isDate, isElement, isError, isGeneratorFunction, isIterable, isIterator, isMap, isObject, isPrimitive, isPromise, isRegExp, isRequest, isSet, isTypedArray, isWeakMap, isWeakSet, type };
+// src/conditionals/validation.ts
+var nullish = /* @__PURE__ */ __name((value) => typeof value === "undefined" || value === null, "nullish");
+var not = /* @__PURE__ */ __name((value) => value === false || nullish(value) || Number.isNaN(value), "not");
+var validURL = /* @__PURE__ */ __name((value, options = { http: true }) => {
+  try {
+    const { protocol } = new URL(value);
+    return !options.http || protocol === "http:" || protocol === "https:";
+  } catch {
+    return false;
+  }
+}, "validURL");
+
+export { assert, is, isArrayBuffer, isAsyncFunction, isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isConstructor, isDate, isElement, isError, isGeneratorFunction, isIterable, isIterator, isMap, isObject, isPrimitive, isPromise, isRegExp, isRequest, isSet, isTypedArray, isWeakMap, isWeakSet, not, nullish, type, validURL };
