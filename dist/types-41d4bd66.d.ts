@@ -1,4 +1,4 @@
-import { P as Primitive$1, I as IsNotFalse, C as ConditionalKeys } from './conditional-keys.d-ac881611.js';
+import { P as Primitive$1, I as IsNotFalse, a as ConditionalKeys, C as ConditionalExcept } from './conditional-except.d-b0cdb712.js';
 
 /**
 Useful to flatten the type output to improve type hints shown in editors. And also to transform an interface into a type to aide with assignability.
@@ -613,46 +613,55 @@ type JsObject<value = JsValue> = {
     [key: string]: value;
 };
 /**
- * More reliably extract and create types from a given type's keys by joining
- * any union types into an intersection (so that `never` is not returned)
- * and omitting the index signature (so that literal keys may be resolved).
+ * More reliably extract a union of a given type's keys as strings by joining
+ * any union types into an intersection *(so that `never` is not returned)*
+ * and omitting the index signature *(so that literal keys may be resolved)*.
  */
-type KeyOf<T, Fallback = string, Target = Normalize<T>> = StringKeyOf<Target> extends never ? Fallback : StringKeyOf<Target>;
+type KeyOf<T, Fallback = string, Target = Composite<T>> = StringKeyOf<Target> extends never ? Fallback : StringKeyOf<Target>;
 /**
  * Create a union type from a given object's values if possible;
  * else falls back to any js value by default.
  */
-type ValueOf<T, Fallback = JsValue, Target = Normalize<T>> = KeyOf<T> extends keyof Target ? Target[KeyOf<T>] : Fallback;
+type ValueOf<T, Fallback = JsValue, Target = Composite<T>> = KeyOf<T> extends keyof Target ? Target[KeyOf<T>] : Fallback;
 /**
- * Like {@link KeyOf}, but recursively extracts all keys, including nested ones.
+ * Like {@link KeyOf}, but recursively extracts nested keys.
  */
-type KeyOfDeep<T, Current = Normalize<T>, Nested extends keyof Current = ConditionalKeys<Current, JsObject>> = KeyOf<T> | (Nested extends never ? never : KeyOfDeep<Current[Nested]>);
+type KeyOfDeep<T, Current = Composite<T>, Nested extends keyof Current = ConditionalKeys<Current, JsObject<any>>> = Type<KeyOf<Current> | (Nested extends never ? never : KeyOfDeep<Current[Nested]>)>;
 /**
- * Like {@link ValueOf}, but recursively extracts all value types, including nested ones.
+ * Like {@link ValueOf}, but recursively extracts nested values.
+ *
+ * Note: Values that are being recursed into themselves
+ * *(i.e. parent values containing sub-values)* are not included.
  */
-type ValueOfDeep<T, Current = Normalize<T>, Nested extends keyof Current = ConditionalKeys<Current, JsObject>> = ValueOf<T> | (Nested extends never ? never : ValueOfDeep<Current[Nested]>);
+type ValueOfDeep<T, Current = Composite<T>, Nested extends keyof Current = ConditionalKeys<Current, JsObject<any>>> = Type<Current[ConditionalKeysExcept<Current, JsObject<any>>] | (Nested extends never ? never : ValueOfDeep<Current[Nested]>)>;
 /**
+ * *Improved version of type-fest's {@link https://github.com/sindresorhus/type-fest/blob/main/source/literal-union.d.ts | LiteralUnion}*.
+ *
  * Generic that allows for both the literal and
  * base types without sacrificing completions.
- * (base type automatically inferred from given literal)
+ * - base type automatically inferred from literal
+ * - does not break on non-literal or complex object types
  */
 type Union<T> = Type<T | (IsLiteral<T> extends true ? LiteralToPrimitive<T> & Defined : Narrow<T>)>;
 /**
  * Narrow down a type to a base type.
  */
-type Narrow<T> = Type<T extends Promise<infer Resolved> ? Promise<Narrow<Resolved>> : T extends (infer Item)[] ? Narrow<Item>[] : T extends Set<infer Item> ? Set<Narrow<Item>> : T extends Map<infer K, infer V> ? Map<Narrow<K>, Narrow<V>> : T extends Function ? Function : T extends JsObject ? JsObject : T extends object ? object : T extends primitive ? LiteralToPrimitive<T> : Defined>;
+type Narrow<T> = Type<T extends Promise<infer Resolved> ? Promise<Narrow<Resolved>> : T extends (infer Item)[] ? Narrow<Item>[] : T extends Set<infer Item> ? Set<Narrow<Item>> : T extends Map<infer K, infer V> ? Map<Narrow<K>, Narrow<V>> : T extends JsObject<infer Values> ? JsObject<Values> : T extends Function ? Function : T extends object ? object : T extends primitive ? LiteralToPrimitive<T> : Defined>;
+/**
+ * Ensure a type can be resolved as an explicit defined type by joining
+ * any unions into intersections, and omitting the index signature.
+ */
+type Composite<T> = OmitIndexSignature<UnionToIntersection<T>>;
+/**
+ * Inverse of type-fest's {@link https://github.com/sindresorhus/type-fest/blob/main/source/conditional-keys.d.ts | ConditionalKeys}.
+ * Retrieves all of the keys that do **not** match the given type.
+ */
+type ConditionalKeysExcept<T, Omit> = keyof ConditionalExcept<T, Omit>;
 /**
  * @internal
- * Utility type only used to contain long type definitions
- * within angle brackets without leaving hanging indents.
+ * Utility type only used to contain long type definitions within angle brackets without leaving hanging indents.
  */
 type Type<T> = T;
-/**
- * @internal
- * Ensure a type can be resolved as a single type by joining
- * any unions into intersections, and omits the index signature
- */
-type Normalize<T> = OmitIndexSignature<UnionToIntersection<T>>;
 /**
  * @internal
  * Wrapped `IsLiteral` from type-fest
