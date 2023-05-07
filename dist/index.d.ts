@@ -2,9 +2,9 @@ export { D as Defined, E as Extends, e as JsObject, J as JsValue, K as KeyOf, f 
 export { HTMLElementProps, HTMLTag, createElement, createHTMLDoc, createLink, querySelectorMatchAll } from './browser/index.js';
 export { AssertionType, assert, is, isArrayBuffer, isAsyncFunction, isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isConstructor, isDate, isElement, isError, isGeneratorFunction, isIterable, isIterator, isMap, isObject, isPrimitive, isPromise, isRegExp, isRequest, isSet, isTypedArray, isWeakMap, isWeakSet, type } from './conditionals/type-checking.js';
 export { not, nullish, validURL } from './conditionals/validation.js';
-export { deepclone, deepcompare } from './externals.js';
+export { deepclone, deepcompare, deepcopy } from './externals.js';
 export { trimLines } from './lib.js';
-export { clear, extend, filter, findkey, map, object, pop } from './objects/index.js';
+export { clear, extend, extendedkeys, filter, findkey, map, object, pop, props } from './objects/index.js';
 export { cdn, sleep } from './promises.js';
 export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from 'deepmerge-ts';
 export { default as range } from 'just-range';
