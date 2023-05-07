@@ -1,4 +1,4 @@
-import { default2, deepcompare } from './chunk-XHBJGOOA.js';
+import default2, { deepcompare } from './chunk-HEWJAYP7.js';
 import { __name } from './chunk-HXRSFH6L.js';
 
 // src/conditionals/type-checking.ts

@@ -1,6 +1,6 @@
-import { pop } from './chunk-A4PWDBXO.js';
-import { trimLines } from './chunk-DDDNNU76.js';
-import { isObject } from './chunk-7U7BT2PX.js';
+import { pop } from './chunk-Y2FOLZE5.js';
+import { trimLines } from './chunk-P3332SUY.js';
+import { isObject } from './chunk-Y3Z756F3.js';
 import { __name } from './chunk-HXRSFH6L.js';
 
 // src/browser/index.ts

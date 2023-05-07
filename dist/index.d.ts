@@ -3,13 +3,13 @@ export { HTMLElementProps, HTMLTag, createElement, createHTMLDoc, createLink, qu
 export { AssertionType, assert, is, isArrayBuffer, isAsyncFunction, isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isConstructor, isDate, isElement, isError, isGeneratorFunction, isIterable, isIterator, isMap, isObject, isPrimitive, isPromise, isRegExp, isRequest, isSet, isTypedArray, isWeakMap, isWeakSet, type } from './conditionals/type-checking.js';
 export { not, nullish, validURL } from './conditionals/validation.js';
 export { deepclone, deepcompare, deepcopy } from './externals.js';
-export { trimLines } from './lib.js';
+export { add, div, gt, gte, lt, lte, mod, mult, sub, trimLines } from './lib.js';
 export { clear, extend, filter, findkey, keysIn, map, object, pop, props } from './objects/index.js';
 export { cdn, sleep } from './promises.js';
-export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from 'deepmerge-ts';
-export { default as range } from 'just-range';
+export { Range, iRange, irange, range } from './range.js';
 export { default as inspect } from 'object-inspect';
 export { default as escapeRegex } from 'escape-string-regexp';
+export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from 'deepmerge-ts';
 import './conditional-keys.d-ac881611.js';
 import './partial-deep.d-c532d293.js';
 import 'type-fest/source/async-return-type.js';

@@ -1,8 +1,15 @@
-export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from 'deepmerge-ts';
-export { default as range } from 'just-range';
 export { default as inspect } from 'object-inspect';
 export { default as escapeRegex } from 'escape-string-regexp';
+export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from 'deepmerge-ts';
 
+/**
+ * *rfdc (Really Fast Deep Clone)*
+ *
+ * Note: Will **fail** if the object contains circular references.
+ * Use {@link deepcopy} if the object can contain circular references.
+ * @see {@link https://www.npmjs.com/package/rfdc}
+ */
+declare const deepclone: <T>(input: T) => T;
 /**
  * *rfdc (Really Fast Deep Clone)* w/ circular reference support
  *
@@ -11,14 +18,6 @@ export { default as escapeRegex } from 'escape-string-regexp';
  * @see {@link https://www.npmjs.com/package/rfdc}
  */
 declare const deepcopy: <T>(input: T) => T;
-/**
- * *rfdc (Really Fast Deep Clone)*
- *
- * Note: Will **fail** if the object contains circular references.
- * Use {@link deepcopy} if the object can contain circular references.
- * @see {@link https://www.npmjs.com/package/rfdc}
- */
-declare const deepclone: <T>(source: T) => T;
 /**
  * *deep-equal* module w/ **strict on** by default
  *
