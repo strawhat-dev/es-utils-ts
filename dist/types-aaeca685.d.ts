@@ -228,7 +228,7 @@ type UnionToIntersection<Union> = (
 	? Intersection
 	: never;
 
-type Numeric$1 = number | bigint;
+type Numeric = number | bigint;
 
 /**
 Given a [literal type](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types) return the {@link Primitive | primitive type} it belongs to, or `never` if it's not a primitive.
@@ -469,7 +469,7 @@ endsWith('abc123', end);
 @category Type Guard
 @category Utilities
 */
-type IsNumericLiteral<T> = LiteralChecks<T, Numeric$1>;
+type IsNumericLiteral<T> = LiteralChecks<T, Numeric>;
 
 /**
 Returns a boolean for whether the given type is a `true` or `false` [literal type](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types).
@@ -592,11 +592,8 @@ stripLeading(str, 'abc');
 */
 type IsLiteral$1<T extends Primitive$1> = IsNotFalse<IsLiteralUnion<T>>;
 
-type Numeric = number | bigint;
 type NumberLike = number | `${number}`;
 type Nullish = null | undefined;
-type Nullable<T> = T | null;
-type Maybe<T> = T | Nullish;
 type Multi<T> = T | T[];
 /**
  * *common primitves*
@@ -652,11 +649,6 @@ type Narrow<T> = Type<T extends Promise<infer Resolved> ? Promise<Narrow<Resolve
 type Type<T> = T;
 /**
  * @internal
- * Utility type to quickly check whether `T1` extends `T2`.
- */
-type Extends<T1, T2> = T1 extends T2 ? true : false;
-/**
- * @internal
  * Ensure a type can be resolved as a single type by joining
  * any unions into intersections, and omits the index signature
  */
@@ -667,4 +659,4 @@ type Normalize<T> = OmitIndexSignature<UnionToIntersection<T>>;
  */
 type IsLiteral<T> = T extends primitive ? IsLiteral$1<T> : false;
 
-export { Defined as D, Extends as E, JsObject as J, KeyOf as K, Multi as M, Nullish as N, OmitIndexSignature as O, Primitive as P, Simplify as S, Type as T, Union as U, ValueOf as V, NumberLike as a, KeyOfDeep as b, ValueOfDeep as c, Numeric as d, Nullable as e, Maybe as f, JsValue as g, Narrow as h, primitive as p };
+export { JsObject as J, KeyOf as K, Multi as M, Nullish as N, OmitIndexSignature as O, Simplify as S, Type as T, Union as U, ValueOf as V, NumberLike as a, KeyOfDeep as b, ValueOfDeep as c, primitive as p };

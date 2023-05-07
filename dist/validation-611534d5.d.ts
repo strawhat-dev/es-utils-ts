@@ -1,6 +1,6 @@
 import './conditional-keys.d-ac881611.js';
 import { AsyncFunction } from 'type-fest/source/async-return-type.js';
-import { U as Union, J as JsObject, p as primitive, K as KeyOf, N as Nullish } from './types-54b1c1d7.js';
+import { U as Union, J as JsObject, p as primitive, K as KeyOf, N as Nullish } from './types-aaeca685.js';
 
 /**
 Matches any [typed array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray), like `Uint8Array` or `Float64Array`.
@@ -134,7 +134,7 @@ declare const isAsyncIterable: (value: unknown) => value is AsyncIterable<any>;
 declare const isAsyncIterator: (value: unknown) => value is AsyncIterator<any, any, undefined>;
 declare const isConstructor: (value: unknown) => value is Constructor<any>;
 declare const isDate: (value: unknown) => value is Date;
-declare const isElement: (value: unknown) => value is Element | Document;
+declare const isElement: (value: unknown) => value is Document | Element;
 declare const isError: (value: unknown) => value is Error;
 declare const isGeneratorFunction: (value: unknown) => value is GeneratorFunction;
 declare const isIterable: (value: unknown) => value is Iterable<any>;
