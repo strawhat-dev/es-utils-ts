@@ -4,7 +4,7 @@
   "description": "esm-first simple typed utilities",
   "repository": "github:strawhat-dev/es-utils-ts",
   "version": "0.0.29",
-  "license": "ISC",
+  "license": "MIT",
   "type": "module",
   "sideEffects": false,
   "module": "./dist/index.js",
