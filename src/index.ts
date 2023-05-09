@@ -3,4 +3,4 @@ export * from '@/html';
 export * from '@/lib';
 export * from '@/objects';
 export * from '@/externals';
-export { path } from '@/path';
+export { default as path } from '@/path';

@@ -78,7 +78,7 @@ declare const defaultExt: (p: string, ext: string, ignore?: string[], max?: numb
  *
  * @see {@link https://www.npmjs.com/package/upath}
  */
-declare const path: Readonly<{
+declare const _default: Readonly<{
     readonly addExt: (p: string, ext: string) => string;
     readonly basename: (path: string, suffix?: string | undefined) => string;
     readonly changeExt: (p: string, ext: string, ignore?: string[], max?: number) => string;
@@ -89,7 +89,7 @@ declare const path: Readonly<{
     readonly format: (pathObj: Path.FormatInputPathObject) => string;
     readonly isAbsolute: (path: string) => boolean;
     readonly join: (...paths: string[]) => string;
-    readonly joinSafe: (...args: Parameters<(typeof Path)['join']>) => string;
+    readonly joinSafe: (...args: string[]) => string;
     readonly normalize: (path: string) => string;
     readonly normalizeSafe: (p: string) => string;
     readonly normalizeTrim: (p: string) => string;
@@ -105,4 +105,4 @@ declare const path: Readonly<{
     readonly toNamespacedPath: (p: string) => string;
 }>;
 
-export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, path, relative, removeExt, resolve, sep, toUnix, trimExt };
+export { addExt, basename, changeExt, _default as default, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, relative, removeExt, resolve, sep, toUnix, trimExt };

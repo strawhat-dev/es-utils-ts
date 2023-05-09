@@ -168,7 +168,7 @@ export const defaultExt = (
  *
  * @see {@link https://www.npmjs.com/package/upath}
  */
-export const path = Object.freeze({
+export default Object.freeze({
   addExt,
   basename,
   changeExt,

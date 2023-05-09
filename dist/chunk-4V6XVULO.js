@@ -83,7 +83,7 @@ var defaultExt = /* @__PURE__ */ __name((p, ext, ignore = [], max = 7) => {
     return addExt(p, ext);
   return result;
 }, "defaultExt");
-var path = Object.freeze({
+var path_default = Object.freeze({
   addExt,
   basename,
   changeExt,
@@ -123,4 +123,4 @@ function isValidExt(ext, ignore = [], max = 7) {
 }
 __name(isValidExt, "isValidExt");
 
-export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, path, relative, removeExt, resolve, sep, toUnix, trimExt };
+export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, path_default, relative, removeExt, resolve, sep, toUnix, trimExt };
