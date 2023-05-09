@@ -1,30 +1,40 @@
 import { map } from './chunk-OPX7PJBV.js';
 import { __name } from './chunk-JXJLGDKJ.js';
 import Path from 'path';
+import PathPosix from 'path/posix';
 
 var sep = "/";
+var methods = /* @__PURE__ */ new Set([
+  "basename",
+  "delimiter",
+  "dirname",
+  "extname",
+  "isAbsolute",
+  "join",
+  "normalize",
+  "relative",
+  "resolve"
+]);
 var {
   basename,
   delimiter,
   dirname,
   extname,
-  format,
   isAbsolute,
   join,
   normalize,
-  parse,
-  posix,
   relative,
-  resolve,
-  toNamespacedPath,
-  win32
-} = map(Path, { inherited: true, nonEnumerable: true }, (name, prop) => [
-  name,
-  unixify(prop)
-]);
+  resolve
+} = map(
+  Path,
+  { inherited: true, nonEnumerable: true },
+  (name, prop) => methods.has(name) && [name, unixify(prop)]
+);
 var toUnix = /* @__PURE__ */ __name((p) => {
   return typeof p === "string" ? p.replace(/\\/g, "/").replace(/(?<!^)\/+/g, "/") : p;
 }, "toUnix");
+var parse = /* @__PURE__ */ __name((p) => PathPosix.parse(toUnix(p)), "parse");
+var format = /* @__PURE__ */ __name((pathObj) => toUnix(Path.format(pathObj)), "format");
 var normalizeSafe = /* @__PURE__ */ __name((p) => {
   p = toUnix(p);
   let result = normalize(p);
@@ -90,15 +100,15 @@ var path = Object.freeze({
   normalizeSafe,
   normalizeTrim,
   parse,
-  posix,
   relative,
   removeExt,
   resolve,
   sep,
-  toNamespacedPath,
   toUnix,
   trimExt,
-  win32
+  posix: PathPosix,
+  win32: PathPosix,
+  toNamespacedPath: toUnix
 });
 function unixify(target) {
   if (Array.isArray(target))
@@ -114,4 +124,4 @@ function isValidExt(ext, ignore = [], max = 7) {
 }
 __name(isValidExt, "isValidExt");
 
-export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, path, posix, relative, removeExt, resolve, sep, toNamespacedPath, toUnix, trimExt, win32 };
+export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, path, relative, removeExt, resolve, sep, toUnix, trimExt };
