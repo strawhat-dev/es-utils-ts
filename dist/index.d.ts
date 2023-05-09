@@ -3,6 +3,7 @@ export { HTMLElementProps, HTMLTag, createElement, createHTMLDoc, createLink, qu
 export { Range, add, cdn, div, gt, gte, iRange, irange, lt, lte, mod, mult, range, sleep, sub, trimLines } from './lib/index.js';
 export { clear, extend, filter, findkey, keysIn, map, object, pop, props } from './objects/index.js';
 export { deepclone, deepcompare, deepcopy, inspect } from './externals.js';
+export { path } from './path.js';
 export { default as escapeRegex } from 'escape-string-regexp';
 export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from 'deepmerge-ts';
 import './conditional-except.d-b0cdb712.js';
@@ -11,3 +12,4 @@ import './types-5ab890d1.js';
 import './partial-deep.d-45e8a659.js';
 import 'type-fest/source/merge-deep.js';
 import 'object-inspect';
+import 'path';
