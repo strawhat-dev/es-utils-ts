@@ -1,29 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable tree-shaking/no-side-effects-in-initialization */
 import Path from 'path';
+import PathPosix from 'path/posix';
 import { map } from '@/objects';
 
 export const sep = '/';
+
+const methods = new Set([
+  'basename',
+  'delimiter',
+  'dirname',
+  'extname',
+  'isAbsolute',
+  'join',
+  'normalize',
+  'relative',
+  'resolve',
+]);
 
 export const {
   basename,
   delimiter,
   dirname,
   extname,
-  format,
   isAbsolute,
   join,
   normalize,
-  parse,
-  posix,
   relative,
   resolve,
-  toNamespacedPath,
-  win32,
-} = map(Path, { inherited: true, nonEnumerable: true }, (name, prop) => [
-  name,
-  unixify(prop),
-]) as Path.PlatformPath;
+} = map(
+  Path,
+  { inherited: true, nonEnumerable: true },
+  (name, prop) => methods.has(name) && [name, unixify(prop)]
+) as PathPosix.PlatformPath;
 
 /**
  * Converts all `\` to `/` and consolidates duplicates
@@ -34,6 +43,17 @@ export const toUnix = (p: string) => {
     ? p.replace(/\\/g, '/').replace(/(?<!^)\/+/g, '/')
     : p;
 };
+
+/**
+ * @returns an object from a path string. *(the opposite of `path.format`)*
+ */
+export const parse = (p: string) => PathPosix.parse(toUnix(p));
+
+/**
+ * @returns a path string from an object. *(the opposite of `path.parse`)*
+ */
+// prettier-ignore
+export const format = (pathObj: Path.FormatInputPathObject) => toUnix(Path.format(pathObj));
 
 /**
  * Exactly like `path.normalize`, but keeps the first meaningful `./` or `//`. \
@@ -140,12 +160,14 @@ export const defaultExt = (
  * In most contexts Windows already allows forward slashes as the path seperator,
  * so there is no reason to stick with the legacy Windows back slash. As a universal
  * path solution for both *windows / unix*, this allows one to just use `'/'`,
- * throughout their code and forget about it. Adapted + refactored from {@link https://www.npmjs.com/package/upath | upath},
- * and re-exported as tree-shakeable named exports.
+ * throughout their code and forget about it. Adapted + refactored from `upath` and
+ * re-exported as tree-shakeable named exports.
  *
  * Note: In non-node.js environments, you usually do not have to install `path-browserify` yourself.
  * If your code runs in the browser, bundlers like browserify or webpack include the path-browserify
  * module by default.
+ *
+ * @see {@link https://www.npmjs.com/package/upath}
  */
 export const path = Object.freeze({
   addExt,
@@ -163,15 +185,15 @@ export const path = Object.freeze({
   normalizeSafe,
   normalizeTrim,
   parse,
-  posix,
   relative,
   removeExt,
   resolve,
   sep,
-  toNamespacedPath,
   toUnix,
   trimExt,
-  win32,
+  posix: PathPosix,
+  win32: PathPosix,
+  toNamespacedPath: toUnix,
 } as const);
 
 /** @internal */
