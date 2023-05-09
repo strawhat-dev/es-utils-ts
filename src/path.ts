@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable tree-shaking/no-side-effects-in-initialization */
 import Path from 'path';
-import PathPosix from 'path/posix';
 import { map } from '@/objects';
 
 export const sep = '/';
@@ -32,7 +31,7 @@ export const {
   Path,
   { inherited: true, nonEnumerable: true },
   (name, prop) => methods.has(name) && [name, unixify(prop)]
-) as PathPosix.PlatformPath;
+) as Path.PlatformPath;
 
 /**
  * Converts all `\` to `/` and consolidates duplicates
@@ -47,7 +46,7 @@ export const toUnix = (p: string) => {
 /**
  * @returns an object from a path string. *(the opposite of `path.format`)*
  */
-export const parse = (p: string) => PathPosix.parse(toUnix(p));
+export const parse = (p: string) => Path.posix.parse(toUnix(p));
 
 /**
  * @returns a path string from an object. *(the opposite of `path.parse`)*
@@ -191,8 +190,8 @@ export const path = Object.freeze({
   sep,
   toUnix,
   trimExt,
-  posix: PathPosix,
-  win32: PathPosix,
+  posix: Path.posix,
+  win32: Path.posix,
   toNamespacedPath: toUnix,
 } as const);
 

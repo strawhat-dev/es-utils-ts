@@ -1,7 +1,6 @@
 import { map } from './chunk-OPX7PJBV.js';
 import { __name } from './chunk-JXJLGDKJ.js';
 import Path from 'path';
-import PathPosix from 'path/posix';
 
 var sep = "/";
 var methods = /* @__PURE__ */ new Set([
@@ -33,7 +32,7 @@ var {
 var toUnix = /* @__PURE__ */ __name((p) => {
   return typeof p === "string" ? p.replace(/\\/g, "/").replace(/(?<!^)\/+/g, "/") : p;
 }, "toUnix");
-var parse = /* @__PURE__ */ __name((p) => PathPosix.parse(toUnix(p)), "parse");
+var parse = /* @__PURE__ */ __name((p) => Path.posix.parse(toUnix(p)), "parse");
 var format = /* @__PURE__ */ __name((pathObj) => toUnix(Path.format(pathObj)), "format");
 var normalizeSafe = /* @__PURE__ */ __name((p) => {
   p = toUnix(p);
@@ -106,8 +105,8 @@ var path = Object.freeze({
   sep,
   toUnix,
   trimExt,
-  posix: PathPosix,
-  win32: PathPosix,
+  posix: Path.posix,
+  win32: Path.posix,
   toNamespacedPath: toUnix
 });
 function unixify(target) {

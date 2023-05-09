@@ -1,4 +1,4 @@
-export { path } from './chunk-YTZQHQER.js';
+export { path } from './chunk-PIEANLFJ.js';
 export { createElement, createHTMLDoc, createLink, querySelectorMatchAll } from './chunk-636SAOUG.js';
 export { Range, add, cdn, div, gt, gte, iRange, irange, lt, lte, mod, mult, range, sleep, sub, trimLines } from './chunk-CWIWIPOX.js';
 export { clear, extend, filter, findkey, keysIn, map, object, pop, props } from './chunk-OPX7PJBV.js';
