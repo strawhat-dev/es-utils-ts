@@ -1,6 +1,6 @@
 import './conditional-except.d-b0cdb712.js';
 import { AsyncFunction } from 'type-fest/source/async-return-type.js';
-import { T as Type, U as Union, J as JsObject, p as primitive, K as KeyOf, N as Nullish } from './types-5ab890d1.js';
+import { T as Type, U as Union, e as JsObject, p as primitive, K as KeyOf, b as Nullish } from './types-31a53eeb.js';
 
 /**
 Matches any [typed array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray), like `Uint8Array` or `Float64Array`.

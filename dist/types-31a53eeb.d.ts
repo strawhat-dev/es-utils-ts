@@ -228,7 +228,7 @@ type UnionToIntersection<Union> = (
 	? Intersection
 	: never;
 
-type Numeric = number | bigint;
+type Numeric$1 = number | bigint;
 
 /**
 Given a [literal type](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types) return the {@link Primitive | primitive type} it belongs to, or `never` if it's not a primitive.
@@ -469,7 +469,7 @@ endsWith('abc123', end);
 @category Type Guard
 @category Utilities
 */
-type IsNumericLiteral<T> = LiteralChecks<T, Numeric>;
+type IsNumericLiteral<T> = LiteralChecks<T, Numeric$1>;
 
 /**
 Returns a boolean for whether the given type is a `true` or `false` [literal type](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types).
@@ -592,8 +592,11 @@ stripLeading(str, 'abc');
 */
 type IsLiteral$1<T extends Primitive$1> = IsNotFalse<IsLiteralUnion<T>>;
 
+type Numeric = number | bigint;
 type NumberLike = number | `${number}`;
 type Nullish = null | undefined;
+type Nullable<T> = T | null;
+type Maybe<T> = T | Nullish;
 type Multi<T> = T | T[];
 /**
  * *common primitves*
@@ -662,8 +665,13 @@ type ConditionalKeysExcept<T, Omit> = keyof ConditionalExcept<T, Omit>;
 type Type<T> = T;
 /**
  * @internal
+ * Utility type to quickly check whether `T1` extends `T2`.
+ */
+type Extends<T1, T2> = T1 extends T2 ? true : false;
+/**
+ * @internal
  * Wrapped `IsLiteral` from type-fest
  */
 type IsLiteral<T> = T extends primitive ? IsLiteral$1<T> : false;
 
-export { JsObject as J, KeyOf as K, Multi as M, Nullish as N, OmitIndexSignature as O, Simplify as S, Type as T, Union as U, ValueOf as V, NumberLike as a, KeyOfDeep as b, ValueOfDeep as c, primitive as p };
+export { Composite as C, Defined as D, Extends as E, JsValue as J, KeyOf as K, Maybe as M, Numeric as N, OmitIndexSignature as O, Primitive as P, Simplify as S, Type as T, Union as U, ValueOf as V, NumberLike as a, Nullish as b, Nullable as c, Multi as d, JsObject as e, KeyOfDeep as f, ValueOfDeep as g, Narrow as h, ConditionalKeysExcept as i, primitive as p };
