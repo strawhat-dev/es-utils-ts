@@ -1,19 +1,20 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type { JsObject, KeyOf } from '@/types';
+import type { JsObject } from '@/types';
 import type {
   ClearFn,
   ExtendFn,
   ExtendOptions,
   FilterFn,
   FindKeyFn,
+  KeyIterationOptions,
   MapFn,
   PopFn,
   PropsFn,
 } from './types';
 
-import { isObject, not, nullish } from '@/conditionals';
 import { deepcopy, deepmergeInto } from '@/externals';
+import { isObject, not, nullish } from '@/conditionals';
 
 /**
  * @returns an array of the object's keys, including *inherited* ones
@@ -84,15 +85,17 @@ export const clear: ClearFn = (obj, options) => {
 export const extend: ExtendFn = (...args: unknown[]) => {
   const descriptorMap: PropertyDescriptorMap = {};
   const [target, props, options] = args.length === 1 ? [{}, args.pop()] : args;
-  const { copy, ...descriptors } = { ...(options as ExtendOptions) };
+  const { copy, freeze, ...descriptors } = { ...(options as ExtendOptions) };
   for (const key in props!) {
     descriptorMap[key] = { ...descriptors, value: (props as JsObject)[key] };
   }
 
-  return Object.defineProperties(
+  const ret = Object.defineProperties(
     copy ? deepcopy(target) : target,
     descriptorMap
-  ) as object;
+  );
+
+  return (freeze ? Object.freeze(ret) : ret) as ReturnType<ExtendFn>;
 };
 
 export const findkey: FindKeyFn = (obj: JsObject, ...args: unknown[]) => {
@@ -105,48 +108,45 @@ export const findkey: FindKeyFn = (obj: JsObject, ...args: unknown[]) => {
   for (const key of keys(obj ?? {})) {
     const value = obj[key];
     if (deep && isObject(value)) {
-      const resolved = findkey(value, { deep, keys }, callback as never);
+      const resolved = findkey(value, { deep, keys }, callback);
       if (resolved) return resolved;
     } else if (callback(value, key)) return key;
   }
 };
 
-// prettier-ignore
 export const map: MapFn = (obj: JsObject, ...args: unknown[]) => {
-  const result = {};
+  const result: JsObject = {};
   const { opts, callback } = parseRestArgs(args);
-  const { deep, ...keyopts } = opts;
+  const { deep, freeze, ...keyopts } = opts;
   const keys = keysDispatch(keyopts);
   for (const key of keys(obj ?? {})) {
     const value = obj[key];
     const entry = (
       deep && isObject(value)
-        ? [key, map(value, { deep, keys }, callback as never)]
+        ? [key, map(value, { deep, freeze, keys }, callback)]
         : callback(key, value)
-    );
+    ) as object;
 
-    const entries = (
-      Array.isArray(entry) && typeof entry[0] === 'object' ? entry : [entry]
-    );
-
-    entries.forEach((entry) =>
-      (isObject(entry) ? deepmergeInto : assignEntry)(result, entry)
-    );
+    if (isObject(entry)) deepmergeInto(result, entry);
+    else if (Array.isArray(entry)) {
+      (Array.isArray(entry[0]) ? entry : [entry]).forEach(
+        ([k, v]) => (result[k] = v)
+      );
+    }
   }
 
-  return result;
+  return freeze ? Object.freeze(result) : result;
 };
 
 export const filter: FilterFn = (obj: JsObject, ...args: unknown[]) => {
-  const result: JsObject = {};
+  let result: JsObject = {};
   const { opts, callback } = parseRestArgs(args, {
     opts: { deep: !args.length, withRest: false },
     callback: ({ value }: { value: unknown }) => typeof value !== 'undefined',
   });
 
   (opts['withRest'] as {}) &&= {};
-  const { deep, withRest, ...keyopts } = opts as unknown as {
-    deep: boolean;
+  const { deep, freeze, withRest, ...keyopts } = opts as typeof opts & {
     withRest: JsObject;
   };
 
@@ -157,22 +157,19 @@ export const filter: FilterFn = (obj: JsObject, ...args: unknown[]) => {
       if (callback({ key, value })) result[key] = value;
       else if (withRest) withRest[key] = value;
     } else {
-      const entry = filter(
-        value,
-        { deep, keys, withRest: !!withRest },
-        callback as never
-      );
-
+      const opts = { deep, freeze, keys, withRest: !!withRest } as const;
+      const entry = filter(value, opts, callback);
       const [resolved, omitted] = withRest ? entry : [entry, {}];
-      if (Object.keys(omitted).length) withRest[key] = omitted;
+      Object.keys(omitted).length && (withRest[key] = omitted);
       result[key] = resolved;
     }
   }
 
+  freeze && (result = Object.freeze(result));
   return withRest ? [result, withRest] : result;
 };
 
-export const object = Object.freeze({
+export const _ = Object.freeze({
   clear,
   extend,
   filter,
@@ -181,11 +178,7 @@ export const object = Object.freeze({
   map,
   pop,
   props,
-} as const);
-
-/** @internal */
-// prettier-ignore
-const assignEntry = (obj: JsObject<unknown>, entry: [string, unknown]) => not(entry?.[0]) || (obj[entry[0]] = entry[1]);
+});
 
 /** @internal */
 const parseRestArgs = (
@@ -203,11 +196,10 @@ const parseRestArgs = (
 };
 
 /** @internal */
-const keysDispatch = ((opts) => {
+const keysDispatch = (opts?: KeyIterationOptions) => {
+  let keys;
   if (!opts) return Object.keys;
-
-  if (opts['keys']) return opts['keys'];
-
+  if ((keys = opts['keys' as never])) return keys;
   if (opts['nonEnumerable']) {
     if (opts['inherited']) return props;
     return Object.getOwnPropertyNames;
@@ -216,4 +208,4 @@ const keysDispatch = ((opts) => {
   if (opts['inherited']) return keysIn;
 
   return Object.keys;
-}) as (opts?: JsObject<boolean>) => <T>(obj: T) => KeyOf<T>;
+};
