@@ -95,7 +95,8 @@ type Replace<
 		: `${Head}${Replacement}${Tail}`
 	: Input;
 
-type TypeName = Type<'Array Iterator' | 'Array' | 'ArrayBuffer' | 'AsyncFunction' | 'AsyncGenerator' | 'AsyncGeneratorFunction' | 'BigInt' | 'BigInt64Array' | 'BigUint64Array' | 'Boolean' | 'Date' | 'Error' | 'Float32Array' | 'Float64Array' | 'Function' | 'Generator' | 'GeneratorFunction' | 'Int16Array' | 'Int32Array' | 'Int8Array' | 'Map Iterator' | 'Map' | 'Null' | 'Number' | 'Object' | 'Promise' | 'RegExp' | 'Request' | 'Set Iterator' | 'Set' | 'SharedArrayBuffer' | 'String' | 'Symbol' | 'Uint16Array' | 'Uint32Array' | 'Uint8Array' | 'Uint8ClampedArray' | 'Undefined' | 'WeakMap' | 'WeakSet'>;
+type GeneratorFunction = (...args: any[]) => Generator;
+type AsyncGeneratorFunction = (...args: any[]) => AsyncGenerator;
 type AssertionOptions = {
     /**
      * Set to `throw` to throw on failed assertions
@@ -110,8 +111,7 @@ type AssertionOptions = {
      */
     quiet?: boolean;
 };
-type GeneratorFunction = (...args: any[]) => Generator;
-type AsyncGeneratorFunction = (...args: any[]) => AsyncGenerator;
+type TypeName = Type<'Array Iterator' | 'Array' | 'ArrayBuffer' | 'AsyncFunction' | 'AsyncGenerator' | 'AsyncGeneratorFunction' | 'BigInt' | 'BigInt64Array' | 'BigUint64Array' | 'Boolean' | 'Date' | 'Error' | 'Float32Array' | 'Float64Array' | 'Function' | 'Generator' | 'GeneratorFunction' | 'Int16Array' | 'Int32Array' | 'Int8Array' | 'Map Iterator' | 'Map' | 'Null' | 'Number' | 'Object' | 'Promise' | 'RegExp' | 'Request' | 'Set Iterator' | 'Set' | 'SharedArrayBuffer' | 'String' | 'Symbol' | 'Uint16Array' | 'Uint32Array' | 'Uint8Array' | 'Uint8ClampedArray' | 'Undefined' | 'WeakMap' | 'WeakSet'>;
 type MultiTypeQueryFunction = (value: unknown) => {
     anyOf: MultiTypeQuery;
     everyOf: MultiTypeQuery;

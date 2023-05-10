@@ -1,19 +1,16 @@
 import { map } from './chunk-OPX7PJBV.js';
 import { __name } from './chunk-JXJLGDKJ.js';
-import Path from 'path';
+import path from 'path';
+import posix from 'path-browserify';
 
+var toUnix = /* @__PURE__ */ __name((p) => {
+  if (typeof p !== "string")
+    return p;
+  return p.replace(/\\/g, "/").replace(/(?<!^)\/+/g, "/");
+}, "toUnix");
 var sep = "/";
-var methods = /* @__PURE__ */ new Set([
-  "basename",
-  "delimiter",
-  "dirname",
-  "extname",
-  "isAbsolute",
-  "join",
-  "normalize",
-  "relative",
-  "resolve"
-]);
+var parse = /* @__PURE__ */ __name((p) => posix.parse(toUnix(p)), "parse");
+var format = /* @__PURE__ */ __name((po) => toUnix(posix.format(po)), "format");
 var {
   basename,
   delimiter,
@@ -25,37 +22,32 @@ var {
   relative,
   resolve
 } = map(
-  Path,
+  path,
   { inherited: true, nonEnumerable: true },
   (name, prop) => methods.has(name) && [name, unixify(prop)]
 );
-var toUnix = /* @__PURE__ */ __name((p) => {
-  return typeof p === "string" ? p.replace(/\\/g, "/").replace(/(?<!^)\/+/g, "/") : p;
-}, "toUnix");
-var parse = /* @__PURE__ */ __name((p) => Path.posix.parse(toUnix(p)), "parse");
-var format = /* @__PURE__ */ __name((pathObj) => toUnix(Path.format(pathObj)), "format");
 var normalizeSafe = /* @__PURE__ */ __name((p) => {
   p = toUnix(p);
-  let result = normalize(p);
-  if (p.startsWith("./") && !result.startsWith("./") && !result.startsWith("..")) {
-    result = `./${result}`;
-  } else if (p.startsWith("//") && !result.startsWith("//")) {
-    result = `${p.startsWith("//./") ? "//." : "/"}${result}`;
+  let ret = normalize(p);
+  if (p.startsWith("./") && !ret.startsWith("./") && !ret.startsWith("..")) {
+    ret = `./${ret}`;
+  } else if (p.startsWith("//") && !ret.startsWith("//")) {
+    ret = `${p.startsWith("//./") ? "//." : "/"}${ret}`;
   }
-  return result;
+  return ret;
 }, "normalizeSafe");
 var normalizeTrim = /* @__PURE__ */ __name((p) => normalizeSafe(p).replace(/[/]$/, ""), "normalizeTrim");
 var joinSafe = /* @__PURE__ */ __name((...args) => {
-  const result = join(...args);
+  const ret = join(...args);
   if (!args.length)
-    return result;
-  return normalizeSafe(result);
+    return ret;
+  return normalizeSafe(ret);
 }, "joinSafe");
-var trimExt = /* @__PURE__ */ __name((p, ignore = [], max = 7) => {
-  const result = extname(p);
-  if (!isValidExt(result, ignore, max))
+var trimExt = /* @__PURE__ */ __name((p, options) => {
+  const ret = extname(p);
+  if (!isValidExt(ret, options))
     return p;
-  return p.replace(new RegExp(`${result}$`), "");
+  return p.replace(new RegExp(`${ret}$`), "");
 }, "trimExt");
 var addExt = /* @__PURE__ */ __name((p, ext) => {
   if (!ext)
@@ -69,20 +61,11 @@ var removeExt = /* @__PURE__ */ __name((p, ext) => {
     return p;
   ext[0] === "." || (ext = `.${ext}`);
   if (extname(p) === ext)
-    return trimExt(p, [], ext.length);
+    return trimExt(p, { maxLength: ext.length });
   return p;
 }, "removeExt");
-var changeExt = /* @__PURE__ */ __name((p, ext, ignore = [], max = 7) => {
-  ext ?? (ext = "");
-  ext[0] === "." || (ext = `.${ext}`);
-  return `${trimExt(p, ignore, max)}${ext}`;
-}, "changeExt");
-var defaultExt = /* @__PURE__ */ __name((p, ext, ignore = [], max = 7) => {
-  const result = extname(p);
-  if (!isValidExt(p, ignore, max))
-    return addExt(p, ext);
-  return result;
-}, "defaultExt");
+var changeExt = /* @__PURE__ */ __name((p, ext = "", options) => (ext[0] === "." || (ext = `.${ext}`), `${trimExt(p, options)}${ext}`), "changeExt");
+var defaultExt = /* @__PURE__ */ __name((p, ext, options) => isValidExt(p, options) ? extname(p) : addExt(p, ext), "defaultExt");
 var path_default = Object.freeze({
   addExt,
   basename,
@@ -99,14 +82,14 @@ var path_default = Object.freeze({
   normalizeSafe,
   normalizeTrim,
   parse,
+  posix,
   relative,
   removeExt,
   resolve,
   sep,
   toUnix,
   trimExt,
-  posix: Path.posix,
-  win32: Path.posix,
+  win32: posix,
   toNamespacedPath: toUnix
 });
 function unixify(target) {
@@ -118,9 +101,20 @@ function unixify(target) {
   return target;
 }
 __name(unixify, "unixify");
-function isValidExt(ext, ignore = [], max = 7) {
-  return ext && ext.length <= max && !ignore.some((val) => (val?.[0] === "." || (val = `.${ext}`), val === ext));
+function isValidExt(ext, { ignore = [], maxLength = 7 } = {}) {
+  return ext && ext.length <= maxLength && !ignore.some((val) => (val?.[0] === "." || (val = `.${ext}`), val === ext));
 }
 __name(isValidExt, "isValidExt");
+var methods = /* @__PURE__ */ new Set([
+  "basename",
+  "delimiter",
+  "dirname",
+  "extname",
+  "isAbsolute",
+  "join",
+  "normalize",
+  "relative",
+  "resolve"
+]);
 
 export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, path_default, relative, removeExt, resolve, sep, toUnix, trimExt };
