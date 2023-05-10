@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Union } from '@/types';
 
-import path from 'path';
+import nodepath from 'path';
 import posix, { type Path } from 'path-browserify';
 import { map } from '@/objects';
 
@@ -21,14 +20,14 @@ const methods = new Set([
  * Converts **all** `\` to `/` and consolidates
  * duplicates without performing any normalization.
  */
-export const toUnix = (p: string) => {
-  if (typeof p !== 'string') return p;
-  return p.replace(/\\/g, '/').replace(/(?<!^)\/+/g, '/');
+export const toUnix = (path: string) => {
+  if (typeof path !== 'string') return path;
+  return path.replace(/\\/g, '/').replace(/(?<!^)\/+/g, '/');
 };
 
-export const sep = '/';
+export const sep: Path['sep'] = '/';
 
-export const format: Path['format'] = (po) => toUnix(posix.format(po));
+export const format: Path['format'] = (obj) => toUnix(posix.format(obj));
 
 export const parse: Path['parse'] = (p) => {
   const ret = posix.parse(toUnix(p));
@@ -48,7 +47,7 @@ export const {
   relative,
   resolve,
 } = map(
-  path as unknown as Path,
+  (nodepath || posix) as unknown as Path,
   { inherited: true, nonEnumerable: true },
   (name, prop) => methods.has(name) && [name, unixify(prop)]
 ) as Path;
@@ -86,40 +85,40 @@ export const joinSafe: Path['join'] = (...args) => {
 /**
  * Trims a path's extension.
  */
-export const trimExt = (p: string, options?: ExtOptions) => {
-  const ret = extname(p);
-  if (!isValidExt(ret, options)) return p;
-  return p.replace(new RegExp(`${ret}$`), '');
+export const trimExt = (path: string, options?: ExtOptions) => {
+  const ret = extname(path);
+  if (!isValidExt(ret, options)) return path;
+  return path.replace(new RegExp(`${ret}$`), '');
 };
 
 /**
  * Adds a given extension,
  * *but only if the path provided doesn't already have the exact extension*.
  */
-export const addExt = (p: string, ext: string) => {
-  if (!ext) return p;
+export const addExt = (path: string, ext: string) => {
+  if (!ext) return path;
   ext[0] === '.' || (ext = `.${ext}`);
-  p.endsWith(ext) || (p = `${p}${ext}`);
-  return p;
+  path.endsWith(ext) || (path = `${path}${ext}`);
+  return path;
 };
 
 /**
  * Remove a given extension if possible
  * *(otherwise left as is)*.
  */
-export const removeExt = (p: string, ext: string) => {
-  if (!ext) return p;
+export const removeExt = (path: string, ext: string) => {
+  if (!ext) return path;
   ext[0] === '.' || (ext = `.${ext}`);
-  if (extname(p) === ext) return trimExt(p, { maxLength: ext.length });
-  return p;
+  if (extname(path) === ext) return trimExt(path, { maxLength: ext.length });
+  return path;
 };
 
 /**
  * Changes an extension given the `ext` provided. \
  * *(Extension added if no valid extension already available)*
  */
-export const changeExt = (p: string, ext = '', options?: ExtOptions) => (
-  ext[0] === '.' || (ext = `.${ext}`), `${trimExt(p, options)}${ext}`
+export const changeExt = (path: string, ext = '', options?: ExtOptions) => (
+  ext[0] === '.' || (ext = `.${ext}`), `${trimExt(path, options)}${ext}`
 );
 
 /**
@@ -127,21 +126,22 @@ export const changeExt = (p: string, ext = '', options?: ExtOptions) => (
  * *but only if the path provided did not already have any extensions before*.
  */
 // prettier-ignore
-export const defaultExt = (p: string, ext: string, options?: ExtOptions) => (
-  isValidExt(p, options) ? extname(p) : addExt(p, ext)
+export const defaultExt = (path: string, ext: string, options?: ExtOptions) => (
+  isValidExt(path, options) ? extname(path) : addExt(path, ext)
 );
 
 /**
- * Drop-in replacement for node.js's path w/ unix style seperators + other utilities.
- * In most contexts Windows already allows forward slashes as the path seperator,
- * so there is no reason to stick with the legacy Windows back slash. As a universal
- * path solution for both *windows / unix*, this allows one to just use `'/'`,
- * throughout their code and forget about it. Adapted + refactored from `upath`.
+ * Universal drop-in replacement for node.js's path w/ unix style seperators + other utilities.
+ * In most contexts windows, already allows forward slashes as the path seperator,
+ * so there is no reason to stick with the legacy back slash. As a universal
+ * path solution for both *windows + unix*, this allows one to just use `'/'`,
+ * throughout their code and worrying about it. Adapted and refactored from `upath`.
  *
  * Note: In non-node.js environments, you usually do not have to install `path-browserify` yourself.
  * If your code runs in the browser, bundlers like browserify or webpack include the path-browserify
  * module by default.
  *
+ * @see {@link https://nodejs.org/api/path.html}
  * @see {@link https://www.npmjs.com/package/upath}
  */
 export default Object.freeze({
@@ -169,13 +169,13 @@ export default Object.freeze({
   trimExt,
   win32: posix,
   toNamespacedPath: toUnix,
-} as const);
+});
 
 /** @internal */
 function unixify<T>(target: T) {
   if (Array.isArray(target)) return target.map(toUnix) as T;
   if (typeof target === 'function') {
-    return ((...args: any[]) => toUnix(target(...args.map(toUnix)))) as T;
+    return ((...args: never[]) => toUnix(target(...args.map(toUnix)))) as T;
   }
 
   return target;

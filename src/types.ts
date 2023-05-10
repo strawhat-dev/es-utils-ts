@@ -16,38 +16,43 @@ export type Numeric = number | bigint;
 export type NumberLike = number | `${number}`;
 export type Nullish = null | undefined;
 export type Nullable<T> = T | null;
-export type Maybe<T> = T | Nullish;
+export type Maybe<T> = T | undefined;
 export type Multi<T> = T | T[];
 
 /**
- * *common primitves*
- * (may be serializable or literally typed).
- * @see {@link primitive} for any primitives
+ * **all** primitives *(i.e. any non-object)*
+ * - *lowercased to semantically denote the inverse of the
+ * lowercased `object` type and differentiate from {@link Primitive}.*
+ */
+export type primitive = Simplify<Primitive | bigint | symbol>;
+
+/**
+ * **common** primitves \
+ * *(may be serializable or literally typed)*
+ * @see {@link primitive} for *any* primitive
  */
 export type Primitive = Simplify<string | boolean | number | Nullish>;
 
-/** any **non-nullish** value. */
+/** any **non-{@link Nullish}** value. */
 export interface Defined {}
 
-/** any **non-object** value. */
-export type primitive = Simplify<Primitive | bigint | symbol>;
-
-/** any js value *(primitves or objects)*. */
+/** **any** js value *(primitves or objects)*. */
 export type JsValue = Simplify<primitive | object>;
 
 /** **plain** js objects. */
 export type JsObject<value = JsValue> = { [key: string]: value };
 
 /**
- * More reliably extract a union of a given type's keys as strings by joining
- * any union types into an intersection *(so that `never` is not returned)*
- * and omitting the index signature *(so that literal keys may be resolved)*.
+ * More reliably extract a union of a given type's keys as strings by
+ * forcefully converting `T` to a {@link Composite} type, and falling
+ * back to `string` by default, so that types like `any`, `unknown`,
+ * and `never` are not resolved.
  */
 export type KeyOf<
   T,
   Fallback = string,
-  Target = Composite<T>
-> = StringKeyOf<Target> extends never ? Fallback : StringKeyOf<Target>;
+  composite = Composite<T>
+> = StringKeyOf<composite> extends never ? Fallback : StringKeyOf<composite>;
 
 /**
  * Create a union type from a given object's values if possible;
@@ -56,47 +61,76 @@ export type KeyOf<
 export type ValueOf<
   T,
   Fallback = JsValue,
-  Target = Composite<T>
-> = KeyOf<T> extends keyof Target ? Target[KeyOf<T>] : Fallback;
+  composite = Composite<T>
+> = KeyOf<T> extends keyof composite ? composite[KeyOf<T>] : Fallback;
 
 /**
  * Like {@link KeyOf}, but recursively extracts nested keys.
  */
 export type KeyOfDeep<
   T,
-  Current = Composite<T>,
-  Nested extends keyof Current = ConditionalKeys<Current, JsObject<any>>
+  current = Composite<T>,
+  nested extends keyof current = ConditionalKeys<current, JsObject<any>>
 > = Type<
-  KeyOf<Current> | (Nested extends never ? never : KeyOfDeep<Current[Nested]>)
+  KeyOf<current> | (nested extends never ? never : KeyOfDeep<current[nested]>)
 >;
 
 /**
  * Like {@link ValueOf}, but recursively extracts nested values. \
  * Note: Values that are being recursed into themselves
- * *(i.e. parent values containing sub-values)* are not included.
+ * *(i.e. the parent values containing the sub-values)* are not included.
  */
 export type ValueOfDeep<
   T,
-  Current = Composite<T>,
-  Nested extends keyof Current = ConditionalKeys<Current, JsObject<any>>
+  current = Composite<T>,
+  nested extends keyof current = ConditionalKeys<current, JsObject<any>>
 > = Type<
-  | Current[ConditionalKeysExcept<Current, JsObject<any>>]
-  | (Nested extends never ? never : ValueOfDeep<Current[Nested]>)
+  | current[KeysExcept<current, JsObject<any>>]
+  | (nested extends never ? never : ValueOfDeep<current[nested]>)
 >;
 
 /**
- * *Improved version of type-fest's {@link https://github.com/sindresorhus/type-fest/blob/main/source/literal-union.d.ts | LiteralUnion}*. \
- * Generic that allows for both the literal and
- * base types without sacrificing completions.
- * - base type automatically inferred from literal
- * - does not break on non-literal or complex object types
+ * Retrieves all of the keys where the
+ * value does **not** extend the given type.
+ * - Inverse of type-fest's
+ *   {@link https://github.com/sindresorhus/type-fest/blob/main/source/conditional-keys.d.ts | ConditionalKeys}.
+ */
+export type KeysExcept<T, ExcludedTypes> = keyof ConditionalExcept<
+  T,
+  ExcludedTypes
+>;
+
+/**
+ * **Improved catch-all solution for type-fest's
+ * {@link https://github.com/sindresorhus/type-fest/blob/main/source/literal-union.d.ts | LiteralUnion}** \
+ * Generic that allows for both the literal/mapped type
+ * and base type without sacrificing completions.
+ * - base type automatically inferred from literal.
+ * - when a non-literal or non-mapped type is passed,
+ *   it will just be {@link Narrow}'ed down or returned as is.
  */
 export type Union<T> = Type<
   T | (IsLiteral<T> extends true ? LiteralToPrimitive<T> & Defined : Narrow<T>)
 >;
 
 /**
- * Narrow down a type to a base type.
+ * Ensure a type can be resolved as an explicit defined type
+ * by composing unions of objects into intersections, omitting
+ * any permissive unions or index signatures, and leaving behind
+ * only explicitly defined properties.
+ * - *can be used to reverse effect of {@link Union}, and used internally for {@link KeyOf} and {@link ValueOf}*
+ */
+export type Composite<T, Composed = UnionToIntersection<T>> = Type<
+  T extends Function
+    ? Extract<T, (...args: any) => any>
+    : T extends string | number
+    ? ExtractLiteral<T>
+    : OmitIndexSignature<Composed>
+>;
+
+/**
+ * Narrow down a type to a common base type.
+ * - *used internally for {@link Union}*
  */
 export type Narrow<T> = Type<
   T extends Promise<infer Resolved>
@@ -119,18 +153,6 @@ export type Narrow<T> = Type<
 >;
 
 /**
- * Ensure a type can be resolved as an explicit defined type by joining
- * any unions into intersections, and omitting the index signature.
- */
-export type Composite<T> = OmitIndexSignature<UnionToIntersection<T>>;
-
-/**
- * Inverse of type-fest's {@link https://github.com/sindresorhus/type-fest/blob/main/source/conditional-keys.d.ts | ConditionalKeys}.
- * Retrieves all of the keys that do **not** match the given type.
- */
-export type ConditionalKeysExcept<T, Omit> = keyof ConditionalExcept<T, Omit>;
-
-/**
  * @internal
  * Utility type only used to contain long type definitions within angle brackets without leaving hanging indents.
  */
@@ -144,6 +166,14 @@ export type Extends<T1, T2> = T1 extends T2 ? true : false;
 
 /**
  * @internal
- * Wrapped `IsLiteral` from type-fest
+ * Used internally for {@link Composite}. Reverses effect of {@link Union} for `strings` and `numbers`.
  */
-type IsLiteral<T> = T extends primitive ? LiteralCheck<T> : false;
+export type ExtractLiteral<T extends string | number> = keyof {
+  [key in T as IsLiteral<key> extends false ? never : key]: never;
+};
+
+/**
+ * @internal
+ * Wrapped `IsLiteral` from `type-fest` to allow checking type in the parameter. Used internally for {@link Union}.
+ */
+export type IsLiteral<T> = T extends primitive ? LiteralCheck<T> : false;
