@@ -20,8 +20,14 @@ var toUnix = /* @__PURE__ */ __name((p) => {
   return p.replace(/\\/g, "/").replace(/(?<!^)\/+/g, "/");
 }, "toUnix");
 var sep = "/";
-var parse = /* @__PURE__ */ __name((p) => posix.parse(toUnix(p)), "parse");
 var format = /* @__PURE__ */ __name((po) => toUnix(posix.format(po)), "format");
+var parse = /* @__PURE__ */ __name((p) => {
+  const ret = posix.parse(toUnix(p));
+  const [root] = ret.dir.split("/");
+  if (root.endsWith(":"))
+    ret.root = `${root}/`;
+  return ret;
+}, "parse");
 var {
   basename,
   delimiter,

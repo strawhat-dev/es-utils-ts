@@ -28,9 +28,14 @@ export const toUnix = (p: string) => {
 
 export const sep = '/';
 
-export const parse: Path['parse'] = (p) => posix.parse(toUnix(p));
-
 export const format: Path['format'] = (po) => toUnix(posix.format(po));
+
+export const parse: Path['parse'] = (p) => {
+  const ret = posix.parse(toUnix(p));
+  const [root] = ret.dir.split('/');
+  if (root.endsWith(':')) ret.root = `${root}/`;
+  return ret;
+};
 
 export const {
   basename,

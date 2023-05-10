@@ -6,8 +6,8 @@ import posix, { Path } from 'path-browserify';
  */
 declare const toUnix: (p: string) => string;
 declare const sep = "/";
-declare const parse: Path['parse'];
 declare const format: Path['format'];
+declare const parse: Path['parse'];
 declare const basename: (path: string, ext?: string | undefined) => string;
 declare const delimiter: string;
 declare const dirname: (path: string) => string;
