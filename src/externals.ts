@@ -49,10 +49,10 @@ export const deepcompare = (
   options: { strict: boolean } = { strict: true }
 ) => deepEqual(a, b, options);
 
-// prettier-ignore
 /**
  * *object-inspect* - String representations of objects in node and the browser. \
  * *Note: indentation defaults to `2` if no options are provided*
  * @see {@link https://www.npmjs.com/package/object-inspect}
  */
+// prettier-ignore
 export const inspect = ((value: unknown, opts: Options = { indent: 2 }) => objectInspect(value, opts));
