@@ -1,21 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable tree-shaking/no-side-effects-in-initialization */
-import Path from 'path';
+import type { Union } from '@/types';
+
+import path from 'path';
+import posix, { type Path } from 'path-browserify';
 import { map } from '@/objects';
+
+/**
+ * Converts **all** `\` to `/` and consolidates
+ * duplicates without performing any normalization.
+ */
+export const toUnix = (p: string) => {
+  if (typeof p !== 'string') return p;
+  return p.replace(/\\/g, '/').replace(/(?<!^)\/+/g, '/');
+};
 
 export const sep = '/';
 
-const methods = new Set([
-  'basename',
-  'delimiter',
-  'dirname',
-  'extname',
-  'isAbsolute',
-  'join',
-  'normalize',
-  'relative',
-  'resolve',
-]);
+export const parse: Path['parse'] = (p) => posix.parse(toUnix(p));
+
+export const format: Path['format'] = (po) => toUnix(posix.format(po));
 
 export const {
   basename,
@@ -28,81 +31,53 @@ export const {
   relative,
   resolve,
 } = map(
-  Path,
+  path as unknown as Path,
   { inherited: true, nonEnumerable: true },
   (name, prop) => methods.has(name) && [name, unixify(prop)]
-) as Path.PlatformPath;
-
-/**
- * Converts all `\` to `/` and consolidates duplicates
- * without performing any normalization.
- */
-export const toUnix = (p: string) => {
-  return typeof p === 'string'
-    ? p.replace(/\\/g, '/').replace(/(?<!^)\/+/g, '/')
-    : p;
-};
-
-/**
- * @returns an object from a path string. *(the opposite of `path.format`)*
- */
-export const parse = (p: string) => Path.posix.parse(toUnix(p));
-
-/**
- * @returns a path string from an object. *(the opposite of `path.parse`)*
- */
-// prettier-ignore
-export const format = (pathObj: Path.FormatInputPathObject) => toUnix(Path.format(pathObj));
+) as Path;
 
 /**
  * Exactly like `path.normalize`, but keeps the first meaningful `./` or `//`. \
- * *Note: `/` is returned everywhere, so Windows `\` is always converted to unix `/`.*
+ * *Note: `/` is returned everywhere, so windows `\` is always converted to unix `/`.*
  */
-export const normalizeSafe = (p: string) => {
+export const normalizeSafe: Path['normalize'] = (p) => {
   p = toUnix(p);
-  let result = normalize(p);
-  if (
-    p.startsWith('./') &&
-    !result.startsWith('./') &&
-    !result.startsWith('..')
-  ) {
-    result = `./${result}`;
-  } else if (p.startsWith('//') && !result.startsWith('//')) {
-    result = `${p.startsWith('//./') ? '//.' : '/'}${result}`;
+  let ret = normalize(p);
+  if (p.startsWith('./') && !ret.startsWith('./') && !ret.startsWith('..')) {
+    ret = `./${ret}`;
+  } else if (p.startsWith('//') && !ret.startsWith('//')) {
+    ret = `${p.startsWith('//./') ? '//.' : '/'}${ret}`;
   }
 
-  return result;
+  return ret;
 };
 
-/**
- * Exactly like `path.normalizeSafe`, but it trims any useless ending `/`.
- */
 // prettier-ignore
-export const normalizeTrim = (p: string) => normalizeSafe(p).replace(/[/]$/, '');
+/** Exactly like `path.normalizeSafe`, but it trims any useless ending `/`. */
+export const normalizeTrim: Path['normalize'] = (p) => normalizeSafe(p).replace(/[/]$/, '');
 
 /**
  * Exactly like `path.join`, but keeps the first meaningful `./` or `//`. \
  * *Note: `/` is returned everywhere, so Windows `\` is always converted to unix `/`.*
  */
-export const joinSafe = (...args: Parameters<(typeof Path)['join']>) => {
-  const result = join(...args);
-  if (!args.length) return result;
-  return normalizeSafe(result);
+export const joinSafe: Path['join'] = (...args) => {
+  const ret = join(...args);
+  if (!args.length) return ret;
+  return normalizeSafe(ret);
 };
 
 /**
  * Trims a path's extension.
- * - Extensions are considered to be up to `max` chars long, counting the dot. *(defaults to 7)*
- * - An array of extensions to ignore may optionally be provided to prevent trimming.
  */
-export const trimExt = (p: string, ignore: string[] = [], max = 7) => {
-  const result = extname(p);
-  if (!isValidExt(result, ignore, max)) return p;
-  return p.replace(new RegExp(`${result}$`), '');
+export const trimExt = (p: string, options?: ExtOptions) => {
+  const ret = extname(p);
+  if (!isValidExt(ret, options)) return p;
+  return p.replace(new RegExp(`${ret}$`), '');
 };
 
 /**
- * Adds a given extension, *but only if the path provided doesn't already have the exact extension*.
+ * Adds a given extension,
+ * *but only if the path provided doesn't already have the exact extension*.
  */
 export const addExt = (p: string, ext: string) => {
   if (!ext) return p;
@@ -112,55 +87,39 @@ export const addExt = (p: string, ext: string) => {
 };
 
 /**
- * Remove a given extension if possible *(otherwise left as is)*.
+ * Remove a given extension if possible
+ * *(otherwise left as is)*.
  */
 export const removeExt = (p: string, ext: string) => {
   if (!ext) return p;
   ext[0] === '.' || (ext = `.${ext}`);
-  if (extname(p) === ext) return trimExt(p, [], ext.length);
+  if (extname(p) === ext) return trimExt(p, { maxLength: ext.length });
   return p;
 };
 
 /**
- * Changes an extension given the `ext` provided.
+ * Changes an extension given the `ext` provided. \
  * *(Extension added if no valid extension already available)*
- * - Extensions are considered to be up to `max` chars long, counting the dot. *(defaults to 7)*
- * - An array of extensions to ignore may optionally be provided to prevent trimming.
  */
-export const changeExt = (
-  p: string,
-  ext: string,
-  ignore: string[] = [],
-  max = 7
-) => {
-  ext ??= '';
-  ext[0] === '.' || (ext = `.${ext}`);
-  return `${trimExt(p, ignore, max)}${ext}`;
-};
+export const changeExt = (p: string, ext = '', options?: ExtOptions) => (
+  ext[0] === '.' || (ext = `.${ext}`), `${trimExt(p, options)}${ext}`
+);
 
 /**
- * Adds a given extension, *but only if the path provided did not already have any extensions before*.
- * - Extensions are considered to be up to `max` chars long, counting the dot. *(defaults to 7)*
- * - An array of extensions to ignore will force add the default even if already present, if provided.
+ * Adds a given extension,
+ * *but only if the path provided did not already have any extensions before*.
  */
-export const defaultExt = (
-  p: string,
-  ext: string,
-  ignore: string[] = [],
-  max = 7
-) => {
-  const result = extname(p);
-  if (!isValidExt(p, ignore, max)) return addExt(p, ext);
-  return result;
-};
+// prettier-ignore
+export const defaultExt = (p: string, ext: string, options?: ExtOptions) => (
+  isValidExt(p, options) ? extname(p) : addExt(p, ext)
+);
 
 /**
  * Drop-in replacement for node.js's path w/ unix style seperators + other utilities.
  * In most contexts Windows already allows forward slashes as the path seperator,
  * so there is no reason to stick with the legacy Windows back slash. As a universal
  * path solution for both *windows / unix*, this allows one to just use `'/'`,
- * throughout their code and forget about it. Adapted + refactored from `upath` and
- * re-exported as tree-shakeable named exports.
+ * throughout their code and forget about it. Adapted + refactored from `upath`.
  *
  * Note: In non-node.js environments, you usually do not have to install `path-browserify` yourself.
  * If your code runs in the browser, bundlers like browserify or webpack include the path-browserify
@@ -184,14 +143,14 @@ export default Object.freeze({
   normalizeSafe,
   normalizeTrim,
   parse,
+  posix,
   relative,
   removeExt,
   resolve,
   sep,
   toUnix,
   trimExt,
-  posix: Path.posix,
-  win32: Path.posix,
+  win32: posix,
   toNamespacedPath: toUnix,
 } as const);
 
@@ -206,10 +165,39 @@ function unixify<T>(target: T) {
 }
 
 /** @internal */
-function isValidExt(ext: string, ignore: string[] = [], max = 7) {
+function isValidExt(
+  ext: string,
+  { ignore = [], maxLength = 7 }: ExtOptions = {}
+) {
   return (
     ext &&
-    ext.length <= max &&
+    ext.length <= maxLength &&
     !ignore.some((val) => (val?.[0] === '.' || (val = `.${ext}`), val === ext))
   );
 }
+
+/** @internal */
+const methods = new Set([
+  'basename',
+  'delimiter',
+  'dirname',
+  'extname',
+  'isAbsolute',
+  'join',
+  'normalize',
+  'relative',
+  'resolve',
+] as Union<keyof Path>[]);
+
+/** @internal */
+type ExtOptions = {
+  /**
+   * Do not the consider extensions listed, if provided.
+   */
+  ignore?: string[];
+  /**
+   * Consider extensions up to `maxLength` long *(counting the `.`)*.
+   * @defaultValue `7`
+   */
+  maxLength?: number;
+};
