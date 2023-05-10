@@ -1,6 +1,6 @@
-import { map } from './chunk-OPX7PJBV.js';
+import { map } from './chunk-RWGOOPFB.js';
 import { __name } from './chunk-JXJLGDKJ.js';
-import path from 'path';
+import nodepath from 'path';
 import posix from 'path-browserify';
 
 var methods = /* @__PURE__ */ new Set([
@@ -14,13 +14,13 @@ var methods = /* @__PURE__ */ new Set([
   "relative",
   "resolve"
 ]);
-var toUnix = /* @__PURE__ */ __name((p) => {
-  if (typeof p !== "string")
-    return p;
-  return p.replace(/\\/g, "/").replace(/(?<!^)\/+/g, "/");
+var toUnix = /* @__PURE__ */ __name((path) => {
+  if (typeof path !== "string")
+    return path;
+  return path.replace(/\\/g, "/").replace(/(?<!^)\/+/g, "/");
 }, "toUnix");
 var sep = "/";
-var format = /* @__PURE__ */ __name((po) => toUnix(posix.format(po)), "format");
+var format = /* @__PURE__ */ __name((obj) => toUnix(posix.format(obj)), "format");
 var parse = /* @__PURE__ */ __name((p) => {
   const ret = posix.parse(toUnix(p));
   const [root] = ret.dir.split("/");
@@ -39,7 +39,7 @@ var {
   relative,
   resolve
 } = map(
-  path,
+  nodepath || posix,
   { inherited: true, nonEnumerable: true },
   (name, prop) => methods.has(name) && [name, unixify(prop)]
 );
@@ -60,29 +60,29 @@ var joinSafe = /* @__PURE__ */ __name((...args) => {
     return ret;
   return normalizeSafe(ret);
 }, "joinSafe");
-var trimExt = /* @__PURE__ */ __name((p, options) => {
-  const ret = extname(p);
+var trimExt = /* @__PURE__ */ __name((path, options) => {
+  const ret = extname(path);
   if (!isValidExt(ret, options))
-    return p;
-  return p.replace(new RegExp(`${ret}$`), "");
+    return path;
+  return path.replace(new RegExp(`${ret}$`), "");
 }, "trimExt");
-var addExt = /* @__PURE__ */ __name((p, ext) => {
+var addExt = /* @__PURE__ */ __name((path, ext) => {
   if (!ext)
-    return p;
+    return path;
   ext[0] === "." || (ext = `.${ext}`);
-  p.endsWith(ext) || (p = `${p}${ext}`);
-  return p;
+  path.endsWith(ext) || (path = `${path}${ext}`);
+  return path;
 }, "addExt");
-var removeExt = /* @__PURE__ */ __name((p, ext) => {
+var removeExt = /* @__PURE__ */ __name((path, ext) => {
   if (!ext)
-    return p;
+    return path;
   ext[0] === "." || (ext = `.${ext}`);
-  if (extname(p) === ext)
-    return trimExt(p, { maxLength: ext.length });
-  return p;
+  if (extname(path) === ext)
+    return trimExt(path, { maxLength: ext.length });
+  return path;
 }, "removeExt");
-var changeExt = /* @__PURE__ */ __name((p, ext = "", options) => (ext[0] === "." || (ext = `.${ext}`), `${trimExt(p, options)}${ext}`), "changeExt");
-var defaultExt = /* @__PURE__ */ __name((p, ext, options) => isValidExt(p, options) ? extname(p) : addExt(p, ext), "defaultExt");
+var changeExt = /* @__PURE__ */ __name((path, ext = "", options) => (ext[0] === "." || (ext = `.${ext}`), `${trimExt(path, options)}${ext}`), "changeExt");
+var defaultExt = /* @__PURE__ */ __name((path, ext, options) => isValidExt(path, options) ? extname(path) : addExt(path, ext), "defaultExt");
 var path_default = Object.freeze({
   addExt,
   basename,

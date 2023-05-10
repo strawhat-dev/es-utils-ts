@@ -1,5 +1,5 @@
-import { a as NumberLike } from '../types-31a53eeb.js';
-import '../conditional-except.d-b0cdb712.js';
+import { a as NumberLike } from '../types-64712e38.js';
+import '../conditional-except.d-f489500f.js';
 
 /** Schedules a `Promise` that resolves after a delay of `ms` milliseconds. */
 declare const sleep: (ms: NumberLike) => Promise<void>;

@@ -1,4 +1,4 @@
-import { P as Primitive$1, I as IsNotFalse, a as ConditionalKeys, C as ConditionalExcept } from './conditional-except.d-b0cdb712.js';
+import { P as Primitive$1, I as IsNotFalse, a as ConditionalKeys, C as ConditionalExcept } from './conditional-except.d-f489500f.js';
 
 /**
 Useful to flatten the type output to improve type hints shown in editors. And also to transform an interface into a type to aide with assignability.
@@ -596,68 +596,81 @@ type Numeric = number | bigint;
 type NumberLike = number | `${number}`;
 type Nullish = null | undefined;
 type Nullable<T> = T | null;
-type Maybe<T> = T | Nullish;
+type Maybe<T> = T | undefined;
 type Multi<T> = T | T[];
 /**
- * *common primitves*
- * (may be serializable or literally typed).
- * @see {@link primitive} for any primitives
+ * **all** primitives *(i.e. any non-object)*
+ * - *lowercased to semantically denote the inverse of the
+ * lowercased `object` type and differentiate from {@link Primitive}.*
+ */
+type primitive = Simplify<Primitive | bigint | symbol>;
+/**
+ * **common** primitves \
+ * *(may be serializable or literally typed)*
+ * @see {@link primitive} for *any* primitive
  */
 type Primitive = Simplify<string | boolean | number | Nullish>;
-/** any **non-nullish** value. */
+/** any **non-{@link Nullish}** value. */
 interface Defined {
 }
-/** any **non-object** value. */
-type primitive = Simplify<Primitive | bigint | symbol>;
-/** any js value *(primitves or objects)*. */
+/** **any** js value *(primitves or objects)*. */
 type JsValue = Simplify<primitive | object>;
 /** **plain** js objects. */
 type JsObject<value = JsValue> = {
     [key: string]: value;
 };
 /**
- * More reliably extract a union of a given type's keys as strings by joining
- * any union types into an intersection *(so that `never` is not returned)*
- * and omitting the index signature *(so that literal keys may be resolved)*.
+ * More reliably extract a union of a given type's keys as strings by
+ * forcefully converting `T` to a {@link Composite} type, and falling
+ * back to `string` by default, so that types like `any`, `unknown`,
+ * and `never` are not resolved.
  */
-type KeyOf<T, Fallback = string, Target = Composite<T>> = StringKeyOf<Target> extends never ? Fallback : StringKeyOf<Target>;
+type KeyOf<T, Fallback = string, composite = Composite<T>> = StringKeyOf<composite> extends never ? Fallback : StringKeyOf<composite>;
 /**
  * Create a union type from a given object's values if possible;
  * else falls back to any js value by default.
  */
-type ValueOf<T, Fallback = JsValue, Target = Composite<T>> = KeyOf<T> extends keyof Target ? Target[KeyOf<T>] : Fallback;
+type ValueOf<T, Fallback = JsValue, composite = Composite<T>> = KeyOf<T> extends keyof composite ? composite[KeyOf<T>] : Fallback;
 /**
  * Like {@link KeyOf}, but recursively extracts nested keys.
  */
-type KeyOfDeep<T, Current = Composite<T>, Nested extends keyof Current = ConditionalKeys<Current, JsObject<any>>> = Type<KeyOf<Current> | (Nested extends never ? never : KeyOfDeep<Current[Nested]>)>;
+type KeyOfDeep<T, current = Composite<T>, nested extends keyof current = ConditionalKeys<current, JsObject<any>>> = Type<KeyOf<current> | (nested extends never ? never : KeyOfDeep<current[nested]>)>;
 /**
  * Like {@link ValueOf}, but recursively extracts nested values. \
  * Note: Values that are being recursed into themselves
- * *(i.e. parent values containing sub-values)* are not included.
+ * *(i.e. the parent values containing the sub-values)* are not included.
  */
-type ValueOfDeep<T, Current = Composite<T>, Nested extends keyof Current = ConditionalKeys<Current, JsObject<any>>> = Type<Current[ConditionalKeysExcept<Current, JsObject<any>>] | (Nested extends never ? never : ValueOfDeep<Current[Nested]>)>;
+type ValueOfDeep<T, current = Composite<T>, nested extends keyof current = ConditionalKeys<current, JsObject<any>>> = Type<current[KeysExcept<current, JsObject<any>>] | (nested extends never ? never : ValueOfDeep<current[nested]>)>;
 /**
- * *Improved version of type-fest's {@link https://github.com/sindresorhus/type-fest/blob/main/source/literal-union.d.ts | LiteralUnion}*. \
- * Generic that allows for both the literal and
- * base types without sacrificing completions.
- * - base type automatically inferred from literal
- * - does not break on non-literal or complex object types
+ * Retrieves all of the keys where the
+ * value does **not** extend the given type.
+ * - Inverse of type-fest's
+ *   {@link https://github.com/sindresorhus/type-fest/blob/main/source/conditional-keys.d.ts | ConditionalKeys}.
+ */
+type KeysExcept<T, ExcludedTypes> = keyof ConditionalExcept<T, ExcludedTypes>;
+/**
+ * **Improved catch-all solution for type-fest's
+ * {@link https://github.com/sindresorhus/type-fest/blob/main/source/literal-union.d.ts | LiteralUnion}** \
+ * Generic that allows for both the literal/mapped type
+ * and base type without sacrificing completions.
+ * - base type automatically inferred from literal.
+ * - when a non-literal or non-mapped type is passed,
+ *   it will just be {@link Narrow}'ed down or returned as is.
  */
 type Union<T> = Type<T | (IsLiteral<T> extends true ? LiteralToPrimitive<T> & Defined : Narrow<T>)>;
 /**
- * Narrow down a type to a base type.
+ * Ensure a type can be resolved as an explicit defined type
+ * by composing unions of objects into intersections, omitting
+ * any permissive unions or index signatures, and leaving behind
+ * only explicitly defined properties.
+ * - *can be used to reverse effect of {@link Union}, and used internally for {@link KeyOf} and {@link ValueOf}*
+ */
+type Composite<T, Composed = UnionToIntersection<T>> = Type<T extends Function ? Extract<T, (...args: any) => any> : T extends string | number ? ExtractLiteral<T> : OmitIndexSignature<Composed>>;
+/**
+ * Narrow down a type to a common base type.
+ * - *used internally for {@link Union}*
  */
 type Narrow<T> = Type<T extends Promise<infer Resolved> ? Promise<Narrow<Resolved>> : T extends (infer Item)[] ? Narrow<Item>[] : T extends Set<infer Item> ? Set<Narrow<Item>> : T extends Map<infer K, infer V> ? Map<Narrow<K>, Narrow<V>> : T extends JsObject<infer Values> ? JsObject<Values> : T extends Function ? Function : T extends object ? object : T extends primitive ? LiteralToPrimitive<T> : Defined>;
-/**
- * Ensure a type can be resolved as an explicit defined type by joining
- * any unions into intersections, and omitting the index signature.
- */
-type Composite<T> = OmitIndexSignature<UnionToIntersection<T>>;
-/**
- * Inverse of type-fest's {@link https://github.com/sindresorhus/type-fest/blob/main/source/conditional-keys.d.ts | ConditionalKeys}.
- * Retrieves all of the keys that do **not** match the given type.
- */
-type ConditionalKeysExcept<T, Omit> = keyof ConditionalExcept<T, Omit>;
 /**
  * @internal
  * Utility type only used to contain long type definitions within angle brackets without leaving hanging indents.
@@ -670,8 +683,15 @@ type Type<T> = T;
 type Extends<T1, T2> = T1 extends T2 ? true : false;
 /**
  * @internal
- * Wrapped `IsLiteral` from type-fest
+ * Used internally for {@link Composite}. Reverses effect of {@link Union} for `strings` and `numbers`.
+ */
+type ExtractLiteral<T extends string | number> = keyof {
+    [key in T as IsLiteral<key> extends false ? never : key]: never;
+};
+/**
+ * @internal
+ * Wrapped `IsLiteral` from `type-fest` to allow checking type in the parameter. Used internally for {@link Union}.
  */
 type IsLiteral<T> = T extends primitive ? IsLiteral$1<T> : false;
 
-export { Composite as C, Defined as D, Extends as E, JsValue as J, KeyOf as K, Maybe as M, Numeric as N, OmitIndexSignature as O, Primitive as P, Simplify as S, Type as T, Union as U, ValueOf as V, NumberLike as a, Nullish as b, Nullable as c, Multi as d, JsObject as e, KeyOfDeep as f, ValueOfDeep as g, Narrow as h, ConditionalKeysExcept as i, primitive as p };
+export { Composite as C, Defined as D, Extends as E, IsLiteral as I, JsValue as J, KeyOf as K, Maybe as M, Numeric as N, OmitIndexSignature as O, Primitive as P, Simplify as S, Type as T, Union as U, ValueOf as V, NumberLike as a, Nullish as b, Nullable as c, Multi as d, JsObject as e, KeyOfDeep as f, ValueOfDeep as g, KeysExcept as h, Narrow as i, ExtractLiteral as j, primitive as p };

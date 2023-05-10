@@ -4,8 +4,8 @@ import posix, { Path } from 'path-browserify';
  * Converts **all** `\` to `/` and consolidates
  * duplicates without performing any normalization.
  */
-declare const toUnix: (p: string) => string;
-declare const sep = "/";
+declare const toUnix: (path: string) => string;
+declare const sep: Path['sep'];
 declare const format: Path['format'];
 declare const parse: Path['parse'];
 declare const basename: (path: string, ext?: string | undefined) => string;
@@ -32,65 +32,66 @@ declare const joinSafe: Path['join'];
 /**
  * Trims a path's extension.
  */
-declare const trimExt: (p: string, options?: ExtOptions) => string;
+declare const trimExt: (path: string, options?: ExtOptions) => string;
 /**
  * Adds a given extension,
  * *but only if the path provided doesn't already have the exact extension*.
  */
-declare const addExt: (p: string, ext: string) => string;
+declare const addExt: (path: string, ext: string) => string;
 /**
  * Remove a given extension if possible
  * *(otherwise left as is)*.
  */
-declare const removeExt: (p: string, ext: string) => string;
+declare const removeExt: (path: string, ext: string) => string;
 /**
  * Changes an extension given the `ext` provided. \
  * *(Extension added if no valid extension already available)*
  */
-declare const changeExt: (p: string, ext?: string, options?: ExtOptions) => string;
+declare const changeExt: (path: string, ext?: string, options?: ExtOptions) => string;
 /**
  * Adds a given extension,
  * *but only if the path provided did not already have any extensions before*.
  */
-declare const defaultExt: (p: string, ext: string, options?: ExtOptions) => string;
+declare const defaultExt: (path: string, ext: string, options?: ExtOptions) => string;
 /**
- * Drop-in replacement for node.js's path w/ unix style seperators + other utilities.
- * In most contexts Windows already allows forward slashes as the path seperator,
- * so there is no reason to stick with the legacy Windows back slash. As a universal
- * path solution for both *windows / unix*, this allows one to just use `'/'`,
- * throughout their code and forget about it. Adapted + refactored from `upath`.
+ * Universal drop-in replacement for node.js's path w/ unix style seperators + other utilities.
+ * In most contexts windows, already allows forward slashes as the path seperator,
+ * so there is no reason to stick with the legacy back slash. As a universal
+ * path solution for both *windows + unix*, this allows one to just use `'/'`,
+ * throughout their code and worrying about it. Adapted and refactored from `upath`.
  *
  * Note: In non-node.js environments, you usually do not have to install `path-browserify` yourself.
  * If your code runs in the browser, bundlers like browserify or webpack include the path-browserify
  * module by default.
  *
+ * @see {@link https://nodejs.org/api/path.html}
  * @see {@link https://www.npmjs.com/package/upath}
  */
 declare const _default: Readonly<{
-    readonly addExt: (p: string, ext: string) => string;
-    readonly basename: (path: string, ext?: string | undefined) => string;
-    readonly changeExt: (p: string, ext?: string, options?: ExtOptions | undefined) => string;
-    readonly defaultExt: (p: string, ext: string, options?: ExtOptions | undefined) => string;
-    readonly delimiter: string;
-    readonly dirname: (path: string) => string;
-    readonly extname: (path: string) => string;
-    readonly format: (pathObject: Partial<posix.PathObject>) => string;
-    readonly isAbsolute: (path: string) => boolean;
-    readonly join: (...paths: string[]) => string;
-    readonly joinSafe: (...paths: string[]) => string;
-    readonly normalize: (path: string) => string;
-    readonly normalizeSafe: (path: string) => string;
-    readonly normalizeTrim: (path: string) => string;
-    readonly parse: (path: string) => posix.PathObject;
-    readonly posix: posix.Path;
-    readonly relative: (from: string, to: string) => string;
-    readonly removeExt: (p: string, ext: string) => string;
-    readonly resolve: (...pathSegments: string[]) => string;
-    readonly sep: "/";
-    readonly toUnix: (p: string) => string;
-    readonly trimExt: (p: string, options?: ExtOptions | undefined) => string;
-    readonly win32: posix.Path;
-    readonly toNamespacedPath: (p: string) => string;
+    addExt: (path: string, ext: string) => string;
+    basename: (path: string, ext?: string | undefined) => string;
+    changeExt: (path: string, ext?: string, options?: ExtOptions | undefined) => string;
+    defaultExt: (path: string, ext: string, options?: ExtOptions | undefined) => string;
+    delimiter: string;
+    dirname: (path: string) => string;
+    extname: (path: string) => string;
+    format: (pathObject: Partial<posix.PathObject>) => string;
+    isAbsolute: (path: string) => boolean;
+    join: (...paths: string[]) => string;
+    joinSafe: (...paths: string[]) => string;
+    normalize: (path: string) => string;
+    normalizeSafe: (path: string) => string;
+    normalizeTrim: (path: string) => string;
+    parse: (path: string) => posix.PathObject;
+    posix: posix.Path;
+    relative: (from: string, to: string) => string;
+    removeExt: (path: string, ext: string) => string;
+    resolve: (...pathSegments: string[]) => string;
+    sep: string;
+    toUnix: (path: string) => string;
+    trimExt: (path: string, options?: ExtOptions | undefined) => string;
+    win32: posix.Path;
+    toNamespacedPath: (path: string) => string;
 }>;
 
 /** @internal */

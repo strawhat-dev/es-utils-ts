@@ -136,6 +136,21 @@ Matches any primitive, `Date`, or `RegExp` value.
 type BuiltIns = Primitive | Date | RegExp;
 
 /**
+Test if the given function has multiple call signatures.
+
+Needed to handle the case of a single call signature with properties.
+
+Multiple call signatures cannot currently be supported due to a TypeScript limitation.
+@see https://github.com/microsoft/TypeScript/issues/29732
+*/
+type HasMultipleCallSignatures<T extends (...arguments: any[]) => unknown> =
+	T extends {(...arguments: infer A): unknown; (...arguments: any[]): unknown}
+		? unknown[] extends A
+			? false
+			: true
+		: false;
+
+/**
 Returns a boolean for whether the given `boolean` is not `false`.
 */
 type IsNotFalse<T extends boolean> = [T] extends [false] ? false : true;
@@ -231,4 +246,4 @@ Base,
 ConditionalKeys<Base, Condition>
 >;
 
-export { BuiltIns as B, ConditionalExcept as C, IsNotFalse as I, Primitive as P, ConditionalKeys as a };
+export { BuiltIns as B, ConditionalExcept as C, HasMultipleCallSignatures as H, IsNotFalse as I, Primitive as P, ConditionalKeys as a };

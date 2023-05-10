@@ -1,5 +1,5 @@
 import { trimLines } from './chunk-CWIWIPOX.js';
-import { pop } from './chunk-OPX7PJBV.js';
+import { pop } from './chunk-RWGOOPFB.js';
 import { isObject } from './chunk-OLDJUYBR.js';
 import { __name } from './chunk-JXJLGDKJ.js';
 

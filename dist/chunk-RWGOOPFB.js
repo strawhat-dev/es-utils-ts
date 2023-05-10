@@ -39,14 +39,15 @@ var clear = /* @__PURE__ */ __name((obj, options) => {
 var extend = /* @__PURE__ */ __name((...args) => {
   const descriptorMap = {};
   const [target, props2, options] = args.length === 1 ? [{}, args.pop()] : args;
-  const { copy, ...descriptors } = { ...options };
+  const { copy, freeze, ...descriptors } = { ...options };
   for (const key in props2) {
     descriptorMap[key] = { ...descriptors, value: props2[key] };
   }
-  return Object.defineProperties(
+  const ret = Object.defineProperties(
     copy ? deepcopy(target) : target,
     descriptorMap
   );
+  return freeze ? Object.freeze(ret) : ret;
 }, "extend");
 var findkey = /* @__PURE__ */ __name((obj, ...args) => {
   const { opts, callback } = parseRestArgs(args, {
@@ -67,26 +68,29 @@ var findkey = /* @__PURE__ */ __name((obj, ...args) => {
 var map = /* @__PURE__ */ __name((obj, ...args) => {
   const result = {};
   const { opts, callback } = parseRestArgs(args);
-  const { deep, ...keyopts } = opts;
+  const { deep, freeze, ...keyopts } = opts;
   const keys = keysDispatch(keyopts);
   for (const key of keys(obj ?? {})) {
     const value = obj[key];
-    const entry = deep && isObject(value) ? [key, map(value, { deep, keys }, callback)] : callback(key, value);
-    const entries = Array.isArray(entry) && typeof entry[0] === "object" ? entry : [entry];
-    entries.forEach(
-      (entry2) => (isObject(entry2) ? deepmergeInto : assignEntry)(result, entry2)
-    );
+    const entry = deep && isObject(value) ? [key, map(value, { deep, freeze, keys }, callback)] : callback(key, value);
+    if (isObject(entry))
+      deepmergeInto(result, entry);
+    else if (Array.isArray(entry)) {
+      (Array.isArray(entry[0]) ? entry : [entry]).forEach(
+        ([k, v]) => result[k] = v
+      );
+    }
   }
-  return result;
+  return freeze ? Object.freeze(result) : result;
 }, "map");
 var filter = /* @__PURE__ */ __name((obj, ...args) => {
-  const result = {};
+  let result = {};
   const { opts, callback } = parseRestArgs(args, {
     opts: { deep: !args.length, withRest: false },
     callback: ({ value }) => typeof value !== "undefined"
   });
   opts["withRest"] && (opts["withRest"] = {});
-  const { deep, withRest, ...keyopts } = opts;
+  const { deep, freeze, withRest, ...keyopts } = opts;
   const keys = keysDispatch(keyopts);
   for (const key of keys(obj ?? {})) {
     const value = obj[key];
@@ -96,20 +100,17 @@ var filter = /* @__PURE__ */ __name((obj, ...args) => {
       else if (withRest)
         withRest[key] = value;
     } else {
-      const entry = filter(
-        value,
-        { deep, keys, withRest: !!withRest },
-        callback
-      );
+      const opts2 = { deep, freeze, keys, withRest: !!withRest };
+      const entry = filter(value, opts2, callback);
       const [resolved, omitted] = withRest ? entry : [entry, {}];
-      if (Object.keys(omitted).length)
-        withRest[key] = omitted;
+      Object.keys(omitted).length && (withRest[key] = omitted);
       result[key] = resolved;
     }
   }
+  freeze && (result = Object.freeze(result));
   return withRest ? [result, withRest] : result;
 }, "filter");
-var object = Object.freeze({
+var _ = Object.freeze({
   clear,
   extend,
   filter,
@@ -119,7 +120,6 @@ var object = Object.freeze({
   pop,
   props
 });
-var assignEntry = /* @__PURE__ */ __name((obj, entry) => not(entry?.[0]) || (obj[entry[0]] = entry[1]), "assignEntry");
 var parseRestArgs = /* @__PURE__ */ __name((args, init = {}) => {
   for (const arg of args) {
     if (isObject(arg))
@@ -133,10 +133,11 @@ var parseRestArgs = /* @__PURE__ */ __name((args, init = {}) => {
   return init;
 }, "parseRestArgs");
 var keysDispatch = /* @__PURE__ */ __name((opts) => {
+  let keys;
   if (!opts)
     return Object.keys;
-  if (opts["keys"])
-    return opts["keys"];
+  if (keys = opts["keys"])
+    return keys;
   if (opts["nonEnumerable"]) {
     if (opts["inherited"])
       return props;
@@ -147,4 +148,4 @@ var keysDispatch = /* @__PURE__ */ __name((opts) => {
   return Object.keys;
 }, "keysDispatch");
 
-export { clear, extend, filter, findkey, keysIn, map, object, pop, props };
+export { _, clear, extend, filter, findkey, keysIn, map, pop, props };
