@@ -5,6 +5,18 @@ import path from 'path';
 import posix, { type Path } from 'path-browserify';
 import { map } from '@/objects';
 
+const methods = new Set([
+  'basename',
+  'delimiter',
+  'dirname',
+  'extname',
+  'isAbsolute',
+  'join',
+  'normalize',
+  'relative',
+  'resolve',
+] as Union<keyof Path>[]);
+
 /**
  * Converts **all** `\` to `/` and consolidates
  * duplicates without performing any normalization.
@@ -175,19 +187,6 @@ function isValidExt(
     !ignore.some((val) => (val?.[0] === '.' || (val = `.${ext}`), val === ext))
   );
 }
-
-/** @internal */
-const methods = new Set([
-  'basename',
-  'delimiter',
-  'dirname',
-  'extname',
-  'isAbsolute',
-  'join',
-  'normalize',
-  'relative',
-  'resolve',
-] as Union<keyof Path>[]);
 
 /** @internal */
 type ExtOptions = {

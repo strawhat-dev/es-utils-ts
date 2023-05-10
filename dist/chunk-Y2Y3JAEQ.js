@@ -3,6 +3,17 @@ import { __name } from './chunk-JXJLGDKJ.js';
 import path from 'path';
 import posix from 'path-browserify';
 
+var methods = /* @__PURE__ */ new Set([
+  "basename",
+  "delimiter",
+  "dirname",
+  "extname",
+  "isAbsolute",
+  "join",
+  "normalize",
+  "relative",
+  "resolve"
+]);
 var toUnix = /* @__PURE__ */ __name((p) => {
   if (typeof p !== "string")
     return p;
@@ -105,16 +116,5 @@ function isValidExt(ext, { ignore = [], maxLength = 7 } = {}) {
   return ext && ext.length <= maxLength && !ignore.some((val) => (val?.[0] === "." || (val = `.${ext}`), val === ext));
 }
 __name(isValidExt, "isValidExt");
-var methods = /* @__PURE__ */ new Set([
-  "basename",
-  "delimiter",
-  "dirname",
-  "extname",
-  "isAbsolute",
-  "join",
-  "normalize",
-  "relative",
-  "resolve"
-]);
 
 export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, path_default, relative, removeExt, resolve, sep, toUnix, trimExt };
