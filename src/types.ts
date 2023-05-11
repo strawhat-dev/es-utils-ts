@@ -11,13 +11,19 @@ import type {
   UnionToIntersection,
 } from 'type-fest';
 
-// simple common type utilities
+// re-exported type-fest utilities
+export type * from 'type-fest';
+export type * from 'type-fest/source/async-return-type.js';
+export type { SimplifyDeep } from 'type-fest/source/merge-deep.js';
+
+/** Any value that is **not** `null` or `undefined`. */
+export interface NonNullish {}
+export type Nullish = null | undefined;
+export type Maybe<T> = T | undefined;
+export type Nullable<T> = T | null;
+export type Multi<T> = T | T[];
 export type Numeric = number | bigint;
 export type NumberLike = number | `${number}`;
-export type Nullish = null | undefined;
-export type Nullable<T> = T | null;
-export type Maybe<T> = T | undefined;
-export type Multi<T> = T | T[];
 
 /**
  * **all** primitives *(i.e. any non-object)*
@@ -32,9 +38,6 @@ export type primitive = Simplify<Primitive | bigint | symbol>;
  * @see {@link primitive} for *any* primitive
  */
 export type Primitive = Simplify<string | boolean | number | Nullish>;
-
-/** any **non-{@link Nullish}** value. */
-export interface Defined {}
 
 /** **any** js value *(primitves or objects)*. */
 export type JsValue = Simplify<primitive | object>;
@@ -55,12 +58,12 @@ export type KeyOf<
 > = StringKeyOf<composite> extends never ? Fallback : StringKeyOf<composite>;
 
 /**
- * Create a union type from a given object's values if possible;
- * else falls back to any js value by default.
+ * Like {@link KeyOf}, but for extracting a
+ * union type from the **values** instead.
  */
 export type ValueOf<
   T,
-  Fallback = JsValue,
+  Fallback = NonNullish,
   composite = Composite<T>
 > = KeyOf<T> extends keyof composite ? composite[KeyOf<T>] : Fallback;
 
@@ -110,7 +113,8 @@ export type KeysExcept<T, ExcludedTypes> = keyof ConditionalExcept<
  *   it will just be {@link Narrow}'ed down or returned as is.
  */
 export type Union<T> = Type<
-  T | (IsLiteral<T> extends true ? LiteralToPrimitive<T> & Defined : Narrow<T>)
+  | T
+  | (IsLiteral<T> extends true ? LiteralToPrimitive<T> & NonNullish : Narrow<T>)
 >;
 
 /**
@@ -133,23 +137,23 @@ export type Composite<T, Composed = UnionToIntersection<T>> = Type<
  * - *used internally for {@link Union}*
  */
 export type Narrow<T> = Type<
-  T extends Promise<infer Resolved>
-    ? Promise<Narrow<Resolved>>
-    : T extends (infer Item)[]
-    ? Narrow<Item>[]
-    : T extends Set<infer Item>
+  T extends JsObject<infer Values>
+    ? JsObject<Narrow<Values>>
+    : T extends readonly (infer Item)[]
+    ? Narrow<Item | unknown>[]
+    : T extends ReadonlySet<infer Item>
     ? Set<Narrow<Item>>
-    : T extends Map<infer K, infer V>
+    : T extends ReadonlyMap<infer K, infer V>
     ? Map<Narrow<K>, Narrow<V>>
-    : T extends JsObject<infer Values>
-    ? JsObject<Values>
+    : T extends Promise<infer Resolved>
+    ? Promise<Narrow<Resolved>>
     : T extends Function
     ? Function
     : T extends object
     ? object
     : T extends primitive
     ? LiteralToPrimitive<T>
-    : Defined
+    : NonNullish
 >;
 
 /**
@@ -169,7 +173,7 @@ export type Extends<T1, T2> = T1 extends T2 ? true : false;
  * Used internally for {@link Composite}. Reverses effect of {@link Union} for `strings` and `numbers`.
  */
 export type ExtractLiteral<T extends string | number> = keyof {
-  [key in T as IsLiteral<key> extends false ? never : key]: never;
+  [k in T as IsLiteral<k> extends false ? never : k]: never;
 };
 
 /**

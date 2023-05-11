@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Constructor, Replace, TypedArray } from 'type-fest';
-import type { AsyncFunction } from 'type-fest/source/async-return-type.js';
-import type { JsObject, KeyOf, Union, primitive } from '@/types';
+import type { AsyncFunction, Constructor, JsObject, KeyOf, Replace, TypedArray, Union, primitive } from '@/types';
 import type { AssertionOptions, AsyncGeneratorFunction, GeneratorFunction, MultiTypeQueryFunction, TypeName } from './types';
 
-import { deepcompare, inspect } from '@/externals';
+import { equal, inspect } from '@/externals';
 
 /**
  * Used internally for some type checking methods in this module
@@ -101,7 +99,7 @@ const querycallback = (value: unknown) => {
       return assert[`is${query as AssertionType}`](value, { quiet: true });
     }
 
-    return deepcompare(value, query);
+    return equal(value, query);
   };
 };
 

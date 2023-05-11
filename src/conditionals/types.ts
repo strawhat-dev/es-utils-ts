@@ -69,7 +69,6 @@ export type MultiTypeQueryFunction = (value: unknown) => {
   everyOf: MultiTypeQuery;
 };
 
-// private
 interface MultiTypeQuery {
   (...queries: unknown[]): boolean;
   (...queries: AssertionType[]): boolean;

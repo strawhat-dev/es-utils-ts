@@ -1,4 +1,4 @@
-import type { ConditionalExcept, PartialDeep } from 'type-fest';
+import type { ConditionalExcept, PartialDeep } from '@/types';
 
 export type HTMLTag = keyof HTMLElementTagNameMap;
 
@@ -6,7 +6,6 @@ export type HTMLElementProps<T extends HTMLTag = 'div'> = PartialDeep<
   ConditionalExcept<HTMLElementTagNameMap[T], Function>
 >;
 
-// private
 export type CreateLinkOptions = {
   /**
    * The `textContent` property to be set on the element.

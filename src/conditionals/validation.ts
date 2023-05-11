@@ -1,4 +1,5 @@
-import type { Nullish } from '@/types';
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import type { Nullish, Union } from '@/types';
 
 /**
  * Similarly to nullish coalescing, checks if given `value` is `undefined` or `null`.
@@ -18,18 +19,20 @@ export const nullish = (value: unknown): value is Nullish => typeof value === 'u
 export const not = (value: unknown): value is false | Nullish => value === false || nullish(value) || Number.isNaN(value);
 
 /**
- * Utilizes `URL` constructor (as opposed to regular expressions)
- * to check if the provided string is a valid url.
- *
- * Set the `http` option to `false` to allow any urls that are parsable by the `URL`
- * constructor (e.g. `"foo:bar"`), instead of just those with a valid "http/https" protocol.
- *
- * *(defaults to `true` since this is the most common desired behavior)*
+ * Utilizes `URL` constructor to check if the provided string is a valid url.
+ * - Set the `protocol` option to a `string` to check for a custom protocol,
+ * or set the `protocol` option to `'any'` to allow **any** protocol. Otherwise,
+ * defaults to checking if the url has a valid *http* protocol (i.e. `http:` or `https:`).
  */
 // prettier-ignore
-export const validURL = (value: string, options: { http: boolean } = { http: true }) => {
+export const validURL = (
+  value: unknown,
+  options?: { protocol?: Union<'any'> }
+): value is URL & string => {
   try {
-    const { protocol } = new URL(value);
-    return !options.http || protocol === 'http:' || protocol === 'https:';
+    const url = new URL(value as URL | string);
+    const { protocol } = options || {};
+    if (!protocol) return url.protocol === 'http:' || url.protocol === 'https:';
+    return protocol === 'any' || protocol === url.protocol;
   } catch { return false; }
 };
