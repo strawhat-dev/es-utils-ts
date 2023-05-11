@@ -1,7 +1,6 @@
 import type { Union } from '@/types';
 
-import nodepath from 'path';
-import posix, { type Path } from 'path-browserify';
+import posix, { type PlatformPath as Path } from 'path';
 import { map } from '@/objects';
 
 const methods = new Set([
@@ -47,7 +46,7 @@ export const {
   relative,
   resolve,
 } = map(
-  (nodepath || posix) as unknown as Path,
+  posix,
   { inherited: true, nonEnumerable: true },
   (name, prop) => methods.has(name) && [name, unixify(prop)]
 ) as Path;
