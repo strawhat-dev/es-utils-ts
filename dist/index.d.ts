@@ -3,7 +3,7 @@ export { deepclone, deepcopy, equal, inspect } from './externals.js';
 export { HTMLElementProps, HTMLTag, createElement, createHTMLDoc, createLink, querySelectorMatchAll } from './html/index.js';
 export { Range, cdn, iRange, irange, range, sleep, trimLines } from './lib/index.js';
 export { _, clear, extend, filter, findkey, keys, keysIn, map, pop, props } from './objects/index.js';
-export { path } from './path.js';
+export { posix as path } from './path.js';
 export { default as escapeRegex } from 'escape-string-regexp';
 export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from 'deepmerge-ts';
 import './types.js';

@@ -1,6 +1,6 @@
 import { map } from './chunk-322U5OCO.js';
 import { __name } from './chunk-Q47Q2FLE.js';
-import nodepath from 'path';
+import _ from 'path';
 
 var methods = /* @__PURE__ */ new Set([
   "basename",
@@ -13,15 +13,15 @@ var methods = /* @__PURE__ */ new Set([
   "relative",
   "resolve"
 ]);
-var toUnix = /* @__PURE__ */ __name((path2) => {
-  if (typeof path2 !== "string")
-    return path2;
-  return path2.replace(/\\/g, "/").replace(/(?<!^)\/+/g, "/");
+var toUnix = /* @__PURE__ */ __name((path) => {
+  if (typeof path !== "string")
+    return path;
+  return path.replace(/\\/g, "/").replace(/(?<!^)\/+/g, "/");
 }, "toUnix");
 var sep = "/";
-var format = /* @__PURE__ */ __name((obj) => toUnix(nodepath.format(obj)), "format");
+var format = /* @__PURE__ */ __name((obj) => toUnix(_.format(obj)), "format");
 var parse = /* @__PURE__ */ __name((p) => {
-  const ret = nodepath.parse(toUnix(p));
+  const ret = _.parse(toUnix(p));
   const [root] = ret.dir.split("/");
   if (root.endsWith(":"))
     ret.root = `${root}/`;
@@ -38,7 +38,7 @@ var {
   relative,
   resolve
 } = map(
-  nodepath,
+  _,
   { inherited: true, nonEnumerable: true },
   (name, prop) => methods.has(name) && [name, unixify(prop)]
 );
@@ -59,30 +59,30 @@ var joinSafe = /* @__PURE__ */ __name((...args) => {
     return ret;
   return normalizeSafe(ret);
 }, "joinSafe");
-var trimExt = /* @__PURE__ */ __name((path2, options) => {
-  const ret = extname(path2);
+var trimExt = /* @__PURE__ */ __name((path, options) => {
+  const ret = extname(path);
   if (!isValidExt(ret, options))
-    return path2;
-  return path2.replace(new RegExp(`${ret}$`), "");
+    return path;
+  return path.replace(new RegExp(`${ret}$`), "");
 }, "trimExt");
-var addExt = /* @__PURE__ */ __name((path2, ext) => {
+var addExt = /* @__PURE__ */ __name((path, ext) => {
   if (!ext)
-    return path2;
+    return path;
   ext[0] === "." || (ext = `.${ext}`);
-  path2.endsWith(ext) || (path2 = `${path2}${ext}`);
-  return path2;
+  path.endsWith(ext) || (path = `${path}${ext}`);
+  return path;
 }, "addExt");
-var removeExt = /* @__PURE__ */ __name((path2, ext) => {
+var removeExt = /* @__PURE__ */ __name((path, ext) => {
   if (!ext)
-    return path2;
+    return path;
   ext[0] === "." || (ext = `.${ext}`);
-  if (extname(path2) === ext)
-    return trimExt(path2, { maxLength: ext.length });
-  return path2;
+  if (extname(path) === ext)
+    return trimExt(path, { maxLength: ext.length });
+  return path;
 }, "removeExt");
-var changeExt = /* @__PURE__ */ __name((path2, ext = "", options) => (ext[0] === "." || (ext = `.${ext}`), `${trimExt(path2, options)}${ext}`), "changeExt");
-var defaultExt = /* @__PURE__ */ __name((path2, ext, options) => isValidExt(path2, options) ? extname(path2) : addExt(path2, ext), "defaultExt");
-var path = Object.freeze({
+var changeExt = /* @__PURE__ */ __name((path, ext = "", options) => (ext[0] === "." || (ext = `.${ext}`), `${trimExt(path, options)}${ext}`), "changeExt");
+var defaultExt = /* @__PURE__ */ __name((path, ext, options) => isValidExt(path, options) ? extname(path) : addExt(path, ext), "defaultExt");
+var posix = Object.freeze({
   addExt,
   basename,
   changeExt,
@@ -104,8 +104,8 @@ var path = Object.freeze({
   sep,
   toUnix,
   trimExt,
-  posix: nodepath.posix,
-  win32: nodepath.posix,
+  posix: _,
+  win32: _,
   toNamespacedPath: toUnix
 });
 function unixify(target) {
@@ -122,4 +122,4 @@ function isValidExt(ext, { ignore = [], maxLength = 7 } = {}) {
 }
 __name(isValidExt, "isValidExt");
 
-export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, path, relative, removeExt, resolve, sep, toUnix, trimExt };
+export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, posix, relative, removeExt, resolve, sep, toUnix, trimExt };

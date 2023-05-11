@@ -1,4 +1,4 @@
-import nodepath, { PlatformPath } from 'path';
+import _, { PlatformPath } from 'path';
 
 /**
  * Converts **all** `\` to `/` and consolidates
@@ -67,7 +67,7 @@ declare const defaultExt: (path: string, ext: string, options?: ExtOptions) => s
  * @see {@link https://nodejs.org/api/path.html}
  * @see {@link https://www.npmjs.com/package/upath}
  */
-declare const path: Readonly<{
+declare const posix: Readonly<{
     addExt: (path: string, ext: string) => string;
     basename: (path: string, suffix?: string | undefined) => string;
     changeExt: (path: string, ext?: string, options?: ExtOptions) => string;
@@ -75,22 +75,22 @@ declare const path: Readonly<{
     delimiter: ";" | ":";
     dirname: (path: string) => string;
     extname: (path: string) => string;
-    format: (pathObject: nodepath.FormatInputPathObject) => string;
+    format: (pathObject: _.FormatInputPathObject) => string;
     isAbsolute: (path: string) => boolean;
     join: (...paths: string[]) => string;
     joinSafe: (...paths: string[]) => string;
     normalize: (path: string) => string;
     normalizeSafe: (path: string) => string;
     normalizeTrim: (path: string) => string;
-    parse: (path: string) => nodepath.ParsedPath;
+    parse: (path: string) => _.ParsedPath;
     relative: (from: string, to: string) => string;
     removeExt: (path: string, ext: string) => string;
     resolve: (...paths: string[]) => string;
     sep: "/";
     toUnix: (path: string) => string;
     trimExt: (path: string, options?: ExtOptions) => string;
-    posix: nodepath.PlatformPath;
-    win32: nodepath.PlatformPath;
+    posix: _.PlatformPath;
+    win32: _.PlatformPath;
     toNamespacedPath: (path: string) => string;
 }>;
 /** @internal */
@@ -106,4 +106,4 @@ type ExtOptions = {
     maxLength?: number;
 };
 
-export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, path, relative, removeExt, resolve, sep, toUnix, trimExt };
+export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, posix, relative, removeExt, resolve, sep, toUnix, trimExt };
