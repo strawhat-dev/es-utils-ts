@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type {
+  Composite,
   JsObject,
   KeyOf,
   KeyOfDeep,
@@ -14,67 +16,71 @@ import type {
   Union,
   ValueOf,
   ValueOfDeep,
+  Writable,
 } from '@/types';
 
-export type PropsFn = <T extends object>(
-  obj: T,
-  options?: PropsOptions
-) => Union<KeyOf<T>>;
+export type KeyDispatcher = <
+  T extends object,
+  Options extends KeyIterationOptions
+>(
+  obj: Readonly<T>,
+  options?: Options
+) => (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
 
-type PropsOptions = {
-  /**
-   * If `true`, properties of `Object.prototype` are included
-   * when traversing up the prototype chain; otherwise omitted.
-   * @defaultValue `false`
-   */
-  objectPrototype?: boolean;
-};
+export type ClearFn = <T extends JsObject>(
+  obj: T,
+  options?: Omit<KeyIterationOptions, 'inherited'>
+) => Partial<T>;
 
 export type PopFn = {
   <T extends JsObject>(obj: Readonly<T>): T[KeyOf<T>];
-
-  <T extends object>(obj: Readonly<T>): T[keyof T];
-
-  <T extends JsObject, Key extends KeyOf<T>>(
+  <T extends JsObject, Key extends KeyOf<Readonly<T>>>(
     obj: Readonly<T>,
     key: Key
   ): T[Key];
 
-  <T extends object, Key extends keyof T>(obj: Readonly<T>, key: Key): T[Key];
+  <T extends object>(obj: Readonly<T>): T[keyof T];
+  <T extends object, Key extends keyof Readonly<T>>(
+    obj: Readonly<T>,
+    key: Key
+  ): T[Key];
 };
-
-export type ClearFn = <T extends object>(
-  obj: Readonly<T>,
-  options?: Omit<KeyIterationOptions, 'inherited'>
-) => Partial<T>;
 
 export type ExtendFn = {
   <T extends JsObject>(props: Readonly<T>): Readonly<T>;
 
-  <T1 extends JsObject, T2 extends JsObject>(
-    obj: Readonly<T1>,
-    props: Readonly<T2>
-  ): ExtendedResult<T1, Readonly<T2>>;
+  <Base extends JsObject, Props extends JsObject>(
+    obj: Readonly<Base>,
+    props: Readonly<Props>
+  ): ExtendedResult<Base, Readonly<Props>>;
 
-  <T1 extends object, T2 extends JsObject>(
-    obj: Readonly<T1>,
-    props: Readonly<T2>
-  ): ExtendedResult<T1, Readonly<T2>>;
+  <Base extends object, Props extends JsObject>(
+    obj: Readonly<Base>,
+    props: Readonly<Props>
+  ): ExtendedResult<Base, Readonly<Props>>;
 
-  <T1 extends JsObject, T2 extends JsObject, Options extends ExtendOptions<T2>>(
-    obj: Readonly<T1>,
-    props: Readonly<T2>,
+  <
+    Base extends JsObject,
+    Props extends JsObject,
+    Options extends ExtendOptions<Props>
+  >(
+    obj: Readonly<Base>,
+    props: Readonly<Props>,
     options: Options
-  ): ExtendedResult<T1, T2, Options>;
+  ): ExtendedResult<Base, Props, Options>;
 
-  <T1 extends object, T2 extends JsObject, Options extends ExtendOptions<T2>>(
-    obj: Readonly<T1>,
-    props: Readonly<T2>,
+  <
+    Base extends object,
+    Props extends JsObject,
+    Options extends ExtendOptions<Props>
+  >(
+    obj: Readonly<Base>,
+    props: Readonly<Props>,
     options: Options
-  ): ExtendedResult<T1, T2, Options>;
+  ): ExtendedResult<Base, Props, Options>;
 };
 
-export type ExtendOptions<T = {}> = {
+export type ExtendOptions<Props = {}> = {
   /**
    * If `true`, return a new object instead
    * of mutating the current one. *(deep copy)*
@@ -87,21 +93,21 @@ export type ExtendOptions<T = {}> = {
    * *(Applied to **all** properties if `true`)*
    * @defaultValue `false`
    */
-  enumerable?: boolean | KeyOf<T>[];
+  enumerable?: boolean | readonly KeyOf<Props>[];
   /**
    * If provided, the values associated may
    * be changed with an assignment operator. \
    * *(Applied to **all** properties if `true`)*
    * @defaultValue `false`
    */
-  writable?: boolean | KeyOf<T>[];
+  writable?: boolean | readonly KeyOf<Props>[];
   /**
    * If provided, the types of these property descriptors may be changed
    * and the properties may be deleted from the corresponding object. \
    * *(Applied to **all** properties if `true`)*
    * @defaultValue `false`
    */
-  configurable?: boolean | KeyOf<T>[];
+  configurable?: boolean | readonly KeyOf<Props>[];
 } & Pick<ObjectOptions, 'freeze'>;
 
 type ExtendedResult<
@@ -110,8 +116,14 @@ type ExtendedResult<
   Options extends ExtendOptions = {},
   Props = Options['configurable'] & Options['writable'] extends true
     ? T2
+    : Options['configurable'] & Options['writable'] extends readonly (infer P)[]
+    ? P extends keyof T2
+      ? Writable<Readonly<T2>, P>
+      : never
     : Readonly<T2>,
-  Result = T1 extends Function ? T1 & Simplify<Props> : Merge<T1, Props>
+  Result = T1 extends Function
+    ? T1 & Simplify<Props>
+    : Merge<T1, Composite<Props>>
 > = Options['freeze'] extends true ? Readonly<Result> : Result;
 
 export type FindKeyFn = {
