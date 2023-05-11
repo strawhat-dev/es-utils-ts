@@ -1,6 +1,7 @@
 import { map } from './chunk-U4BFGVV4.js';
 import { __name } from './chunk-JGF42Q5W.js';
-import posix from 'path';
+import nodepath from 'path';
+import { format as format$1, parse as parse$1 } from 'path-browserify';
 
 var methods = /* @__PURE__ */ new Set([
   "basename",
@@ -19,9 +20,9 @@ var toUnix = /* @__PURE__ */ __name((path) => {
   return path.replace(/\\/g, "/").replace(/(?<!^)\/+/g, "/");
 }, "toUnix");
 var sep = "/";
-var format = /* @__PURE__ */ __name((obj) => toUnix(posix.format(obj)), "format");
+var format = /* @__PURE__ */ __name((obj) => toUnix(format$1(obj)), "format");
 var parse = /* @__PURE__ */ __name((p) => {
-  const ret = posix.parse(toUnix(p));
+  const ret = parse$1(toUnix(p));
   const [root] = ret.dir.split("/");
   if (root.endsWith(":"))
     ret.root = `${root}/`;
@@ -38,7 +39,7 @@ var {
   relative,
   resolve
 } = map(
-  posix,
+  nodepath,
   { inherited: true, nonEnumerable: true },
   (name, prop) => methods.has(name) && [name, unixify(prop)]
 );
@@ -98,14 +99,14 @@ var path_default = Object.freeze({
   normalizeSafe,
   normalizeTrim,
   parse,
-  posix,
   relative,
   removeExt,
   resolve,
   sep,
   toUnix,
   trimExt,
-  win32: posix,
+  posix: nodepath.posix,
+  win32: nodepath.posix,
   toNamespacedPath: toUnix
 });
 function unixify(target) {

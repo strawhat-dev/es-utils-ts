@@ -1,4 +1,4 @@
-import posix, { PlatformPath } from 'path';
+import nodepath, { PlatformPath } from 'path';
 
 /**
  * Converts **all** `\` to `/` and consolidates
@@ -75,22 +75,22 @@ declare const _default: Readonly<{
     delimiter: ";" | ":";
     dirname: (path: string) => string;
     extname: (path: string) => string;
-    format: (pathObject: posix.FormatInputPathObject) => string;
+    format: (pathObject: nodepath.FormatInputPathObject) => string;
     isAbsolute: (path: string) => boolean;
     join: (...paths: string[]) => string;
     joinSafe: (...paths: string[]) => string;
     normalize: (path: string) => string;
     normalizeSafe: (path: string) => string;
     normalizeTrim: (path: string) => string;
-    parse: (path: string) => posix.ParsedPath;
-    posix: posix.PlatformPath;
+    parse: (path: string) => nodepath.ParsedPath;
     relative: (from: string, to: string) => string;
     removeExt: (path: string, ext: string) => string;
     resolve: (...paths: string[]) => string;
     sep: "/";
     toUnix: (path: string) => string;
     trimExt: (path: string, options?: ExtOptions | undefined) => string;
-    win32: posix.PlatformPath;
+    posix: nodepath.PlatformPath;
+    win32: nodepath.PlatformPath;
     toNamespacedPath: (path: string) => string;
 }>;
 
