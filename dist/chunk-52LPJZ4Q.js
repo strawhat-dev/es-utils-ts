@@ -5,8 +5,8 @@ import { __name } from './chunk-JGF42Q5W.js';
 var ESM_CDN_URL = "https://esm.run";
 var sleep = /* @__PURE__ */ __name(async (ms) => new Promise((res) => setTimeout(res, +ms)), "sleep");
 var cdn = /* @__PURE__ */ __name(async (name) => {
-  const mod2 = await import(`${ESM_CDN_URL}/${name}`);
-  return mod2?.default || mod2;
+  const mod = await import(`${ESM_CDN_URL}/${name}`);
+  return mod?.default || mod;
 }, "cdn");
 
 // src/lib/range.ts
@@ -71,14 +71,5 @@ var iRange = /* @__PURE__ */ __name((start = 0, stop, step) => {
 
 // src/lib/index.ts
 var trimLines = /* @__PURE__ */ __name((s) => s.split(/\r?\n/).filter((line) => line.trim()).join("\n"), "trimLines");
-var add = /* @__PURE__ */ __name((a, b) => a + b, "add");
-var sub = /* @__PURE__ */ __name((a, b) => a - b, "sub");
-var mult = /* @__PURE__ */ __name((a, b) => a * b, "mult");
-var div = /* @__PURE__ */ __name((a, b) => a / b, "div");
-var mod = /* @__PURE__ */ __name((a, b) => a % b, "mod");
-var lt = /* @__PURE__ */ __name((a, b) => a < b, "lt");
-var gt = /* @__PURE__ */ __name((a, b) => a > b, "gt");
-var lte = /* @__PURE__ */ __name((a, b) => a <= b, "lte");
-var gte = /* @__PURE__ */ __name((a, b) => a >= b, "gte");
 
-export { Range, add, cdn, div, gt, gte, iRange, irange, lt, lte, mod, mult, range, sleep, sub, trimLines };
+export { Range, cdn, iRange, irange, range, sleep, trimLines };

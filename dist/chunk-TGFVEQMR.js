@@ -1,7 +1,6 @@
-import { map } from './chunk-RE2Z5U4Z.js';
+import { map } from './chunk-U4BFGVV4.js';
 import { __name } from './chunk-JGF42Q5W.js';
-import nodepath from 'path';
-import posix from 'path-browserify';
+import posix from 'path';
 
 var methods = /* @__PURE__ */ new Set([
   "basename",
@@ -39,7 +38,7 @@ var {
   relative,
   resolve
 } = map(
-  nodepath || posix,
+  posix,
   { inherited: true, nonEnumerable: true },
   (name, prop) => methods.has(name) && [name, unixify(prop)]
 );

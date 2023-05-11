@@ -1,34 +1,34 @@
-import posix, { Path } from 'path-browserify';
+import posix, { PlatformPath } from 'path';
 
 /**
  * Converts **all** `\` to `/` and consolidates
  * duplicates without performing any normalization.
  */
 declare const toUnix: (path: string) => string;
-declare const sep: Path['sep'];
-declare const format: Path['format'];
-declare const parse: Path['parse'];
-declare const basename: (path: string, ext?: string | undefined) => string;
-declare const delimiter: string;
+declare const sep: PlatformPath['sep'];
+declare const format: PlatformPath['format'];
+declare const parse: PlatformPath['parse'];
+declare const basename: (path: string, suffix?: string | undefined) => string;
+declare const delimiter: ";" | ":";
 declare const dirname: (path: string) => string;
 declare const extname: (path: string) => string;
 declare const isAbsolute: (path: string) => boolean;
 declare const join: (...paths: string[]) => string;
 declare const normalize: (path: string) => string;
 declare const relative: (from: string, to: string) => string;
-declare const resolve: (...pathSegments: string[]) => string;
+declare const resolve: (...paths: string[]) => string;
 /**
  * Exactly like `path.normalize`, but keeps the first meaningful `./` or `//`. \
  * *Note: `/` is returned everywhere, so windows `\` is always converted to unix `/`.*
  */
-declare const normalizeSafe: Path['normalize'];
+declare const normalizeSafe: PlatformPath['normalize'];
 /** Exactly like `path.normalizeSafe`, but it trims any useless ending `/`. */
-declare const normalizeTrim: Path['normalize'];
+declare const normalizeTrim: PlatformPath['normalize'];
 /**
  * Exactly like `path.join`, but keeps the first meaningful `./` or `//`. \
  * *Note: `/` is returned everywhere, so Windows `\` is always converted to unix `/`.*
  */
-declare const joinSafe: Path['join'];
+declare const joinSafe: PlatformPath['join'];
 /**
  * Trims a path's extension.
  */
@@ -69,28 +69,28 @@ declare const defaultExt: (path: string, ext: string, options?: ExtOptions) => s
  */
 declare const _default: Readonly<{
     addExt: (path: string, ext: string) => string;
-    basename: (path: string, ext?: string | undefined) => string;
+    basename: (path: string, suffix?: string | undefined) => string;
     changeExt: (path: string, ext?: string, options?: ExtOptions | undefined) => string;
     defaultExt: (path: string, ext: string, options?: ExtOptions | undefined) => string;
-    delimiter: string;
+    delimiter: ";" | ":";
     dirname: (path: string) => string;
     extname: (path: string) => string;
-    format: (pathObject: Partial<posix.PathObject>) => string;
+    format: (pathObject: posix.FormatInputPathObject) => string;
     isAbsolute: (path: string) => boolean;
     join: (...paths: string[]) => string;
     joinSafe: (...paths: string[]) => string;
     normalize: (path: string) => string;
     normalizeSafe: (path: string) => string;
     normalizeTrim: (path: string) => string;
-    parse: (path: string) => posix.PathObject;
-    posix: posix.Path;
+    parse: (path: string) => posix.ParsedPath;
+    posix: posix.PlatformPath;
     relative: (from: string, to: string) => string;
     removeExt: (path: string, ext: string) => string;
-    resolve: (...pathSegments: string[]) => string;
-    sep: string;
+    resolve: (...paths: string[]) => string;
+    sep: "/";
     toUnix: (path: string) => string;
     trimExt: (path: string, options?: ExtOptions | undefined) => string;
-    win32: posix.Path;
+    win32: posix.PlatformPath;
     toNamespacedPath: (path: string) => string;
 }>;
 
