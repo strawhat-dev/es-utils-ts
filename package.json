@@ -10,7 +10,17 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js",
+    "./types": {
+      "types": "./dist/types.d.ts"
+    },
+    "./externals": {
+      "import": "./dist/externals.js",
+      "types": "./dist/externals.d.ts"
+    },
+    "./path": {
+      "import": "./dist/path.js",
+      "types": "./dist/path.d.ts"
+    },
     "./conditionals": {
       "import": "./dist/conditionals/index.js",
       "types": "./dist/conditionals/index.d.ts"
@@ -26,14 +36,6 @@
     "./objects": {
       "import": "./dist/objects/index.js",
       "types": "./dist/objects/index.d.ts"
-    },
-    "./path": {
-      "import": "./dist/path.js",
-      "types": "./dist/path.d.ts"
-    },
-    "./externals": {
-      "import": "./dist/externals.js",
-      "types": "./dist/externals.d.ts"
     }
   },
   "engines": {

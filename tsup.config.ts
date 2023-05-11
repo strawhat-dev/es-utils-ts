@@ -12,5 +12,10 @@ export default defineConfig({
   dts: { resolve: true },
   skipNodeModulesBundle: true,
   outDir: 'dist',
-  entry: ['src/path.ts', 'src/externals.ts', ...glob('src/**/index.ts')],
+  entry: [
+    'src/types.ts',
+    'src/path.ts',
+    'src/externals.ts',
+    ...glob('src/**/index.ts'),
+  ],
 });
