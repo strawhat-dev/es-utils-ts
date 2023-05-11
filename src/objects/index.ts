@@ -76,18 +76,16 @@ export const clear: ClearFn = (obj, options) => {
  * the values to be assigned being the direct property for a given property name, and
  * the `configurable`, `enumerable`, and `writable` options all `false` by default.
  *
- * The `configurable`, `enumerable`, and `writable` options may still be provided as the third argument,
+ * The `configurable`, `enumerable`, and `writable` options may still be optionally provided,
  * and the resulting object will be correctly typed accordingly (i.e. `readonly` vs non-`readonly`).
- *
- * Note: This would apply to all of the given properties however,
- * as opposed to a per-property basis with `Object.defineProperties`.
  */
 export const extend: ExtendFn = (...args: unknown[]) => {
   const descriptorMap: PropertyDescriptorMap = {};
   const [target, props, options] = args.length === 1 ? [{}, args.pop()] : args;
   const { copy, freeze, ...descriptors } = { ...(options as ExtendOptions) };
   for (const key in props!) {
-    descriptorMap[key] = { ...descriptors, value: (props as JsObject)[key] };
+    const value = (props as JsObject)[key];
+    descriptorMap[key] = mapDescriptors(key, value, descriptors);
   }
 
   const ret = Object.defineProperties(
@@ -99,7 +97,7 @@ export const extend: ExtendFn = (...args: unknown[]) => {
 };
 
 export const findkey: FindKeyFn = (obj: JsObject, ...args: unknown[]) => {
-  const { opts, callback } = parseRestArgs(args, {
+  const { opts, callback } = mapargs(args, {
     callback: (value: unknown) => !not(value),
   });
 
@@ -116,7 +114,7 @@ export const findkey: FindKeyFn = (obj: JsObject, ...args: unknown[]) => {
 
 export const map: MapFn = (obj: JsObject, ...args: unknown[]) => {
   const result: JsObject = {};
-  const { opts, callback } = parseRestArgs(args);
+  const { opts, callback } = mapargs(args);
   const { deep, freeze, ...keyopts } = opts;
   const keys = keysDispatch(keyopts);
   for (const key of keys(obj ?? {})) {
@@ -140,7 +138,7 @@ export const map: MapFn = (obj: JsObject, ...args: unknown[]) => {
 
 export const filter: FilterFn = (obj: JsObject, ...args: unknown[]) => {
   let result: JsObject = {};
-  const { opts, callback } = parseRestArgs(args, {
+  const { opts, callback } = mapargs(args, {
     opts: { deep: !args.length, withRest: false },
     callback: ({ value }: { value: unknown }) => typeof value !== 'undefined',
   });
@@ -181,7 +179,7 @@ export const _ = Object.freeze({
 });
 
 /** @internal */
-const parseRestArgs = (
+const mapargs = (
   args: unknown[],
   init: { opts?: JsObject<boolean>; callback?: Function } = {}
 ) => {
@@ -194,6 +192,19 @@ const parseRestArgs = (
   init.callback ||= () => {};
   return init as Required<typeof init>;
 };
+
+/** @internal */
+const mapDescriptors = (
+  property: string,
+  value: unknown,
+  options: ExtendOptions,
+  resolver = (d: unknown) => (Array.isArray(d) ? d.includes(property) : !!d)
+): PropertyDescriptor => ({
+  value,
+  writable: resolver(options.writable),
+  enumerable: resolver(options.enumerable),
+  configurable: resolver(options.configurable),
+});
 
 /** @internal */
 const keysDispatch = (opts?: KeyIterationOptions) => {

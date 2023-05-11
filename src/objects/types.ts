@@ -1,12 +1,15 @@
-import type { Merge, PartialDeep, ReadonlyDeep, Simplify } from 'type-fest';
-import type { SimplifyDeep } from 'type-fest/source/merge-deep.js';
 import type {
   JsObject,
   KeyOf,
   KeyOfDeep,
   Maybe,
+  Merge,
   Multi,
   Nullish,
+  PartialDeep,
+  ReadonlyDeep,
+  Simplify,
+  SimplifyDeep,
   Type,
   Union,
   ValueOf,
@@ -21,7 +24,7 @@ export type PropsFn = <T extends object>(
 type PropsOptions = {
   /**
    * If `true`, properties of `Object.prototype` are included
-   * when traversing up the prototype chain, otherwise omitted.
+   * when traversing up the prototype chain; otherwise omitted.
    * @defaultValue `false`
    */
   objectPrototype?: boolean;
@@ -58,44 +61,47 @@ export type ExtendFn = {
     props: Readonly<T2>
   ): ExtendedResult<T1, Readonly<T2>>;
 
-  <T1 extends JsObject, T2 extends JsObject, Options extends ExtendOptions>(
+  <T1 extends JsObject, T2 extends JsObject, Options extends ExtendOptions<T2>>(
     obj: Readonly<T1>,
     props: Readonly<T2>,
     options: Options
   ): ExtendedResult<T1, T2, Options>;
 
-  <T1 extends object, T2 extends JsObject, Options extends ExtendOptions>(
+  <T1 extends object, T2 extends JsObject, Options extends ExtendOptions<T2>>(
     obj: Readonly<T1>,
     props: Readonly<T2>,
     options: Options
   ): ExtendedResult<T1, T2, Options>;
 };
 
-export type ExtendOptions = {
+export type ExtendOptions<T = {}> = {
   /**
-   * if `true`, return a new object instead
+   * If `true`, return a new object instead
    * of mutating the current one. *(deep copy)*
    * @defaultValue `false`
    */
   copy?: boolean;
   /**
-   * if `true`, properties show up during the
-   * enumeration of the corresponding object.
+   * If provided, the properties listed will show up
+   * during the enumeration of the corresponding object. \
+   * *(Applied to **all** properties if `true`)*
    * @defaultValue `false`
    */
-  enumerable?: boolean;
+  enumerable?: boolean | KeyOf<T>[];
   /**
-   * if `true`, the values associated may
-   * be changed with an assignment operator.
+   * If provided, the values associated may
+   * be changed with an assignment operator. \
+   * *(Applied to **all** properties if `true`)*
    * @defaultValue `false`
    */
-  writable?: boolean;
+  writable?: boolean | KeyOf<T>[];
   /**
-   * if `true`, the types of these property descriptors may be changed
-   * and/or the properties may be deleted from the corresponding object.
+   * If provided, the types of these property descriptors may be changed
+   * and the properties may be deleted from the corresponding object. \
+   * *(Applied to **all** properties if `true`)*
    * @defaultValue `false`
    */
-  configurable?: boolean;
+  configurable?: boolean | KeyOf<T>[];
 } & Pick<ObjectOptions, 'freeze'>;
 
 type ExtendedResult<
