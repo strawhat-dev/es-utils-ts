@@ -67,11 +67,11 @@ declare const defaultExt: (path: string, ext: string, options?: ExtOptions) => s
  * @see {@link https://nodejs.org/api/path.html}
  * @see {@link https://www.npmjs.com/package/upath}
  */
-declare const _default: Readonly<{
+declare const path: Readonly<{
     addExt: (path: string, ext: string) => string;
     basename: (path: string, suffix?: string | undefined) => string;
-    changeExt: (path: string, ext?: string, options?: ExtOptions | undefined) => string;
-    defaultExt: (path: string, ext: string, options?: ExtOptions | undefined) => string;
+    changeExt: (path: string, ext?: string, options?: ExtOptions) => string;
+    defaultExt: (path: string, ext: string, options?: ExtOptions) => string;
     delimiter: ";" | ":";
     dirname: (path: string) => string;
     extname: (path: string) => string;
@@ -88,12 +88,11 @@ declare const _default: Readonly<{
     resolve: (...paths: string[]) => string;
     sep: "/";
     toUnix: (path: string) => string;
-    trimExt: (path: string, options?: ExtOptions | undefined) => string;
+    trimExt: (path: string, options?: ExtOptions) => string;
     posix: nodepath.PlatformPath;
     win32: nodepath.PlatformPath;
     toNamespacedPath: (path: string) => string;
 }>;
-
 /** @internal */
 type ExtOptions = {
     /**
@@ -107,4 +106,4 @@ type ExtOptions = {
     maxLength?: number;
 };
 
-export { addExt, basename, changeExt, _default as default, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, relative, removeExt, resolve, sep, toUnix, trimExt };
+export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, joinSafe, normalize, normalizeSafe, normalizeTrim, parse, path, relative, removeExt, resolve, sep, toUnix, trimExt };

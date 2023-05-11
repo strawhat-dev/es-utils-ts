@@ -2,7 +2,6 @@ import type { Union } from '@/types';
 
 import { map } from '@/objects';
 import nodepath, { type PlatformPath as Path } from 'path';
-import { format as fmt, parse as parsepath } from 'path-browserify';
 
 const methods = new Set([
   'basename',
@@ -27,10 +26,10 @@ export const toUnix = (path: string) => {
 
 export const sep: Path['sep'] = '/';
 
-export const format: Path['format'] = (obj) => toUnix(fmt(obj));
+export const format: Path['format'] = (obj) => toUnix(nodepath.format(obj));
 
 export const parse: Path['parse'] = (p) => {
-  const ret = parsepath(toUnix(p));
+  const ret = nodepath.parse(toUnix(p));
   const [root] = ret.dir.split('/');
   if (root.endsWith(':')) ret.root = `${root}/`;
   return ret;
@@ -144,7 +143,7 @@ export const defaultExt = (path: string, ext: string, options?: ExtOptions) => (
  * @see {@link https://nodejs.org/api/path.html}
  * @see {@link https://www.npmjs.com/package/upath}
  */
-export default Object.freeze({
+export const path = Object.freeze({
   addExt,
   basename,
   changeExt,

@@ -1,4 +1,4 @@
-export { path_default as path } from './chunk-JINGSKTC.js';
+export { path } from './chunk-C4QNP55D.js';
 export { createElement, createHTMLDoc, createLink, querySelectorMatchAll } from './chunk-GXNRAQMY.js';
 export { Range, cdn, iRange, irange, range, sleep, trimLines } from './chunk-MEICBSKU.js';
 export { _, clear, extend, filter, findkey, keys, keysIn, map, pop, props } from './chunk-322U5OCO.js';
