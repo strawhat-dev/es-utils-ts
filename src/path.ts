@@ -1,7 +1,7 @@
 import type { Union } from '@/types';
 
 import { map } from '@/objects';
-import nodepath, { type PlatformPath as Path } from 'path';
+import _, { type PlatformPath as Path } from 'path';
 
 const methods = new Set([
   'basename',
@@ -26,10 +26,10 @@ export const toUnix = (path: string) => {
 
 export const sep: Path['sep'] = '/';
 
-export const format: Path['format'] = (obj) => toUnix(nodepath.format(obj));
+export const format: Path['format'] = (obj) => toUnix(_.format(obj));
 
 export const parse: Path['parse'] = (p) => {
-  const ret = nodepath.parse(toUnix(p));
+  const ret = _.parse(toUnix(p));
   const [root] = ret.dir.split('/');
   if (root.endsWith(':')) ret.root = `${root}/`;
   return ret;
@@ -46,7 +46,7 @@ export const {
   relative,
   resolve,
 } = map(
-  nodepath,
+  _,
   { inherited: true, nonEnumerable: true },
   (name, prop) => methods.has(name) && [name, unixify(prop)]
 ) as Path;
@@ -143,7 +143,7 @@ export const defaultExt = (path: string, ext: string, options?: ExtOptions) => (
  * @see {@link https://nodejs.org/api/path.html}
  * @see {@link https://www.npmjs.com/package/upath}
  */
-export const path = Object.freeze({
+export const posix = Object.freeze({
   addExt,
   basename,
   changeExt,
@@ -165,8 +165,8 @@ export const path = Object.freeze({
   sep,
   toUnix,
   trimExt,
-  posix: nodepath.posix,
-  win32: nodepath.posix,
+  posix: _,
+  win32: _,
   toNamespacedPath: toUnix,
 });
 
