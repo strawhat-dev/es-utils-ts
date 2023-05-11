@@ -1,4 +1,4 @@
-import { inspect, __name, equal } from './chunk-JGF42Q5W.js';
+import { inspect, __name, equal } from './chunk-Q47Q2FLE.js';
 
 // src/conditionals/type-checking.ts
 var type = /* @__PURE__ */ __name((value) => Object.prototype.toString.call(value).slice(8, -1), "type");

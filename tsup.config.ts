@@ -3,7 +3,7 @@ import { globbySync as glob } from 'globby';
 
 export default defineConfig({
   platform: 'neutral',
-  target: 'es2020',
+  target: 'es2021',
   format: 'esm',
   clean: true,
   keepNames: true,

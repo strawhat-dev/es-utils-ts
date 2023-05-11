@@ -1,5 +1,5 @@
-import { nullish, not, isObject } from './chunk-XZH5SYJV.js';
-import { __name, deepcopy, deepmergeInto } from './chunk-JGF42Q5W.js';
+import { nullish, not, isObject } from './chunk-BPNVOCZU.js';
+import { __name, deepcopy, deepmergeInto } from './chunk-Q47Q2FLE.js';
 
 // src/objects/index.ts
 var keys = /* @__PURE__ */ __name((obj, options) => {
@@ -93,7 +93,7 @@ var filter = /* @__PURE__ */ __name((obj, ...args) => {
     opts: { deep: !args.length, withRest: false },
     callback: ({ value }) => typeof value !== "undefined"
   });
-  opts["withRest"] && (opts["withRest"] = {});
+  opts["withRest"] &&= {};
   const { deep, freeze, withRest, ...keyopts } = opts;
   for (const key of keys(obj, keyopts)) {
     const value = obj[key];
@@ -131,9 +131,9 @@ var mapargs = /* @__PURE__ */ __name((args, init = {}) => {
     else if (typeof arg === "object")
       init.opts = arg;
   }
-  init.opts || (init.opts = {});
-  init.callback || (init.callback = () => {
-  });
+  init.opts ||= {};
+  init.callback ||= () => {
+  };
   return init;
 }, "mapargs");
 var mapDescriptors = /* @__PURE__ */ __name((property, value, options, resolver = (d) => Array.isArray(d) ? d.includes(property) : !!d) => ({

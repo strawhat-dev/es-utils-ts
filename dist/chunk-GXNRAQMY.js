@@ -1,7 +1,7 @@
-import { trimLines } from './chunk-52LPJZ4Q.js';
-import { pop } from './chunk-U4BFGVV4.js';
-import { isObject } from './chunk-XZH5SYJV.js';
-import { __name } from './chunk-JGF42Q5W.js';
+import { trimLines } from './chunk-MEICBSKU.js';
+import { pop } from './chunk-322U5OCO.js';
+import { isObject } from './chunk-BPNVOCZU.js';
+import { __name } from './chunk-Q47Q2FLE.js';
 
 // src/html/index.ts
 var querySelectorMatchAll = /* @__PURE__ */ __name((regex, selectors = "*", document = globalThis["document"]) => {
@@ -20,7 +20,7 @@ var createElement = /* @__PURE__ */ __name((tag, properties, document = globalTh
 }, "createElement");
 var createLink = /* @__PURE__ */ __name((href, options = {}, document = globalThis["document"]) => {
   let { newtab, textContent = href } = { ...options };
-  newtab && (newtab = { target: "_blank", rel: "noreferrer noopener" });
+  newtab &&= { target: "_blank", rel: "noreferrer noopener" };
   return createElement("a", { href, textContent, ...newtab }, document);
 }, "createLink");
 var createHTMLDoc = /* @__PURE__ */ __name(({ head = "", body = "" } = {}) => trimLines(
