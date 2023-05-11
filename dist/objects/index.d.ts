@@ -1,274 +1,14 @@
-import { B as BuiltIns, H as HasMultipleCallSignatures } from '../conditional-except.d-f489500f.js';
-import { S as Simplify, O as OmitIndexSignature, U as Union, K as KeyOf, e as JsObject, M as Maybe, d as Multi, b as Nullish, T as Type, f as KeyOfDeep, g as ValueOfDeep, V as ValueOf } from '../types-64712e38.js';
-import { P as PartialDeep } from '../partial-deep.d-4b6146e4.js';
+import { Union, KeyOf, JsObject, Merge, Maybe, Multi, Nullish, Type, ReadonlyDeep, KeyOfDeep, ValueOfDeep, ValueOf } from '../types.js';
+import { S as Simplify, P as PartialDeep } from '../conditional-except.d-9c5a45d7.js';
 import { SimplifyDeep } from 'type-fest/source/merge-deep.js';
-
-/**
-Pick only index signatures from the given object type, leaving out all explicitly defined properties.
-
-This is the counterpart of `OmitIndexSignature`.
-
-When you use a type that will iterate through an object that has indexed keys and explicitly defined keys you end up with a type where only the indexed keys are kept. This is because `keyof` of an indexed type always returns `string | number | symbol`, because every key is possible in that object. With this type, you can save the indexed keys and reinject them later, like in the second example below.
-
-@example
-```
-import type {PickIndexSignature} from 'type-fest';
-
-declare const symbolKey: unique symbol;
-
-type Example = {
-	// These index signatures will remain.
-	[x: string]: unknown;
-	[x: number]: unknown;
-	[x: symbol]: unknown;
-	[x: `head-${string}`]: string;
-	[x: `${string}-tail`]: string;
-	[x: `head-${string}-tail`]: string;
-	[x: `${bigint}`]: string;
-	[x: `embedded-${number}`]: string;
-
-	// These explicitly defined keys will be removed.
-	['snake-case-key']: string;
-	[symbolKey]: string;
-	foo: 'bar';
-	qux?: 'baz';
-};
-
-type ExampleIndexSignature = PickIndexSignature<Example>;
-// {
-// 	[x: string]: unknown;
-// 	[x: number]: unknown;
-// 	[x: symbol]: unknown;
-// 	[x: `head-${string}`]: string;
-// 	[x: `${string}-tail`]: string;
-// 	[x: `head-${string}-tail`]: string;
-// 	[x: `${bigint}`]: string;
-// 	[x: `embedded-${number}`]: string;
-// }
-```
-
-@example
-```
-import type {OmitIndexSignature, PickIndexSignature, Simplify} from 'type-fest';
-
-type Foo = {
-	[x: string]: string;
-	foo: string;
-	bar: number;
-};
-
-// Imagine that you want a new type `Bar` that comes from `Foo`.
-// => {
-// 	[x: string]: string;
-// 	bar: number;
-// };
-
-type Bar = Omit<Foo, 'foo'>;
-// This is not working because `Omit` returns only indexed keys.
-// => {
-// 	[x: string]: string;
-// 	[x: number]: string;
-// }
-
-// One solution is to save the indexed signatures to new type.
-type FooIndexSignature = PickIndexSignature<Foo>;
-// => {
-// 	[x: string]: string;
-// }
-
-// Get a new type without index signatures.
-type FooWithoutIndexSignature = OmitIndexSignature<Foo>;
-// => {
-// 	foo: string;
-// 	bar: number;
-// }
-
-// At this point we can use Omit to get our new type.
-type BarWithoutIndexSignature = Omit<FooWithoutIndexSignature, 'foo'>;
-// => {
-// 	bar: number;
-// }
-
-// And finally we can merge back the indexed signatures.
-type BarWithIndexSignature = Simplify<BarWithoutIndexSignature & FooIndexSignature>;
-// => {
-// 	[x: string]: string;
-// 	bar: number;
-// }
-```
-
-@see OmitIndexSignature
-@category Object
-*/
-type PickIndexSignature<ObjectType> = {
-	[KeyType in keyof ObjectType as {} extends Record<KeyType, unknown>
-		? KeyType
-		: never]: ObjectType[KeyType];
-};
-
-// Returns `never` if the key is optional otherwise return the key type.
-type RequiredFilter<Type, Key extends keyof Type> = undefined extends Type[Key]
-	? Type[Key] extends undefined
-		? Key
-		: never
-	: Key;
-
-// Returns `never` if the key is required otherwise return the key type.
-type OptionalFilter<Type, Key extends keyof Type> = undefined extends Type[Key]
-	? Type[Key] extends undefined
-		? never
-		: Key
-	: never;
-
-/**
-Enforce optional keys (by adding the `?` operator) for keys that have a union with `undefined`.
-
-@example
-```
-import type {EnforceOptional} from 'type-fest';
-
-type Foo = {
-	a: string;
-	b?: string;
-	c: undefined;
-	d: number | undefined;
-};
-
-type FooBar = EnforceOptional<Foo>;
-// => {
-// 	a: string;
-// 	b?: string;
-// 	c: undefined;
-// 	d?: number;
-// }
-```
-
-@internal
-@category Object
-*/
-type EnforceOptional<ObjectType> = Simplify<{
-	[Key in keyof ObjectType as RequiredFilter<ObjectType, Key>]: ObjectType[Key]
-} & {
-	[Key in keyof ObjectType as OptionalFilter<ObjectType, Key>]?: Exclude<ObjectType[Key], undefined>
-}>;
-
-// Merges two objects without worrying about index signatures.
-type SimpleMerge<Destination, Source> = {
-	[Key in keyof Destination as Key extends keyof Source ? never : Key]: Destination[Key];
-} & Source;
-
-/**
-Merge two types into a new type. Keys of the second type overrides keys of the first type.
-
-@example
-```
-import type {Merge} from 'type-fest';
-
-interface Foo {
-	[x: string]: unknown;
-	[x: number]: unknown;
-	foo: string;
-	bar: symbol;
-}
-
-type Bar = {
-	[x: number]: number;
-	[x: symbol]: unknown;
-	bar: Date;
-	baz: boolean;
-};
-
-export type FooBar = Merge<Foo, Bar>;
-// => {
-// 	[x: string]: unknown;
-// 	[x: number]: number;
-// 	[x: symbol]: unknown;
-// 	foo: string;
-// 	bar: Date;
-// 	baz: boolean;
-// }
-```
-
-@category Object
-*/
-type Merge<Destination, Source> = EnforceOptional<
-SimpleMerge<PickIndexSignature<Destination>, PickIndexSignature<Source>>
-& SimpleMerge<OmitIndexSignature<Destination>, OmitIndexSignature<Source>>>;
-
-/**
-Convert `object`s, `Map`s, `Set`s, and `Array`s and all of their keys/elements into immutable structures recursively.
-
-This is useful when a deeply nested structure needs to be exposed as completely immutable, for example, an imported JSON module or when receiving an API response that is passed around.
-
-Please upvote [this issue](https://github.com/microsoft/TypeScript/issues/13923) if you want to have this type as a built-in in TypeScript.
-
-@example
-```
-// data.json
-{
-	"foo": ["bar"]
-}
-
-// main.ts
-import type {ReadonlyDeep} from 'type-fest';
-import dataJson = require('./data.json');
-
-const data: ReadonlyDeep<typeof dataJson> = dataJson;
-
-export default data;
-
-// test.ts
-import data from './main';
-
-data.foo.push('bar');
-//=> error TS2339: Property 'push' does not exist on type 'readonly string[]'
-```
-
-Note that types containing overloaded functions are not made deeply readonly due to a [TypeScript limitation](https://github.com/microsoft/TypeScript/issues/29732).
-
-@category Object
-@category Array
-@category Set
-@category Map
-*/
-type ReadonlyDeep<T> = T extends BuiltIns
-	? T
-	: T extends (...arguments: any[]) => unknown
-		? {} extends ReadonlyObjectDeep<T>
-			? T
-			: HasMultipleCallSignatures<T> extends true
-				? T
-				: ((...arguments: Parameters<T>) => ReturnType<T>) & ReadonlyObjectDeep<T>
-		: T extends Readonly<ReadonlyMap<infer KeyType, infer ValueType>>
-			? ReadonlyMapDeep<KeyType, ValueType>
-			: T extends Readonly<ReadonlySet<infer ItemType>>
-				? ReadonlySetDeep<ItemType>
-				: T extends object
-					? ReadonlyObjectDeep<T>
-					: unknown;
-
-/**
-Same as `ReadonlyDeep`, but accepts only `ReadonlyMap`s as inputs. Internal helper for `ReadonlyDeep`.
-*/
-type ReadonlyMapDeep<KeyType, ValueType> = {} & Readonly<ReadonlyMap<ReadonlyDeep<KeyType>, ReadonlyDeep<ValueType>>>;
-
-/**
-Same as `ReadonlyDeep`, but accepts only `ReadonlySet`s as inputs. Internal helper for `ReadonlyDeep`.
-*/
-type ReadonlySetDeep<ItemType> = {} & Readonly<ReadonlySet<ReadonlyDeep<ItemType>>>;
-
-/**
-Same as `ReadonlyDeep`, but accepts only `object`s as inputs. Internal helper for `ReadonlyDeep`.
-*/
-type ReadonlyObjectDeep<ObjectType extends object> = {
-	readonly [KeyType in keyof ObjectType]: ReadonlyDeep<ObjectType[KeyType]>
-};
+import './writable.js';
+import 'type-fest/source/async-return-type.js';
 
 type PropsFn = <T extends object>(obj: T, options?: PropsOptions) => Union<KeyOf<T>>;
 type PropsOptions = {
     /**
      * If `true`, properties of `Object.prototype` are included
-     * when traversing up the prototype chain, otherwise omitted.
+     * when traversing up the prototype chain; otherwise omitted.
      * @defaultValue `false`
      */
     objectPrototype?: boolean;
@@ -284,34 +24,37 @@ type ExtendFn = {
     <T extends JsObject>(props: Readonly<T>): Readonly<T>;
     <T1 extends JsObject, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
     <T1 extends object, T2 extends JsObject>(obj: Readonly<T1>, props: Readonly<T2>): ExtendedResult<T1, Readonly<T2>>;
-    <T1 extends JsObject, T2 extends JsObject, Options extends ExtendOptions>(obj: Readonly<T1>, props: Readonly<T2>, options: Options): ExtendedResult<T1, T2, Options>;
-    <T1 extends object, T2 extends JsObject, Options extends ExtendOptions>(obj: Readonly<T1>, props: Readonly<T2>, options: Options): ExtendedResult<T1, T2, Options>;
+    <T1 extends JsObject, T2 extends JsObject, Options extends ExtendOptions<T2>>(obj: Readonly<T1>, props: Readonly<T2>, options: Options): ExtendedResult<T1, T2, Options>;
+    <T1 extends object, T2 extends JsObject, Options extends ExtendOptions<T2>>(obj: Readonly<T1>, props: Readonly<T2>, options: Options): ExtendedResult<T1, T2, Options>;
 };
-type ExtendOptions = {
+type ExtendOptions<T = {}> = {
     /**
-     * if `true`, return a new object instead
+     * If `true`, return a new object instead
      * of mutating the current one. *(deep copy)*
      * @defaultValue `false`
      */
     copy?: boolean;
     /**
-     * if `true`, properties show up during the
-     * enumeration of the corresponding object.
+     * If provided, the properties listed will show up
+     * during the enumeration of the corresponding object. \
+     * *(Applied to **all** properties if `true`)*
      * @defaultValue `false`
      */
-    enumerable?: boolean;
+    enumerable?: boolean | KeyOf<T>[];
     /**
-     * if `true`, the values associated may
-     * be changed with an assignment operator.
+     * If provided, the values associated may
+     * be changed with an assignment operator. \
+     * *(Applied to **all** properties if `true`)*
      * @defaultValue `false`
      */
-    writable?: boolean;
+    writable?: boolean | KeyOf<T>[];
     /**
-     * if `true`, the types of these property descriptors may be changed
-     * and/or the properties may be deleted from the corresponding object.
+     * If provided, the types of these property descriptors may be changed
+     * and the properties may be deleted from the corresponding object. \
+     * *(Applied to **all** properties if `true`)*
      * @defaultValue `false`
      */
-    configurable?: boolean;
+    configurable?: boolean | KeyOf<T>[];
 } & Pick<ObjectOptions, 'freeze'>;
 type ExtendedResult<T1, T2, Options extends ExtendOptions = {}, Props = Options['configurable'] & Options['writable'] extends true ? T2 : Readonly<T2>, Result = T1 extends Function ? T1 & Simplify<Props> : Merge<T1, Props>> = Options['freeze'] extends true ? Readonly<Result> : Result;
 type FindKeyFn = {
@@ -412,11 +155,8 @@ declare const clear: ClearFn;
  * the values to be assigned being the direct property for a given property name, and
  * the `configurable`, `enumerable`, and `writable` options all `false` by default.
  *
- * The `configurable`, `enumerable`, and `writable` options may still be provided as the third argument,
+ * The `configurable`, `enumerable`, and `writable` options may still be optionally provided,
  * and the resulting object will be correctly typed accordingly (i.e. `readonly` vs non-`readonly`).
- *
- * Note: This would apply to all of the given properties however,
- * as opposed to a per-property basis with `Object.defineProperties`.
  */
 declare const extend: ExtendFn;
 declare const findkey: FindKeyFn;

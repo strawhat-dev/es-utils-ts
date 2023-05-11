@@ -1,5 +1,8 @@
-import { a as NumberLike } from '../types-64712e38.js';
-import '../conditional-except.d-f489500f.js';
+import { NumberLike } from '../types.js';
+import '../conditional-except.d-9c5a45d7.js';
+import './writable.js';
+import 'type-fest/source/async-return-type.js';
+import 'type-fest/source/merge-deep.js';
 
 /** Schedules a `Promise` that resolves after a delay of `ms` milliseconds. */
 declare const sleep: (ms: NumberLike) => Promise<void>;

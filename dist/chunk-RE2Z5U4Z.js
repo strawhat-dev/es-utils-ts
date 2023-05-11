@@ -1,5 +1,5 @@
-import { nullish, not, isObject } from './chunk-OLDJUYBR.js';
-import { __name, deepcopy, deepmergeInto } from './chunk-JXJLGDKJ.js';
+import { nullish, not, isObject } from './chunk-XZH5SYJV.js';
+import { __name, deepcopy, deepmergeInto } from './chunk-JGF42Q5W.js';
 
 // src/objects/index.ts
 var keysIn = /* @__PURE__ */ __name((obj) => {
@@ -41,7 +41,8 @@ var extend = /* @__PURE__ */ __name((...args) => {
   const [target, props2, options] = args.length === 1 ? [{}, args.pop()] : args;
   const { copy, freeze, ...descriptors } = { ...options };
   for (const key in props2) {
-    descriptorMap[key] = { ...descriptors, value: props2[key] };
+    const value = props2[key];
+    descriptorMap[key] = mapDescriptors(key, value, descriptors);
   }
   const ret = Object.defineProperties(
     copy ? deepcopy(target) : target,
@@ -50,7 +51,7 @@ var extend = /* @__PURE__ */ __name((...args) => {
   return freeze ? Object.freeze(ret) : ret;
 }, "extend");
 var findkey = /* @__PURE__ */ __name((obj, ...args) => {
-  const { opts, callback } = parseRestArgs(args, {
+  const { opts, callback } = mapargs(args, {
     callback: (value) => !not(value)
   });
   const { deep, ...keyopts } = opts;
@@ -67,7 +68,7 @@ var findkey = /* @__PURE__ */ __name((obj, ...args) => {
 }, "findkey");
 var map = /* @__PURE__ */ __name((obj, ...args) => {
   const result = {};
-  const { opts, callback } = parseRestArgs(args);
+  const { opts, callback } = mapargs(args);
   const { deep, freeze, ...keyopts } = opts;
   const keys = keysDispatch(keyopts);
   for (const key of keys(obj ?? {})) {
@@ -85,7 +86,7 @@ var map = /* @__PURE__ */ __name((obj, ...args) => {
 }, "map");
 var filter = /* @__PURE__ */ __name((obj, ...args) => {
   let result = {};
-  const { opts, callback } = parseRestArgs(args, {
+  const { opts, callback } = mapargs(args, {
     opts: { deep: !args.length, withRest: false },
     callback: ({ value }) => typeof value !== "undefined"
   });
@@ -120,7 +121,7 @@ var _ = Object.freeze({
   pop,
   props
 });
-var parseRestArgs = /* @__PURE__ */ __name((args, init = {}) => {
+var mapargs = /* @__PURE__ */ __name((args, init = {}) => {
   for (const arg of args) {
     if (isObject(arg))
       init.opts = arg;
@@ -131,7 +132,13 @@ var parseRestArgs = /* @__PURE__ */ __name((args, init = {}) => {
   init.callback || (init.callback = () => {
   });
   return init;
-}, "parseRestArgs");
+}, "mapargs");
+var mapDescriptors = /* @__PURE__ */ __name((property, value, options, resolver = (d) => Array.isArray(d) ? d.includes(property) : !!d) => ({
+  value,
+  writable: resolver(options.writable),
+  enumerable: resolver(options.enumerable),
+  configurable: resolver(options.configurable)
+}), "mapDescriptors");
 var keysDispatch = /* @__PURE__ */ __name((opts) => {
   let keys;
   if (!opts)

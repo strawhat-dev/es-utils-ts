@@ -1,4 +1,4 @@
-import { inspect, __name, deepcompare } from './chunk-JXJLGDKJ.js';
+import { inspect, __name, equal } from './chunk-JGF42Q5W.js';
 
 // src/conditionals/type-checking.ts
 var type = /* @__PURE__ */ __name((value) => Object.prototype.toString.call(value).slice(8, -1), "type");
@@ -71,7 +71,7 @@ var querycallback = /* @__PURE__ */ __name((value) => {
     if (typeof query === "string" && `is${query}` in assert) {
       return assert[`is${query}`](value, { quiet: true });
     }
-    return deepcompare(value, query);
+    return equal(value, query);
   };
 }, "querycallback");
 function createAssertion(assertion, expected = assertion.name.slice(2)) {
@@ -96,10 +96,13 @@ __name(createAssertion, "createAssertion");
 // src/conditionals/validation.ts
 var nullish = /* @__PURE__ */ __name((value) => typeof value === "undefined" || value === null, "nullish");
 var not = /* @__PURE__ */ __name((value) => value === false || nullish(value) || Number.isNaN(value), "not");
-var validURL = /* @__PURE__ */ __name((value, options = { http: true }) => {
+var validURL = /* @__PURE__ */ __name((value, options) => {
   try {
-    const { protocol } = new URL(value);
-    return !options.http || protocol === "http:" || protocol === "https:";
+    const url = new URL(value);
+    const { protocol } = options || {};
+    if (!protocol)
+      return url.protocol === "http:" || url.protocol === "https:";
+    return protocol === "any" || protocol === url.protocol;
   } catch {
     return false;
   }

@@ -1,5 +1,4 @@
-import { C as ConditionalExcept } from '../conditional-except.d-f489500f.js';
-import { P as PartialDeep } from '../partial-deep.d-4b6146e4.js';
+import { P as PartialDeep, C as ConditionalExcept } from '../conditional-except.d-9c5a45d7.js';
 
 type HTMLTag = keyof HTMLElementTagNameMap;
 type HTMLElementProps<T extends HTMLTag = 'div'> = PartialDeep<ConditionalExcept<HTMLElementTagNameMap[T], Function>>;

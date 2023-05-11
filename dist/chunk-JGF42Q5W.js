@@ -7,9 +7,12 @@ export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from '
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var deepclone = rfdc;
 var deepcopy = Rfdc?.({ circles: true });
-var deepcompare = /* @__PURE__ */ __name((a, b, options = { strict: true }) => deepEqual(a, b, options), "deepcompare");
-var inspect = /* @__PURE__ */ __name((value, opts = { indent: 2 }) => objectInspect(value, opts), "inspect");
+var deepclone = rfdc;
+var inspect = /* @__PURE__ */ __name((obj, opts = {}) => (opts["indent"] ?? (opts["indent"] = 2), objectInspect(obj, opts)), "inspect");
+var equal = /* @__PURE__ */ __name((...args) => {
+  var _a;
+  return args[2] ? (_a = args[2])["strict"] ?? (_a["strict"] = true) : args[2] = { strict: true }, deepEqual(...args);
+}, "equal");
 
-export { __name, deepclone, deepcompare, deepcopy, inspect };
+export { __name, deepclone, deepcopy, equal, inspect };

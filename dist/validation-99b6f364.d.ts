@@ -1,99 +1,6 @@
-import './conditional-except.d-f489500f.js';
+import { Type, Union, Constructor, JsObject, primitive, TypedArray, Replace, KeyOf, Nullish } from './types.js';
+import './conditional-except.d-9c5a45d7.js';
 import { AsyncFunction } from 'type-fest/source/async-return-type.js';
-import { T as Type, U as Union, e as JsObject, p as primitive, K as KeyOf, b as Nullish } from './types-64712e38.js';
-
-/**
-Matches any [typed array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray), like `Uint8Array` or `Float64Array`.
-
-@category Array
-*/
-type TypedArray =
-	| Int8Array
-	| Uint8Array
-	| Uint8ClampedArray
-	| Int16Array
-	| Uint16Array
-	| Int32Array
-	| Uint32Array
-	| Float32Array
-	| Float64Array
-	| BigInt64Array
-	| BigUint64Array;
-
-/**
-Matches a [`class` constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes).
-
-@category Class
-*/
-type Constructor<T, Arguments extends unknown[] = any[]> = new(...arguments_: Arguments) => T;
-
-type ReplaceOptions = {
-	all?: boolean;
-};
-
-/**
-Represents a string with some or all matches replaced by a replacement.
-
-Use-case:
-- `snake-case-path` to `dotted.path.notation`
-- Changing date/time format: `01-08-2042` → `01/08/2042`
-- Manipulation of type properties, for example, removal of prefixes
-
-@example
-```
-import {Replace} from 'type-fest';
-
-declare function replace<
-	Input extends string,
-	Search extends string,
-	Replacement extends string
->(
-	input: Input,
-	search: Search,
-	replacement: Replacement
-): Replace<Input, Search, Replacement>;
-
-declare function replaceAll<
-	Input extends string,
-	Search extends string,
-	Replacement extends string
->(
-	input: Input,
-	search: Search,
-	replacement: Replacement
-): Replace<Input, Search, Replacement, {all: true}>;
-
-// The return type is the exact string literal, not just `string`.
-
-replace('hello ?', '?', '🦄');
-//=> 'hello 🦄'
-
-replace('hello ??', '?', '❓');
-//=> 'hello ❓?'
-
-replaceAll('10:42:00', ':', '-');
-//=> '10-42-00'
-
-replaceAll('__userName__', '__', '');
-//=> 'userName'
-
-replaceAll('My Cool Title', ' ', '');
-//=> 'MyCoolTitle'
-```
-
-@category String
-@category Template literal
-*/
-type Replace<
-	Input extends string,
-	Search extends string,
-	Replacement extends string,
-	Options extends ReplaceOptions = {},
-> = Input extends `${infer Head}${Search}${infer Tail}`
-	? Options['all'] extends true
-		? `${Head}${Replacement}${Replace<Tail, Search, Replacement, Options>}`
-		: `${Head}${Replacement}${Tail}`
-	: Input;
 
 type GeneratorFunction = (...args: any[]) => Generator;
 type AsyncGeneratorFunction = (...args: any[]) => AsyncGenerator;
@@ -212,16 +119,13 @@ declare const nullish: (value: unknown) => value is Nullish;
  */
 declare const not: (value: unknown) => value is false | Nullish;
 /**
- * Utilizes `URL` constructor (as opposed to regular expressions)
- * to check if the provided string is a valid url.
- *
- * Set the `http` option to `false` to allow any urls that are parsable by the `URL`
- * constructor (e.g. `"foo:bar"`), instead of just those with a valid "http/https" protocol.
- *
- * *(defaults to `true` since this is the most common desired behavior)*
+ * Utilizes `URL` constructor to check if the provided string is a valid url.
+ * - Set the `protocol` option to a `string` to check for a custom protocol,
+ * or set the `protocol` option to `'any'` to allow **any** protocol. Otherwise,
+ * defaults to checking if the url has a valid *http* protocol (i.e. `http:` or `https:`).
  */
-declare const validURL: (value: string, options?: {
-    http: boolean;
-}) => boolean;
+declare const validURL: (value: unknown, options?: {
+    protocol?: Union<'any'>;
+}) => value is URL & string;
 
 export { AssertionType as A, not as B, validURL as C, isAsyncFunction as a, isAsyncGeneratorFunction as b, isAsyncIterable as c, isAsyncIterator as d, isConstructor as e, isDate as f, isElement as g, isError as h, isArrayBuffer as i, isGeneratorFunction as j, isIterable as k, isIterator as l, isMap as m, isObject as n, isPrimitive as o, isPromise as p, isRegExp as q, isRequest as r, isSet as s, type as t, isTypedArray as u, isWeakMap as v, isWeakSet as w, is as x, assert as y, nullish as z };
