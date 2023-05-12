@@ -1,5 +1,8 @@
 {
+  "include": ["src/**/*.ts"],
   "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
     "lib": ["esnext", "dom", "dom.iterable"],
     "target": "es2021",
     "module": "esnext",
@@ -14,9 +17,6 @@
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "dist",
-    "rootDirs": ["src", "dist"]
-  },
-  "include": ["src/**/*.ts", "tsup.config.ts"]
+    "forceConsistentCasingInFileNames": true
+  }
 }
