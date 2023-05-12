@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { CreateLinkOptions, HTMLElementProps, HTMLTag } from './types';
 
-import { pop } from '@/objects';
-import { trimLines } from '@/lib';
-import { isObject } from '@/conditionals';
+import { pop } from '../objects';
+import { trimLines } from '../lib';
+import { isObject } from '../conditionals';
 
 /**
  * Like `querySelectorAll`, but returns an array of elements where

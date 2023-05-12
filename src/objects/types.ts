@@ -17,7 +17,7 @@ import type {
   ValueOf,
   ValueOfDeep,
   Writable,
-} from '@/types';
+} from '../types';
 
 export type KeyDispatcher = <
   T extends object,

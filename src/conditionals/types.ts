@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Type } from '@/types';
+import type { Type } from '../types';
 import type { AssertionType } from './type-checking';
 
 export type GeneratorFunction = (...args: any[]) => Generator;

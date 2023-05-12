@@ -1,6 +1,6 @@
-import type { Union } from '@/types';
+import type { Union } from './types';
 
-import { map } from '@/objects';
+import { map } from './objects';
 import _, { type PlatformPath as Path } from 'path';
 import {
   format as fmt,

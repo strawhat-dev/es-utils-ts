@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { not } from '@/conditionals';
+import { not } from '../conditionals';
 
 /**
  * Note: A decreasing range (`step = -1`) will be

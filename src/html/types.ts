@@ -1,4 +1,4 @@
-import type { ConditionalExcept, PartialDeep } from '@/types';
+import type { ConditionalExcept, PartialDeep } from '../types';
 
 export type HTMLTag = keyof HTMLElementTagNameMap;
 

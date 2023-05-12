@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { NumberLike } from '@/types';
+import type { NumberLike } from '../types';
 
 const ESM_CDN_URL = 'https://esm.run';
 

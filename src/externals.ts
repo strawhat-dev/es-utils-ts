@@ -5,7 +5,7 @@
  * All credits goes to their respective authors.
  */
 
-import type { JsObject, JsValue } from '@/types';
+import type { JsObject, JsValue } from './types';
 
 // @ts-ignore
 import rfdc from 'rfdc/default';

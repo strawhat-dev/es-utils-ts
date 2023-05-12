@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type { JsObject, KeyOf, Merge, Union } from '@/types';
+import type { JsObject, KeyOf, Merge, Union } from '../types';
 import type {
   ClearFn,
   ExtendFn,
@@ -13,8 +13,8 @@ import type {
   PopFn,
 } from './types';
 
-import { deepcopy, deepmergeInto } from '@/externals';
-import { isObject, not, nullish } from '@/conditionals';
+import { deepcopy, deepmergeInto } from '../externals';
+import { isObject, not, nullish } from '../conditionals';
 
 export const keys = ((obj, options) => {
   if (nullish(obj)) return [];

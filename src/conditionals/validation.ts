@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type { Nullish, Union } from '@/types';
+import type { Nullish, Union } from '../types';
 
 /**
  * Similarly to nullish coalescing, checks if given `value` is `undefined` or `null`.
