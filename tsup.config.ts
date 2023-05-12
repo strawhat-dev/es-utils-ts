@@ -1,5 +1,6 @@
 import { defineConfig } from 'tsup';
-import { globbySync as glob } from 'globby';
+
+// import { globbySync as glob } from 'globby';
 
 export default defineConfig({
   platform: 'neutral',
@@ -12,10 +13,5 @@ export default defineConfig({
   dts: { resolve: true },
   skipNodeModulesBundle: true,
   outDir: 'dist',
-  entry: [
-    'src/types.ts',
-    'src/path.ts',
-    'src/externals.ts',
-    ...glob('src/**/index.ts'),
-  ],
+  entry: ['src/**/*.ts'],
 });
