@@ -1,7 +1,11 @@
 import type { Union } from '@/types';
 
 import { map } from '@/objects';
-import _, { type PlatformPath as Path } from 'path';
+import _, {
+  type PlatformPath as Path,
+  format as fmt,
+  parse as parsePath,
+} from 'path';
 
 const methods = new Set([
   'basename',
@@ -26,10 +30,10 @@ export const toUnix = (path: string) => {
 
 export const sep: Path['sep'] = '/';
 
-export const format: Path['format'] = (obj) => toUnix(_.format(obj));
+export const format: Path['format'] = (obj) => toUnix(fmt(obj));
 
 export const parse: Path['parse'] = (p) => {
-  const ret = _.parse(toUnix(p));
+  const ret = parsePath(toUnix(p));
   const [root] = ret.dir.split('/');
   if (root.endsWith(':')) ret.root = `${root}/`;
   return ret;

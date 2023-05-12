@@ -1,6 +1,6 @@
 import { map } from './chunk-322U5OCO.js';
 import { __name } from './chunk-Q47Q2FLE.js';
-import _ from 'path';
+import _, { format as format$1, parse as parse$1 } from 'path';
 
 var methods = /* @__PURE__ */ new Set([
   "basename",
@@ -19,9 +19,9 @@ var toUnix = /* @__PURE__ */ __name((path) => {
   return path.replace(/\\/g, "/").replace(/(?<!^)\/+/g, "/");
 }, "toUnix");
 var sep = "/";
-var format = /* @__PURE__ */ __name((obj) => toUnix(_.format(obj)), "format");
+var format = /* @__PURE__ */ __name((obj) => toUnix(format$1(obj)), "format");
 var parse = /* @__PURE__ */ __name((p) => {
-  const ret = _.parse(toUnix(p));
+  const ret = parse$1(toUnix(p));
   const [root] = ret.dir.split("/");
   if (root.endsWith(":"))
     ret.root = `${root}/`;
