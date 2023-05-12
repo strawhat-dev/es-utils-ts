@@ -12,4 +12,5 @@ import './writable.js';
 import 'type-fest/source/async-return-type.js';
 import 'type-fest/source/merge-deep.js';
 import 'object-inspect';
+import 'path-browserify';
 import 'path';

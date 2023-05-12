@@ -1,4 +1,4 @@
-export { posix as path } from './chunk-ZCK4DSV3.js';
+export { posix as path } from './chunk-5NI7VIQL.js';
 export { createElement, createHTMLDoc, createLink, querySelectorMatchAll } from './chunk-GXNRAQMY.js';
 export { Range, cdn, iRange, irange, range, sleep, trimLines } from './chunk-MEICBSKU.js';
 export { _, clear, extend, filter, findkey, keys, keysIn, map, pop, props } from './chunk-322U5OCO.js';

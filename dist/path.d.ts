@@ -1,3 +1,4 @@
+import * as path_browserify from 'path-browserify';
 import _, { PlatformPath } from 'path';
 
 /**
@@ -89,8 +90,8 @@ declare const posix: Readonly<{
     sep: "/";
     toUnix: (path: string) => string;
     trimExt: (path: string, options?: ExtOptions) => string;
-    posix: _.PlatformPath;
-    win32: _.PlatformPath;
+    posix: path_browserify.Path;
+    win32: path_browserify.Path;
     toNamespacedPath: (path: string) => string;
 }>;
 /** @internal */

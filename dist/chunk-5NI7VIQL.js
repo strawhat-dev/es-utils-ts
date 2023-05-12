@@ -1,6 +1,7 @@
 import { map } from './chunk-322U5OCO.js';
 import { __name } from './chunk-Q47Q2FLE.js';
-import _, { format as format$1, parse as parse$1 } from 'path';
+import _ from 'path';
+import { format as format$1, parse as parse$1, posix as posix$1 } from 'path-browserify';
 
 var methods = /* @__PURE__ */ new Set([
   "basename",
@@ -104,8 +105,8 @@ var posix = Object.freeze({
   sep,
   toUnix,
   trimExt,
-  posix: _,
-  win32: _,
+  posix: posix$1,
+  win32: posix$1,
   toNamespacedPath: toUnix
 });
 function unixify(target) {

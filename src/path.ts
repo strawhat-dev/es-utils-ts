@@ -1,11 +1,12 @@
 import type { Union } from '@/types';
 
 import { map } from '@/objects';
-import _, {
-  type PlatformPath as Path,
+import _, { type PlatformPath as Path } from 'path';
+import {
   format as fmt,
   parse as parsePath,
-} from 'path';
+  posix as unix,
+} from 'path-browserify';
 
 const methods = new Set([
   'basename',
@@ -169,8 +170,8 @@ export const posix = Object.freeze({
   sep,
   toUnix,
   trimExt,
-  posix: _,
-  win32: _,
+  posix: unix,
+  win32: unix,
   toNamespacedPath: toUnix,
 });
 
