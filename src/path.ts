@@ -2,11 +2,6 @@ import type { Union } from './types';
 
 import { map } from './objects';
 import _, { type PlatformPath as Path } from 'path';
-import {
-  format as fmt,
-  parse as parsePath,
-  posix as unix,
-} from 'path-browserify';
 
 const methods = new Set([
   'basename',
@@ -31,10 +26,10 @@ export const toUnix = (path: string) => {
 
 export const sep: Path['sep'] = '/';
 
-export const format: Path['format'] = (obj) => toUnix(fmt(obj));
+export const format: Path['format'] = (obj) => toUnix(_.format(obj));
 
 export const parse: Path['parse'] = (p) => {
-  const ret = parsePath(toUnix(p));
+  const ret = _.parse(toUnix(p));
   const [root] = ret.dir.split('/');
   if (root.endsWith(':')) ret.root = `${root}/`;
   return ret;
@@ -170,8 +165,8 @@ export const posix = Object.freeze({
   sep,
   toUnix,
   trimExt,
-  posix: unix,
-  win32: unix,
+  posix: _.posix,
+  win32: _.posix,
   toNamespacedPath: toUnix,
 });
 
