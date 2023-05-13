@@ -2,7 +2,7 @@
 import type { CreateLinkOptions, HTMLElementProps, HTMLTag } from './types';
 
 import { pop } from '../objects';
-import { trimLines } from '../lib';
+import { trimLines } from '../common';
 import { isObject } from '../conditionals';
 
 /**
