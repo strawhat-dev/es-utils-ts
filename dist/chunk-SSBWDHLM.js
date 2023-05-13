@@ -21,19 +21,13 @@ var _parse = /* @__PURE__ */ __name((path2) => {
     return ret;
   let code = path2.charCodeAt(0);
   const isAbsolute2 = code === 47;
-  let start;
-  if (isAbsolute2) {
-    start = 1;
-    ret.root = "/";
-  } else
-    start = 0;
+  isAbsolute2 && (ret.root = "/");
+  let end = -1;
   let startDot = -1;
   let startPart = 0;
-  let end = -1;
-  let matchedSlash = true;
   let preDotState = 0;
-  let i = path2.length - 1;
-  for (; i >= start; --i) {
+  let matchedSlash = true;
+  for (let i = path2.length - 1; i >= +isAbsolute2; --i) {
     code = path2.charCodeAt(i);
     if (code === 47) {
       if (!matchedSlash) {
@@ -43,27 +37,26 @@ var _parse = /* @__PURE__ */ __name((path2) => {
       continue;
     }
     if (end === -1) {
-      matchedSlash = false;
       end = i + 1;
+      matchedSlash = false;
     }
     if (code === 46) {
       if (startDot === -1)
         startDot = i;
       else if (preDotState !== 1)
         preDotState = 1;
-    } else if (startDot !== -1) {
+    } else if (startDot !== -1)
       preDotState = -1;
-    }
   }
-  if (startDot === -1 || end === -1 || preDotState === 0 || preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+  if (startDot === -1 || end === -1 || !preDotState || preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
     if (end !== -1) {
-      if (startPart === 0 && isAbsolute2)
+      if (!startPart && isAbsolute2) {
         ret.base = ret.name = path2.slice(1, end);
-      else
+      } else
         ret.base = ret.name = path2.slice(startPart, end);
     }
   } else {
-    if (startPart === 0 && isAbsolute2) {
+    if (!startPart && isAbsolute2) {
       ret.name = path2.slice(1, startDot);
       ret.base = path2.slice(1, end);
     } else {
@@ -72,7 +65,7 @@ var _parse = /* @__PURE__ */ __name((path2) => {
     }
     ret.ext = path2.slice(startDot, end);
   }
-  if (startPart > 0)
+  if (startPart)
     ret.dir = path2.slice(0, startPart - 1);
   else if (isAbsolute2)
     ret.dir = "/";
@@ -105,7 +98,7 @@ var normalize = /* @__PURE__ */ __name((p) => {
 var parse = /* @__PURE__ */ __name((p) => {
   const ret = _parse(toUnix(p));
   const [root] = ret.dir.split(sep);
-  root.endsWith(":") && (ret.root += sep);
+  root.endsWith(":") && (ret.root ||= `${root}/`);
   return ret;
 }, "parse");
 var trimExt = /* @__PURE__ */ __name((p, opts) => {

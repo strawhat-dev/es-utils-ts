@@ -52,7 +52,7 @@ declare const toUnix: Path['toUnix'];
 declare const basename: (path: string, suffix?: string | undefined) => string;
 declare const dirname: (path: string) => string;
 declare const extname: (path: string) => string;
-declare const format: (pathObj: path.FormatInputPathObject) => string;
+declare const format: (pathObject: path.FormatInputPathObject) => string;
 declare const isAbsolute: (path: string) => boolean;
 declare const join: (...paths: string[]) => string;
 declare const relative: (from: string, to: string) => string;
