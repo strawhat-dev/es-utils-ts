@@ -1,4 +1,21 @@
-import type { CreateLinkOptions, HTMLElementProps, HTMLTag } from './types';
+import { PartialDeep, ConditionalExcept } from 'type-fest';
+
+type HTMLTag = keyof HTMLElementTagNameMap;
+type HTMLElementProps<T extends HTMLTag = 'div'> = PartialDeep<ConditionalExcept<HTMLElementTagNameMap[T], Function>>;
+type CreateLinkOptions = {
+    /**
+     * The `textContent` property to be set on the element.
+     * @defaultValue `href` passed from the *first argument*
+     */
+    textContent?: string;
+    /**
+     * If `true`, sets the `target` and `rel` properties of
+     * the element accordingly to allow opening in new tabs.
+     * @defaultValue `false`
+     */
+    newtab?: boolean;
+};
+
 /**
  * Like `querySelectorAll`, but returns an array of elements where
  * the `textContent` matches the regex provided as the first argument.
@@ -10,7 +27,7 @@ import type { CreateLinkOptions, HTMLElementProps, HTMLTag } from './types';
  * optionally provide an alternative implementation (e.g. `jsdom` or `linkedom`)
  * as the final argument in such environments ***(will otherwise fail)***.
  */
-export declare const querySelectorMatchAll: (regex: RegExp, selectors?: string, document?: Document) => Element[];
+declare const querySelectorMatchAll: (regex: RegExp, selectors?: string, document?: Document) => Element[];
 /**
  * Convenience wrapper for `document.create` which allows for the
  * more semantic assignment of properties from the second argument,
@@ -23,7 +40,7 @@ export declare const querySelectorMatchAll: (regex: RegExp, selectors?: string, 
  *
  * @returns some `HTMLElement` created from the given `tag` & `properties`
  */
-export declare const createElement: <T extends keyof HTMLElementTagNameMap>(tag: T, properties?: HTMLElementProps<T> | undefined, document?: Document) => HTMLElementTagNameMap[T];
+declare const createElement: <T extends keyof HTMLElementTagNameMap>(tag: T, properties?: HTMLElementProps<T> | undefined, document?: Document) => HTMLElementTagNameMap[T];
 /**
  * Note: Intended for **browser** usage since the `document` object
  * is not be available in environments such as node.js. Users may
@@ -32,15 +49,15 @@ export declare const createElement: <T extends keyof HTMLElementTagNameMap>(tag:
  *
  * @returns an `HTMLAnchorElement` created from the given `href` & `options`
  */
-export declare const createLink: (href: string, options?: CreateLinkOptions, document?: Document) => HTMLAnchorElement;
+declare const createLink: (href: string, options?: CreateLinkOptions, document?: Document) => HTMLAnchorElement;
 /**
  * Generates an html string using the everyday
  * boilerplate code most html templates should have already.
  * Body and header contents may also optionally be inserted if provided.
  */
-export declare const createHTMLDoc: ({ head, body }?: {
+declare const createHTMLDoc: ({ head, body }?: {
     head?: string | undefined;
     body?: string | undefined;
 }) => string;
-export type { HTMLElementProps, HTMLTag };
-//# sourceMappingURL=index.d.ts.map
+
+export { HTMLElementProps, HTMLTag, createElement, createHTMLDoc, createLink, querySelectorMatchAll };
