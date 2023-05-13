@@ -3,16 +3,18 @@ import type { Path } from './types';
 
 import path from 'path';
 import { re } from '../common';
+import { _format, _parse } from './internal';
 
 export const sep = '/';
 export const delimiter = path.delimiter;
 
 // prettier-ignore
 export const toUnix: Path['toUnix'] = (p) => p?.replace(/\\/g, sep).replace(/(?<!^)\/+/g, sep);
+
 export const basename = unixify(path.basename);
 export const dirname = unixify(path.dirname);
 export const extname = unixify(path.extname);
-export const format = unixify(path.format);
+export const format = unixify(_format);
 export const isAbsolute = unixify(path.isAbsolute);
 export const join = unixify(path.join);
 export const relative = unixify(path.relative);
@@ -32,15 +34,15 @@ export const normalize: Path['normalize'] = (p) => {
 };
 
 export const parse: Path['parse'] = (p) => {
-  const ret = path.parse(toUnix(p));
+  const ret = _parse(toUnix(p));
   const [root] = ret.dir.split(sep);
   root.endsWith(':') && (ret.root += sep);
   return ret;
 };
 
-export const trimExt: Path['trimExt'] = (p, options) => {
+export const trimExt: Path['trimExt'] = (p, opts) => {
   const ext = extname(p);
-  if (!isValidExt(ext, options)) return p;
+  if (!isValidExt(ext, opts)) return p;
   return p.replace(re`${ext}$`, '');
 };
 
@@ -58,13 +60,13 @@ export const removeExt: Path['removeExt'] = (p, ext) => {
   return p;
 };
 
-export const changeExt: Path['changeExt'] = (p, ext, options) => (
-  ext[0] === '.' || (ext = `.${ext}`), `${trimExt(p, options)}${ext}`
+export const changeExt: Path['changeExt'] = (p, ext, opts) => (
+  ext[0] === '.' || (ext = `.${ext}`), `${trimExt(p, opts)}${ext}`
 );
 
 // prettier-ignore
-export const defaultExt: Path['defaultExt'] = (p, ext, options) => (
-  isValidExt(p, options) ? extname(p) : addExt(p, ext)
+export const defaultExt: Path['defaultExt'] = (p, ext, opts) => (
+  isValidExt(p, opts) ? extname(p) : addExt(p, ext)
 );
 
 const upath = {
