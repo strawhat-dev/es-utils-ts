@@ -5,7 +5,10 @@ import { keys } from '../objects';
 import { isObject } from '../conditionals';
 import { escapeRegex } from '../externals';
 
-const RE_FLAG = Object.freeze({
+// https://stackoverflow.com/a/13546700
+const RE_FLAG_PATTERN = /[/]\b(?!\w*(\w)\w*\1)[dgimsuy]+\b$/;
+
+const RE_FLAG_OPTION = Object.freeze({
   indices: 'd',
   global: 'g',
   ignoreCase: 'i',
@@ -69,12 +72,12 @@ export const re: RegexBuilder = (raw, ...subs) => {
   if (Array.isArray(pattern) && 'raw' in pattern) {
     subs.push(escapeRegex);
     pattern = t(raw as TemplateStringsArray, ...subs);
-    flags = (pattern.match(/[/][dgimsuy]{1,7}$/) || [''])[0].slice(1);
-    flags && (pattern = pattern.replace(new RegExp(`[/]${flags}$`), ''));
+    flags = (pattern.match(RE_FLAG_PATTERN) || [''])[0].slice(1);
+    flags && (pattern = pattern.replace(RE_FLAG_PATTERN, ''));
   } else if (isObject(flags)) {
     const options = flags as RegexOptions;
     flags = '';
-    for (const opt of keys(options)) flags += RE_FLAG[opt];
+    for (const opt of keys(options)) flags += RE_FLAG_OPTION[opt];
   }
 
   return new RegExp(pattern as string, flags as string);
