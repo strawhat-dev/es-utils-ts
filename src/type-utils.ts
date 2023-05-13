@@ -13,10 +13,9 @@ import type {
 
 // re-exported type-fest utilities
 export type * from 'type-fest';
-export type * from 'type-fest/source/async-return-type.js';
 export type { SimplifyDeep } from 'type-fest/source/merge-deep.js';
+export type { AsyncFunction } from 'type-fest/source/async-return-type';
 
-/** Any value that is **not** `null` or `undefined`. */
 export interface NonNullish {}
 export type Nullish = null | undefined;
 export type Maybe<T> = T | undefined;
@@ -24,6 +23,10 @@ export type Nullable<T> = T | null;
 export type Multi<T> = T | T[];
 export type Numeric = number | bigint;
 export type NumberLike = number | `${number}`;
+export type Fn<
+  ReturnValue extends Value = any,
+  Params extends Value[] = any[]
+> = (...args: Params) => ReturnValue;
 
 /**
  * **all** primitives *(i.e. any non-object)*
@@ -40,10 +43,13 @@ export type primitive = Simplify<Primitive | bigint | symbol>;
 export type Primitive = Simplify<string | boolean | number | Nullish>;
 
 /** **any** js value *(primitves or objects)*. */
-export type JsValue = Simplify<primitive | object>;
+export type Value = primitive | object;
+
+/** **any** non-nullish defined value. */
+export type Defined = Exclude<Value, Nullish>;
 
 /** **plain** js objects. */
-export type JsObject<value = JsValue> = { [key: string]: value };
+export type JsObject<value = Value> = { [key: string]: value };
 
 /**
  * More reliably extract a union of a given type's keys as strings by
@@ -107,9 +113,9 @@ export type KeysExcept<T, ExcludedTypes> = keyof ConditionalExcept<
  * **Improved catch-all solution for type-fest's
  * {@link https://github.com/sindresorhus/type-fest/blob/main/source/literal-union.d.ts | LiteralUnion}** \
  * Generic that allows for both the literal/mapped type
- * and base type without sacrificing completions.
+ * and its inferred base type without sacrificing completions.
  * - base type automatically inferred from literal.
- * - when a non-literal or non-mapped type is passed,
+ * - non-literal or non-mapped types can still be passed and
  *   it will just be {@link Narrow}'ed down or returned as is.
  */
 export type Union<T> = Type<
@@ -126,15 +132,24 @@ export type Union<T> = Type<
  */
 export type Composite<T, Composed = UnionToIntersection<T>> = Type<
   T extends Function
-    ? Extract<T, (...args: any) => any>
+    ? Extract<T, Fn>
     : T extends string | number
     ? ExtractLiteral<T>
     : OmitIndexSignature<Composed>
 >;
 
 /**
- * Narrow down a type to a common base type.
- * - *used internally for {@link Union}*
+ * Recursively narrow down a type to a common base type. \
+ * Base Types:
+ * - {@link JsObject} (plain objects)
+ * - `Array`
+ * - `Set`
+ * - `Map`
+ * - `Promise`
+ * - `Function`
+ * - `object` (non-`primitive`)
+ * - `primitive` (converted down to its base type)
+ * - {@link NonNullish}
  */
 export type Narrow<T> = Type<
   T extends JsObject<infer Values>

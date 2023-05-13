@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type { JsObject, KeyOf, Merge, Union } from '../types';
+import type { JsObject, KeyOf, Merge, Union } from '../type-utils';
 import type {
   ClearFn,
   ExtendFn,
@@ -13,8 +13,9 @@ import type {
   PopFn,
 } from './types';
 
+import { defined } from '../common';
+import { isObject, nullish } from '../conditionals';
 import { deepcopy, deepmergeInto } from '../externals';
-import { isObject, not, nullish } from '../conditionals';
 
 export const keys = ((obj, options) => {
   if (nullish(obj)) return [];
@@ -78,15 +79,11 @@ export const pop: PopFn = (obj: JsObject, key = keys(obj).pop()) => {
  * and the resulting object will be correctly typed accordingly (i.e. `readonly` vs non-`readonly`).
  */
 export const extend = ((...args: any[]) => {
-  const [target, props, options] = args.length === 1 ? [{}, args.pop()] : args;
+  const [target, obj, options] = args.length === 1 ? [{}, args.pop()] : args;
   const { copy, freeze, ...descriptors } = options ?? {};
   const ret = copy ? deepcopy(target) : target;
-  for (const key in props) {
-    Object.defineProperty(
-      ret,
-      key,
-      mapDescriptors(key, props[key], descriptors)
-    );
+  for (const key in obj) {
+    Object.defineProperty(ret, key, mapDescriptors(key, obj[key], descriptors));
   }
 
   return freeze ? Object.freeze(ret) : ret;
@@ -94,7 +91,7 @@ export const extend = ((...args: any[]) => {
 
 export const findkey: FindKeyFn = (obj: JsObject, ...args: unknown[]) => {
   const { opts, callback } = mapargs(args, {
-    callback: (value: unknown) => !not(value),
+    callback: (value: unknown) => defined(value),
   });
 
   const { deep, ...keyopts } = opts;
@@ -131,10 +128,10 @@ export const map: MapFn = (obj: JsObject, ...args: unknown[]) => {
 };
 
 export const filter: FilterFn = (obj: JsObject, ...args: unknown[]) => {
-  let result: JsObject = {};
+  const result: JsObject = {};
   const { opts, callback } = mapargs(args, {
     opts: { deep: !args.length, withRest: false },
-    callback: ({ value }: { value: unknown }) => typeof value !== 'undefined',
+    callback: (entry: { value: unknown }) => !nullish(entry['value']),
   });
 
   (opts['withRest'] as {}) &&= {};
@@ -154,7 +151,7 @@ export const filter: FilterFn = (obj: JsObject, ...args: unknown[]) => {
     }
   }
 
-  freeze && (result = Object.freeze(result));
+  freeze && Object.freeze(result);
   return withRest ? [result, withRest] : result;
 };
 

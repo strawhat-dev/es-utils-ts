@@ -1,21 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type {
-  AsyncFunction,
-  Constructor,
-  JsObject,
-  KeyOf,
-  Replace,
-  TypedArray,
-  Union,
-  primitive,
-} from '../types';
-import type {
-  AssertionOptions,
-  AsyncGeneratorFunction,
-  GeneratorFunction,
-  MultiTypeQueryFunction,
-  TypeName,
-} from './types';
+import type { AsyncFunction, Constructor, JsObject, KeyOf, Replace, TypedArray, Union, primitive } from '../type-utils';
+import type { AssertionOptions, AsyncGeneratorFunction, GeneratorFunction, MultiTypeQueryFunction, TypeName } from './types';
 
 import { equal, inspect } from '../externals';
 

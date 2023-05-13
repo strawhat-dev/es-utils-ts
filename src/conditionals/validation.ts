@@ -1,22 +1,13 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type { Nullish, Union } from '../types';
+import type { Nullish, Union } from '../type-utils';
 
 /**
- * Similarly to nullish coalescing, checks if given `value` is `undefined` or `null`.
- * @returns `true` if `value` is `undefined` or `null`; `false` otherwise
+ * Checks if a value is `nullish`, but **also considers `NaN`** *(because the
+ * contexts in which one would consider `NaN` to be a valid condition to continue
+ * would most likely be next to none)*.
+ * @returns `true` if `value` is `NaN`, `null`, or `undefined`; `false` otherwise
  */
 // prettier-ignore
-export const nullish = (value: unknown): value is Nullish => typeof value === 'undefined' || value === null;
-
-/**
- * An alternative to the *logical not* operator; checks if `value` is falsy ***(excluding `''` + `0`)***.
- * This is similar to nullish coalescing but with checks for `false` and `NaN` as well, for the common
- * use case of wanting to check if some value is *falsy/invalid*, but would consider *empty strings* or
- * the *number zero* to be *valid*, whereas simply using the logical not operator (e.g. `!value`) would not.
- * @returns `true` if `value` is `false`, `undefined`, `null`, or `NaN`; `false` otherwise
- */
-// prettier-ignore
-export const not = (value: unknown): value is false | Nullish => value === false || nullish(value) || Number.isNaN(value);
+export const nullish = (value: unknown): value is Nullish => typeof value === 'undefined' || value === null || Number.isNaN(value);
 
 /**
  * Utilizes `URL` constructor to check if the provided string is a valid url.
@@ -25,13 +16,10 @@ export const not = (value: unknown): value is false | Nullish => value === false
  * defaults to checking if the url has a valid *http* protocol (i.e. `http:` or `https:`).
  */
 // prettier-ignore
-export const validURL = (
-  value: unknown,
-  options?: { protocol?: Union<'any'> }
-): value is URL & string => {
+export const validURL = (value: unknown, options?: { protocol?: Union<'any'> }): value is URL & string => {
   try {
     const url = new URL(value as URL | string);
-    const { protocol } = options || {};
+    const { protocol } = options ?? {};
     if (!protocol) return url.protocol === 'http:' || url.protocol === 'https:';
     return protocol === 'any' || protocol === url.protocol;
   } catch { return false; }

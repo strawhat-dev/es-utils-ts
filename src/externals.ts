@@ -1,19 +1,18 @@
 /**
- * @overview - Other external "essential" utilities as named exports (tree-shakeable!).
+ * @overview - Other external "essential" utilities that should really
+ * be part of the standard library, as named exports (tree-shakeable!).
  * Some may be a dependency for some internal utilities or have changed defaults.
- * Handpicked based on combination of performance, popularity, and update recency.
- * All credits goes to their respective authors.
+ * Chosen based on combination of necessity, performance, popularity, and update recency.
  */
 
-import type { JsObject, JsValue } from './types';
+import type { JsObject, Value } from './type-utils';
 
 // @ts-ignore
 import rfdc from 'rfdc/default';
 import Rfdc from 'rfdc';
 import deepEqual from 'deep-equal';
 import objectInspect from 'object-inspect';
-
-export { default as escapeRegex } from 'escape-string-regexp';
+import escapeStringRegexp from 'escape-string-regexp';
 
 export {
   deepmerge,
@@ -21,6 +20,11 @@ export {
   deepmergeInto,
   deepmergeIntoCustom,
 } from 'deepmerge-ts';
+
+// prettier-ignore
+export const escapeRegex = ((s) =>
+  escapeStringRegexp((s ?? '').toString())
+) as typeof escapeStringRegexp;
 
 /**
  * *rfdc (Really Fast Deep Clone)* w/ circular reference support \
@@ -69,7 +73,7 @@ export const equal = ((...args: Parameters<typeof deepEqual>) => (
     }
   ): a is B;
 
-  <A extends JsValue[], B extends Readonly<A>>(
+  <A extends Value[], B extends Readonly<A>>(
     a: Readonly<A>,
     b: Readonly<B>,
     options?: {
@@ -78,7 +82,7 @@ export const equal = ((...args: Parameters<typeof deepEqual>) => (
     }
   ): a is B;
 
-  <A extends JsValue, B extends Readonly<A>>(
+  <A extends Value, B extends Readonly<A>>(
     a: Readonly<A>,
     b: Readonly<B>,
     options?: {
