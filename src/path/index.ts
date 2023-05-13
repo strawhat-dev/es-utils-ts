@@ -36,7 +36,7 @@ export const normalize: Path['normalize'] = (p) => {
 export const parse: Path['parse'] = (p) => {
   const ret = _parse(toUnix(p));
   const [root] = ret.dir.split(sep);
-  root.endsWith(':') && (ret.root += sep);
+  root.endsWith(':') && (ret.root ||= `${root}/`);
   return ret;
 };
 
