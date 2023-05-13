@@ -2,7 +2,8 @@ import { isObject, nullish } from './chunk-KWJFEMZN.js';
 import { __name, escapeRegex, deepcopy, deepmergeInto } from './chunk-YRHHOPJS.js';
 
 // src/common/lib.ts
-var RE_FLAG = Object.freeze({
+var RE_FLAG_PATTERN = /[/]\b(?!\w*(\w)\w*\1)[dgimsuy]+\b$/;
+var RE_FLAG_OPTION = Object.freeze({
   indices: "d",
   global: "g",
   ignoreCase: "i",
@@ -24,13 +25,13 @@ var re = /* @__PURE__ */ __name((raw, ...subs) => {
   if (Array.isArray(pattern) && "raw" in pattern) {
     subs.push(escapeRegex);
     pattern = t(raw, ...subs);
-    flags = (pattern.match(/[/][dgimsuy]{1,7}$/) || [""])[0].slice(1);
-    flags && (pattern = pattern.replace(new RegExp(`[/]${flags}$`), ""));
+    flags = (pattern.match(RE_FLAG_PATTERN) || [""])[0].slice(1);
+    flags && (pattern = pattern.replace(RE_FLAG_PATTERN, ""));
   } else if (isObject(flags)) {
     const options = flags;
     flags = "";
     for (const opt of keys(options))
-      flags += RE_FLAG[opt];
+      flags += RE_FLAG_OPTION[opt];
   }
   return new RegExp(pattern, flags);
 }, "re");
