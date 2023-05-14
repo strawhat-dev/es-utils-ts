@@ -2,7 +2,6 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   platform: 'neutral',
-  target: 'es2021',
   format: 'esm',
   clean: true,
   minify: false,

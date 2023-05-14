@@ -1,7 +1,6 @@
 {
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "tsup.config.ts"],
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "dist",
     "lib": ["esnext", "dom", "dom.iterable"],
     "target": "es2021",
