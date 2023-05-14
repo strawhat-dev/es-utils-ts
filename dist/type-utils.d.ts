@@ -33,17 +33,14 @@ type JsObject<value = Value> = {
     [key: string]: value;
 };
 /**
- * More reliably extract a union of a given type's keys as strings by
- * forcefully converting `T` to a {@link Composite} type, and falling
- * back to `string` by default, so that types like `any`, `unknown`,
- * and `never` are not resolved.
+ * More reliably extract a union of a given type's keys as strings.
  */
-type KeyOf<T, Fallback = string, composite = Composite<T>> = StringKeyOf<composite> extends never ? Fallback : StringKeyOf<composite>;
+type KeyOf<T, Resolved = Composite<T>> = StringKeyOf<Resolved> extends never ? keyof T extends never ? string : keyof T : StringKeyOf<Resolved>;
 /**
  * Like {@link KeyOf}, but for extracting a
  * union type from the **values** instead.
  */
-type ValueOf<T, Fallback = NonNullish, composite = Composite<T>> = KeyOf<T> extends keyof composite ? composite[KeyOf<T>] : Fallback;
+type ValueOf<T, Resolved = Composite<T>> = KeyOf<T> extends keyof Resolved ? Resolved[KeyOf<T>] : NonNullish;
 /**
  * Like {@link KeyOf}, but recursively extracts nested keys.
  */
@@ -78,7 +75,7 @@ type Union<T> = Type<T | (IsLiteral<T> extends true ? LiteralToPrimitive<T> & No
  * only explicitly defined properties.
  * - *can be used to reverse effect of {@link Union}, and used internally for {@link KeyOf} and {@link ValueOf}*
  */
-type Composite<T, Composed = UnionToIntersection<T>> = Type<T extends Function ? Extract<T, Fn> : T extends string | number ? ExtractLiteral<T> : OmitIndexSignature<Composed>>;
+type Composite<T, Intersection = UnionToIntersection<T>> = Type<T extends Function ? Extract<T, Fn> : T extends string | number ? ExtractLiteral<T> : OmitIndexSignature<Intersection>>;
 /**
  * Recursively narrow down a type to a common base type. \
  * Base Types:

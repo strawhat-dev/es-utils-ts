@@ -47,7 +47,7 @@ type ExtendOptions<Props = {}> = {
      */
     configurable?: boolean | readonly KeyOf<Props>[];
 } & Pick<ObjectOptions, 'freeze'>;
-type ExtendedResult<T1, T2, Options extends ExtendOptions = {}, Props = Options['configurable'] & Options['writable'] extends true ? T2 : Options['configurable'] & Options['writable'] extends readonly (infer P)[] ? P extends keyof T2 ? Writable<Readonly<T2>, P> : never : Readonly<T2>, Result = T1 extends Function ? T1 & Simplify<Props> : Merge<T1, Composite<Props>>> = Options['freeze'] extends true ? Readonly<Result> : Result;
+type ExtendedResult<T1, T2, Options extends ExtendOptions<T2> = {}, Props = Options['configurable'] & Options['writable'] extends true ? T2 : Options['configurable'] & Options['writable'] extends readonly (infer P)[] ? P extends keyof T2 ? Writable<Readonly<T2>, P> : never : Readonly<T2>, Result = T1 extends Function ? T1 & Simplify<Props> : Merge<T1, Composite<Props>>> = Options['freeze'] extends true ? Readonly<Result> : Result;
 type FindKeyFn = {
     <T extends object>(obj: Readonly<T>): Maybe<KeyOf<Readonly<T>>>;
     <T extends object>(obj: Readonly<T>, predicate: FindKeyCallback<T>): Maybe<KeyOf<Readonly<T>>>;
