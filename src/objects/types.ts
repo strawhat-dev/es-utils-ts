@@ -113,7 +113,7 @@ export type ExtendOptions<Props = {}> = {
 type ExtendedResult<
   T1,
   T2,
-  Options extends ExtendOptions = {},
+  Options extends ExtendOptions<T2> = {},
   Props = Options['configurable'] & Options['writable'] extends true
     ? T2
     : Options['configurable'] & Options['writable'] extends readonly (infer P)[]

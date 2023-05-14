@@ -52,16 +52,16 @@ export type Defined = Exclude<Value, Nullish>;
 export type JsObject<value = Value> = { [key: string]: value };
 
 /**
- * More reliably extract a union of a given type's keys as strings by
- * forcefully converting `T` to a {@link Composite} type, and falling
- * back to `string` by default, so that types like `any`, `unknown`,
- * and `never` are not resolved.
+ * More reliably extract a union of a given type's keys as strings.
  */
 export type KeyOf<
   T,
-  Fallback = string,
-  composite = Composite<T>
-> = StringKeyOf<composite> extends never ? Fallback : StringKeyOf<composite>;
+  Resolved = Composite<T>
+> = StringKeyOf<Resolved> extends never
+  ? keyof T extends never
+    ? string
+    : keyof T
+  : StringKeyOf<Resolved>;
 
 /**
  * Like {@link KeyOf}, but for extracting a
@@ -69,9 +69,8 @@ export type KeyOf<
  */
 export type ValueOf<
   T,
-  Fallback = NonNullish,
-  composite = Composite<T>
-> = KeyOf<T> extends keyof composite ? composite[KeyOf<T>] : Fallback;
+  Resolved = Composite<T>
+> = KeyOf<T> extends keyof Resolved ? Resolved[KeyOf<T>] : NonNullish;
 
 /**
  * Like {@link KeyOf}, but recursively extracts nested keys.
@@ -130,12 +129,12 @@ export type Union<T> = Type<
  * only explicitly defined properties.
  * - *can be used to reverse effect of {@link Union}, and used internally for {@link KeyOf} and {@link ValueOf}*
  */
-export type Composite<T, Composed = UnionToIntersection<T>> = Type<
+export type Composite<T, Intersection = UnionToIntersection<T>> = Type<
   T extends Function
     ? Extract<T, Fn>
     : T extends string | number
     ? ExtractLiteral<T>
-    : OmitIndexSignature<Composed>
+    : OmitIndexSignature<Intersection>
 >;
 
 /**
