@@ -2,16 +2,10 @@
 module.exports = {
   root: true,
   env: { es2022: true, node: true },
-  ignorePatterns: ['.eslintrc.cjs', 'tsup.config.ts', 'dist'],
-  extends: ['plugin:@typescript-eslint/recommended', 'prettier'],
-  plugins: ['@typescript-eslint', 'tree-shaking'],
   parser: '@typescript-eslint/parser',
-  parserOptions: {
-    sourceType: 'module',
-    ecmaVersion: 'latest',
-    tsconfigRootDir: __dirname,
-    project: ['tsconfig.json'],
-  },
+  plugins: ['@typescript-eslint', 'tree-shaking'],
+  extends: ['plugin:@typescript-eslint/recommended', 'prettier'],
+  ignorePatterns: ['dist', 'tsup.config.ts', '.eslintrc.cjs'],
   rules: {
     '@typescript-eslint/ban-types': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
