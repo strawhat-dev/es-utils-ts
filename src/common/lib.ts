@@ -2,8 +2,8 @@ import type { Fn, Nullish } from '../type-utils';
 import type { RegexBuilder, RegexOptions, TaggedTemplate } from './types';
 
 import { keys } from '../objects';
-import { isObject } from '../conditionals';
 import { escapeRegex } from '../externals';
+import { isTemplateStringsArray } from '../conditionals';
 
 // https://stackoverflow.com/a/13546700
 const RE_FLAG_PATTERN = /[/]\b(?!\w*(\w)\w*\1)[dgimsuy]+\b$/;
@@ -34,13 +34,21 @@ export const defined = <T>(value: T) => (
 /**
  * @returns an array of *all* **non-empty** lines of the given string.
  */
-// prettier-ignore
-export const lines = (s: string) => s.split(/\r?\n/).filter((line) => line.trim());
+export const linesOf = (s: string) => {
+  const ret = [];
+  const lines = s.split(/\r?\n/);
+  for (let i = 0; i < lines.length; ++i) {
+    const line = lines[i];
+    line.trim() && ret.push(line);
+  }
+
+  return ret;
+};
 
 /**
  * @returns the *trimmed* string with *all* **empty** lines removed.
  */
-export const trimLines = (s: string) => lines(s).join('\n');
+export const trimLines = (s: string) => linesOf(s).join('\n').trim();
 
 /**
  * Tag function that rebuilds and returns the rebuilt string, but with each sub of
@@ -48,18 +56,19 @@ export const trimLines = (s: string) => lines(s).join('\n');
  * Optionally a callback may be provided, in which the `subs` may be customly mapped instead.
  */
 export const t: TaggedTemplate = (raw, ...subs) => {
-  let mapper = defined;
-  typeof subs.at(-1) === 'function' && (mapper = subs.pop() as Fn);
-  return String.raw({ raw }, ...subs.map((s) => mapper(s)));
+  let callback = defined;
+  typeof subs.at(-1) === 'function' && (callback = subs.pop() as Fn);
+  for (let i = 0; i < subs.length; ++i) subs[i] = callback(subs[i]) as never;
+  return String.raw({ raw }, ...subs);
 };
 
 /**
  * Like the `RegExp` constructor with the following enhancements:
  * - When invoked as a **tagged template**, any expression interpolated will be *escaped* for regex.
  * - The `flags` argument may also optionally be provided as an {@link RegexOptions | options object}
- *   that maps to the corresponding flags, with typed completions, for better readability.
- * - Regular expression flags may still be provided when invoked as tag function by simply adding
- *   the desired flags as how you would normally for regular expressions, at the end.
+ *   that maps to the corresponding flags (with typed completions) for better readability.
+ * - Regular expression flags may still be provided when invoked as tag function by simply
+ *   including the desired flags at the end (as with normal regular expressions).
  *
  * @example
  * const currency = '$';
@@ -69,15 +78,17 @@ export const t: TaggedTemplate = (raw, ...subs) => {
  */
 export const re: RegexBuilder = (raw, ...subs) => {
   let [pattern, flags = ''] = [raw, subs[0]];
-  if (Array.isArray(pattern) && 'raw' in pattern) {
+  if (isTemplateStringsArray(raw)) {
     subs.push(escapeRegex);
-    pattern = t(raw as TemplateStringsArray, ...subs);
+    pattern = t(raw, ...subs);
     flags = (pattern.match(RE_FLAG_PATTERN) || [''])[0].slice(1);
     flags && (pattern = pattern.replace(RE_FLAG_PATTERN, ''));
-  } else if (isObject(flags)) {
-    const options = flags as RegexOptions;
+  } else if (typeof flags === 'object') {
+    const opts = flags as RegexOptions;
     flags = '';
-    for (const opt of keys(options)) flags += RE_FLAG_OPTION[opt];
+    for (const opt of keys(opts, { defined: true })) {
+      flags += RE_FLAG_OPTION[opt] ?? '';
+    }
   }
 
   return new RegExp(pattern as string, flags as string);
