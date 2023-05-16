@@ -12,7 +12,6 @@ import type {
   PopFn,
 } from './types';
 
-import { defined } from '../common';
 import { isObject, nullish } from '../conditionals';
 import { deepcopy, deepmergeInto } from '../externals';
 
@@ -75,16 +74,13 @@ export const keys = ((obj: JsObject, ...args: unknown[]) => {
   if (nullish(obj)) return [];
   let { opts, callback } = mapargs(args);
   const { inherited, nonEnumerable } = opts;
-  if (opts['defined']) callback = (k) => defined(obj[k]);
+  if (opts['defined']) callback = (k) => !(nullish(obj[k]) || obj[k] === false);
   if (inherited && nonEnumerable) return props(obj, callback);
   if (nonEnumerable) return keysOf(obj, callback);
   if (inherited) return keysIn(obj, callback);
-  return keysIn(
-    obj,
-    typeof callback === 'function'
-      ? (k) => Object.hasOwn(obj, k) && callback!(k)
-      : (k) => Object.hasOwn(obj, k)
-  );
+  return typeof callback === 'function'
+    ? keysIn(obj, (k) => Object.hasOwn(obj, k) && callback?.(k))
+    : Object.keys(obj);
 }) as KeyDispatcher;
 
 /**
@@ -119,7 +115,10 @@ export const clear: ClearFn = (obj, options) => {
  * Delete a property while retrieving its value at the same time.
  * @returns the value of the property deleted from the object
  */
-export const pop: PopFn = (obj: JsObject, key = Object.keys(obj).pop()) => {
+export const pop: PopFn = (
+  obj: JsObject,
+  key = Object.keys(obj ?? {}).pop()
+) => {
   if (nullish(obj)) return;
   const value = obj[key!];
   delete obj[key!];
@@ -127,7 +126,7 @@ export const pop: PopFn = (obj: JsObject, key = Object.keys(obj).pop()) => {
 };
 
 export const findkey: FindKeyFn = (obj: JsObject, ...args: unknown[]) => {
-  const { opts, callback } = mapargs(args, { callback: defined });
+  const { opts, callback } = mapargs(args, { callback: (k) => k });
   const { deep, ...keyopts } = opts;
   for (const key of keys(obj, keyopts)) {
     const value = obj[key];

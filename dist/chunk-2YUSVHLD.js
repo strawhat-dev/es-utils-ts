@@ -1,102 +1,5 @@
-import { isTemplateStringsArray, nullish, isObject } from './chunk-R2HOTKJN.js';
-import { __name, escapeRegex, deepcopy, deepmergeInto } from './chunk-ETHVEPTR.js';
-
-// src/common/lib.ts
-var RE_FLAG_PATTERN = /[/]\b(?!\w*(\w)\w*\1)[dgimsuy]+\b$/;
-var RE_FLAG_OPTION = Object.freeze({
-  indices: "d",
-  global: "g",
-  ignoreCase: "i",
-  multiline: "m",
-  dotAll: "s",
-  unicode: "u",
-  sticky: "y"
-});
-var defined = /* @__PURE__ */ __name((value) => value || value === 0 ? value : "", "defined");
-var linesOf = /* @__PURE__ */ __name((s) => {
-  const ret = [];
-  const lines = s.split(/\r?\n/);
-  for (let i = 0; i < lines.length; ++i) {
-    const line = lines[i];
-    line.trim() && ret.push(line);
-  }
-  return ret;
-}, "linesOf");
-var trimLines = /* @__PURE__ */ __name((s) => linesOf(s).join("\n").trim(), "trimLines");
-var t = /* @__PURE__ */ __name((raw, ...subs) => {
-  let callback = defined;
-  typeof subs.at(-1) === "function" && (callback = subs.pop());
-  for (let i = 0; i < subs.length; ++i)
-    subs[i] = callback(subs[i]);
-  return String.raw({ raw }, ...subs);
-}, "t");
-var re = /* @__PURE__ */ __name((raw, ...subs) => {
-  let [pattern, flags = ""] = [raw, subs[0]];
-  if (isTemplateStringsArray(raw)) {
-    subs.push(escapeRegex);
-    pattern = t(raw, ...subs);
-    flags = (pattern.match(RE_FLAG_PATTERN) || [""])[0].slice(1);
-    flags && (pattern = pattern.replace(RE_FLAG_PATTERN, ""));
-  } else if (typeof flags === "object") {
-    const opts = flags;
-    flags = "";
-    for (const opt of keys(opts, { defined: true })) {
-      flags += RE_FLAG_OPTION[opt] ?? "";
-    }
-  }
-  return new RegExp(pattern, flags);
-}, "re");
-
-// src/common/promises.ts
-var ESM_CDN_URL = "https://esm.run";
-var sleep = /* @__PURE__ */ __name(async (ms) => new Promise((res) => setTimeout(res, +ms)), "sleep");
-var cdn = /* @__PURE__ */ __name(async (name) => {
-  const mod = await import(`${ESM_CDN_URL}/${name}`);
-  return mod?.default || mod;
-}, "cdn");
-
-// src/common/range.ts
-var range = /* @__PURE__ */ __name((start = 0, stop, step) => {
-  if (nullish(stop))
-    [start, stop] = [0, start];
-  if (nullish(step))
-    step = stop < start ? -1 : 1;
-  const n = Math.max(0, Math.ceil((stop - start) / (step || 1)));
-  const ret = new Array(n);
-  for (let i = 0; i < n; ++i) {
-    ret[i] = start;
-    start += step;
-  }
-  return ret;
-}, "range");
-var Range = /* @__PURE__ */ __name((start = 0, stop, step, _incl) => {
-  if (nullish(stop))
-    [start, stop] = [0, start];
-  if (nullish(step))
-    step = stop < start ? -1 : 1;
-  return Object.freeze(
-    new Proxy(Object.freeze({}), {
-      has(_2, n) {
-        if (!/^\d+$/.test(n))
-          return false;
-        if (+n % step)
-          return false;
-        if (!step)
-          return +n === start;
-        if (start > stop) {
-          return +n <= start && (_incl ? +n >= stop : +n > stop);
-        }
-        return +n >= start && (_incl ? +n <= stop : +n < stop);
-      }
-    })
-  );
-}, "Range");
-var irange = /* @__PURE__ */ __name((...args) => {
-  const [i, start] = args.length > 1 ? [1, args[0]] : [0, 0];
-  args[i] < start ? --args[i] : ++args[i];
-  return range(...args);
-}, "irange");
-var iRange = /* @__PURE__ */ __name((...args) => Range(...args), "iRange");
+import { nullish, isObject } from './chunk-R2HOTKJN.js';
+import { __name, deepcopy, deepmergeInto } from './chunk-ETHVEPTR.js';
 
 // src/objects/index.ts
 var keysIn = /* @__PURE__ */ __name((obj, f) => {
@@ -138,17 +41,14 @@ var keys = /* @__PURE__ */ __name((obj, ...args) => {
   let { opts, callback } = mapargs(args);
   const { inherited, nonEnumerable } = opts;
   if (opts["defined"])
-    callback = /* @__PURE__ */ __name((k) => defined(obj[k]), "callback");
+    callback = /* @__PURE__ */ __name((k) => !(nullish(obj[k]) || obj[k] === false), "callback");
   if (inherited && nonEnumerable)
     return props(obj, callback);
   if (nonEnumerable)
     return keysOf(obj, callback);
   if (inherited)
     return keysIn(obj, callback);
-  return keysIn(
-    obj,
-    typeof callback === "function" ? (k) => Object.hasOwn(obj, k) && callback(k) : (k) => Object.hasOwn(obj, k)
-  );
+  return typeof callback === "function" ? keysIn(obj, (k) => Object.hasOwn(obj, k) && callback?.(k)) : Object.keys(obj);
 }, "keys");
 var extend = /* @__PURE__ */ __name((...args) => {
   const [target, obj, options] = args.length === 1 ? [{}, args.pop()] : args;
@@ -165,7 +65,7 @@ var clear = /* @__PURE__ */ __name((obj, options) => {
     delete obj[key];
   return obj;
 }, "clear");
-var pop = /* @__PURE__ */ __name((obj, key = Object.keys(obj).pop()) => {
+var pop = /* @__PURE__ */ __name((obj, key = Object.keys(obj ?? {}).pop()) => {
   if (nullish(obj))
     return;
   const value = obj[key];
@@ -173,7 +73,7 @@ var pop = /* @__PURE__ */ __name((obj, key = Object.keys(obj).pop()) => {
   return value;
 }, "pop");
 var findkey = /* @__PURE__ */ __name((obj, ...args) => {
-  const { opts, callback } = mapargs(args, { callback: defined });
+  const { opts, callback } = mapargs(args, { callback: (k) => k });
   const { deep, ...keyopts } = opts;
   for (const key of keys(obj, keyopts)) {
     const value = obj[key];
@@ -261,4 +161,4 @@ var mapd = /* @__PURE__ */ __name((property, value, options, resolver = (d) => A
   configurable: resolver(options.configurable)
 }), "mapd");
 
-export { Range, _, cdn, clear, defined, extend, filter, findkey, iRange, irange, keys, keysIn, keysOf, linesOf, map, pop, props, range, re, sleep, t, trimLines };
+export { _, clear, extend, filter, findkey, keys, keysIn, keysOf, map, pop, props };
