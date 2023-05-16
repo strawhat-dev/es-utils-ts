@@ -19,14 +19,6 @@ import type {
   Writable,
 } from '../type-utils';
 
-export type KeyDispatcher = <
-  T extends object,
-  Options extends KeyIterationOptions
->(
-  obj: Readonly<T>,
-  options?: Options
-) => (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
-
 export type ClearFn = <T extends JsObject>(
   obj: T,
   options?: Omit<KeyIterationOptions, 'inherited'>
@@ -46,7 +38,44 @@ export type PopFn = {
   ): T[Key];
 };
 
-export type ExtendFn = {
+export type KeyDispatcher = {
+  <T extends object>(obj: Readonly<T>): KeyOf<T>[];
+
+  <T extends object>(
+    obj: Readonly<T>,
+    callback: (key: KeyOf<T>) => unknown
+  ): KeyOf<T>[];
+
+  <T extends object, Options extends KeyDispatcherOptions>(
+    obj: Readonly<T>,
+    options?: Options
+  ): (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
+
+  <T extends object, Options extends KeyDispatcherOptions>(
+    obj: Readonly<T>,
+    callback: (key: KeyOf<T>) => unknown,
+    options: Options
+  ): (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
+
+  <T extends object, Options extends KeyDispatcherOptions>(
+    obj: Readonly<T>,
+    options: Options,
+    callback: (key: KeyOf<T>) => unknown
+  ): (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
+};
+
+type KeyDispatcherOptions = KeyIterationOptions & {
+  /**
+   * if `true`, retrieve *only* keys where the *corresponding values*
+   * are **not any of** `undefined`, `null`, `NaN`, or `false`.
+   * - *provided as a convenience option and
+   *   alternative for the callback parameter*
+   * @defaultValue `false`
+   */
+  defined?: boolean;
+};
+
+export type Extender = {
   <T extends JsObject>(props: Readonly<T>): Readonly<T>;
 
   <Base extends JsObject, Props extends JsObject>(
@@ -163,7 +192,7 @@ type FindKeyCallback<T, Options extends FindKeyOptions = {}> = Union<
   ) => boolean
 >;
 
-export type MapFn = {
+export type Mapper = {
   <T extends JsObject>(
     obj: Readonly<T>,
     callback: MapCallback<Readonly<T>>
@@ -199,7 +228,7 @@ export type MapFn = {
   ): MappedResult<T, Options>;
 };
 
-export type MapCallback<T, Options extends ObjectOptions = {}> = Union<
+type MapCallback<T, Options extends ObjectOptions = {}> = Union<
   (
     key: Union<ResolvedKeys<T, Options>>,
     value: Union<ResolvedValues<T, Options>>
@@ -210,7 +239,7 @@ type MappedResult<T, Options extends ObjectOptions = {}> = SimplifyDeep<
   ResolvedResult<T, Options> & JsObject
 >;
 
-export type FilterFn = {
+export type Filterer = {
   <T extends JsObject>(obj: Readonly<T>): T;
 
   <T extends object>(obj: Readonly<T>): T;
@@ -274,7 +303,7 @@ type FilteredResult<T, Options extends FilterOptions = {}> = SimplifyDeep<
 >;
 
 // common
-export type KeyIterationOptions = {
+type KeyIterationOptions = {
   /**
    * if `true`, inherited keys *(i.e. those from its prototype chain)*
    * are also included while traversing this object
