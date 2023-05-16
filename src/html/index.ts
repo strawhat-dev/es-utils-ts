@@ -91,5 +91,3 @@ export const createHTMLDoc = ({ head = '', body = '' } = {}) => trimLines(/* htm
   </body>
 </html>
 `);
-
-export type { HTMLElementProps, HTMLTag };
