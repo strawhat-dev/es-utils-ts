@@ -81,7 +81,9 @@ export const keys = ((obj: JsObject, ...args: unknown[]) => {
   if (inherited) return keysIn(obj, callback);
   return keysIn(
     obj,
-    (k) => (!callback || callback(k)) && Object.hasOwn(obj, k)
+    typeof callback === 'function'
+      ? (k) => Object.hasOwn(obj, k) && callback!(k)
+      : (k) => Object.hasOwn(obj, k)
   );
 }) as KeyDispatcher;
 
