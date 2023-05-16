@@ -54,14 +54,13 @@ export type JsObject<value = Value> = { [key: string]: value };
 /**
  * More reliably extract a union of a given type's keys as strings.
  */
-export type KeyOf<
-  T,
-  Resolved = Composite<T>
-> = StringKeyOf<Resolved> extends never
-  ? keyof T extends never
-    ? string
-    : keyof T
-  : StringKeyOf<Resolved>;
+export type KeyOf<T, Resolved = Composite<T>> = Type<
+  StringKeyOf<Resolved> extends never
+    ? keyof T extends never
+      ? string
+      : keyof T
+    : StringKeyOf<Resolved>
+>;
 
 /**
  * Like {@link KeyOf}, but for extracting a
