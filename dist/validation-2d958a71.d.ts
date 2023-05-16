@@ -1,9 +1,10 @@
-import { Type, Union, JsObject, primitive, KeyOf, Nullish } from './type-utils.js';
+import { Type, KeyOf, Union, JsObject, primitive, Nullish } from './type-utils.js';
 import { AsyncFunction } from 'type-fest/source/async-return-type';
-import { Constructor, TypedArray, Replace } from 'type-fest';
+import { Replace, Constructor, TypedArray } from 'type-fest';
 
 type GeneratorFunction = (...args: any[]) => Generator;
 type AsyncGeneratorFunction = (...args: any[]) => AsyncGenerator;
+type AssertionType = Replace<KeyOf<typeof assert>, 'is', ''>;
 type AssertionOptions = {
     /**
      * Set to `throw` to throw on failed assertions
@@ -53,6 +54,7 @@ declare const isPromise: (value: unknown) => value is Promise<any>;
 declare const isRegExp: (value: unknown) => value is RegExp;
 declare const isRequest: (value: unknown) => value is Request;
 declare const isSet: (value: unknown) => value is Set<any>;
+declare const isTemplateStringsArray: (value: unknown) => value is TemplateStringsArray;
 declare const isTypedArray: (value: unknown) => value is TypedArray;
 declare const isWeakMap: (value: unknown) => value is WeakMap<object, any>;
 declare const isWeakSet: (value: unknown) => value is WeakSet<object>;
@@ -89,6 +91,7 @@ declare const assert: Readonly<{
     readonly isRegExp: (value: unknown, opts?: AssertionOptions) => boolean;
     readonly isRequest: (value: unknown, opts?: AssertionOptions) => boolean;
     readonly isSet: (value: unknown, opts?: AssertionOptions) => boolean;
+    readonly isTemplateStringsArray: (value: unknown, opts?: AssertionOptions) => boolean;
     readonly isTypedArray: (value: unknown, opts?: AssertionOptions) => boolean;
     readonly isWeakMap: (value: unknown, opts?: AssertionOptions) => boolean;
     readonly isWeakSet: (value: unknown, opts?: AssertionOptions) => boolean;
@@ -102,8 +105,6 @@ declare const assert: Readonly<{
     readonly isSymbol: (value: unknown, opts?: AssertionOptions) => boolean;
     readonly isUndefined: (value: unknown, opts?: AssertionOptions) => boolean;
 }>;
-/** @internal */
-type AssertionType = Replace<KeyOf<typeof assert>, 'is', ''>;
 
 /**
  * Checks if a value is `nullish`, but **also considers `NaN`** *(because the
@@ -122,4 +123,4 @@ declare const validURL: (value: unknown, options?: {
     protocol?: Union<'any'>;
 }) => value is URL & string;
 
-export { AssertionType as A, validURL as B, isAsyncFunction as a, isAsyncGeneratorFunction as b, isAsyncIterable as c, isAsyncIterator as d, isConstructor as e, isDate as f, isElement as g, isError as h, isArrayBuffer as i, isGeneratorFunction as j, isIterable as k, isIterator as l, isMap as m, isObject as n, isPrimitive as o, isPromise as p, isRegExp as q, isRequest as r, isSet as s, type as t, isTypedArray as u, isWeakMap as v, isWeakSet as w, is as x, assert as y, nullish as z };
+export { nullish as A, validURL as B, isAsyncFunction as a, isAsyncGeneratorFunction as b, isAsyncIterable as c, isAsyncIterator as d, isConstructor as e, isDate as f, isElement as g, isError as h, isArrayBuffer as i, isGeneratorFunction as j, isIterable as k, isIterator as l, isMap as m, isObject as n, isPrimitive as o, isPromise as p, isRegExp as q, isRequest as r, isSet as s, type as t, isTemplateStringsArray as u, isTypedArray as v, isWeakMap as w, isWeakSet as x, is as y, assert as z };

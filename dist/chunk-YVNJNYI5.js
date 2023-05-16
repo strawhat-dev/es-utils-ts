@@ -1,9 +1,20 @@
-import { re } from './chunk-MVICGNT5.js';
-import { assert } from './chunk-KWJFEMZN.js';
+import { re } from './chunk-OH43ZVYP.js';
+import { assert } from './chunk-PESHTHBB.js';
 import { __name } from './chunk-YRHHOPJS.js';
 import path from 'path';
 
 // src/path/internal.ts
+var toUnix = /* @__PURE__ */ __name((p) => p?.replace(/\\/g, "/").replace(/(?<!^)\/+/g, "/"), "toUnix");
+var unixify = /* @__PURE__ */ __name((fn) => {
+  return (...args) => {
+    for (let i = 0; i < args.length; ++i) {
+      typeof args[i] === "string" && (args[i] = toUnix(args[i]));
+    }
+    const ret = fn(...args);
+    return typeof ret === "string" ? toUnix(ret) : ret;
+  };
+}, "unixify");
+var isValidExt = /* @__PURE__ */ __name((ext = "", { ignore = [], maxLength = 7 } = {}) => ext && ext.length <= maxLength && !ignore.some((val) => (val?.[0] === "." || (val = `.${ext}`), val === ext)), "isValidExt");
 var _format = /* @__PURE__ */ __name((pathObj) => {
   assert.isObject(pathObj, { onError: "throw" });
   const dir = pathObj.dir || pathObj.root;
@@ -74,20 +85,26 @@ var _parse = /* @__PURE__ */ __name((path2) => {
 
 // src/path/index.ts
 var sep = "/";
+var toUnix2 = toUnix;
 var delimiter = path.delimiter;
-var toUnix = /* @__PURE__ */ __name((p) => p?.replace(/\\/g, sep).replace(/(?<!^)\/+/g, sep), "toUnix");
 var basename = unixify(path.basename);
 var dirname = unixify(path.dirname);
 var extname = unixify(path.extname);
-var format = unixify(_format);
 var isAbsolute = unixify(path.isAbsolute);
 var join = unixify(path.join);
 var relative = unixify(path.relative);
 var resolve = unixify(path.resolve);
 var toNamespacedPath = unixify(path.toNamespacedPath);
+var format = unixify(_format);
+var parse = /* @__PURE__ */ __name((p) => {
+  const ret = _parse(toUnix2(p));
+  const [root] = ret.dir.split(sep);
+  root.endsWith(":") && (ret.root ||= `${root}/`);
+  return ret;
+}, "parse");
 var normalize = /* @__PURE__ */ __name((p) => {
-  p = toUnix(p);
-  let ret = toUnix(path.normalize(p));
+  p = toUnix2(p);
+  let ret = toUnix2(path.normalize(p));
   if (p.startsWith("./") && !ret.startsWith("./") && !ret.startsWith("..")) {
     ret = `./${ret}`;
   } else if (p.startsWith("//") && !ret.startsWith("//")) {
@@ -95,12 +112,6 @@ var normalize = /* @__PURE__ */ __name((p) => {
   }
   return ret.endsWith(sep) ? ret.slice(0, -1) : ret;
 }, "normalize");
-var parse = /* @__PURE__ */ __name((p) => {
-  const ret = _parse(toUnix(p));
-  const [root] = ret.dir.split(sep);
-  root.endsWith(":") && (ret.root ||= `${root}/`);
-  return ret;
-}, "parse");
 var trimExt = /* @__PURE__ */ __name((p, opts) => {
   const ext = extname(p);
   if (!isValidExt(ext, opts))
@@ -142,7 +153,7 @@ var upath = {
   resolve,
   sep,
   toNamespacedPath,
-  toUnix,
+  toUnix: toUnix2,
   trimExt
 };
 upath["win32"] = upath;
@@ -150,19 +161,6 @@ upath["posix"] = upath;
 Object.freeze(upath);
 var win32 = upath;
 var posix = upath;
-function unixify(fn) {
-  return (...args) => {
-    for (let i = 0; i < args.length; ++i) {
-      typeof args[i] === "string" && (args[i] = toUnix(args[i]));
-    }
-    const ret = fn(...args);
-    return typeof ret === "string" ? toUnix(ret) : ret;
-  };
-}
-__name(unixify, "unixify");
-function isValidExt(ext = "", { ignore = [], maxLength = 7 } = {}) {
-  return ext && ext.length <= maxLength && !ignore.some((val) => (val?.[0] === "." || (val = `.${ext}`), val === ext));
-}
-__name(isValidExt, "isValidExt");
+var path_default = upath;
 
-export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, normalize, parse, posix, relative, removeExt, resolve, sep, toNamespacedPath, toUnix, trimExt, win32 };
+export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, normalize, parse, path_default, posix, relative, removeExt, resolve, sep, toNamespacedPath, toUnix2 as toUnix, trimExt, win32 };

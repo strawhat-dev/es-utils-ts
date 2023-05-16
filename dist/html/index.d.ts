@@ -60,4 +60,4 @@ declare const createHTMLDoc: ({ head, body }?: {
     body?: string | undefined;
 }) => string;
 
-export { HTMLElementProps, HTMLTag, createElement, createHTMLDoc, createLink, querySelectorMatchAll };
+export { createElement, createHTMLDoc, createLink, querySelectorMatchAll };

@@ -21,6 +21,7 @@ var isPromise = /* @__PURE__ */ __name((value) => type(value) === "Promise", "is
 var isRegExp = /* @__PURE__ */ __name((value) => type(value) === "RegExp", "isRegExp");
 var isRequest = /* @__PURE__ */ __name((value) => type(value) === "Request", "isRequest");
 var isSet = /* @__PURE__ */ __name((value) => type(value) === "Set", "isSet");
+var isTemplateStringsArray = /* @__PURE__ */ __name((value) => Array.isArray(value) && "raw" in value, "isTemplateStringsArray");
 var isTypedArray = /* @__PURE__ */ __name((value) => ArrayBuffer.isView(value) && !(value instanceof DataView), "isTypedArray");
 var isWeakMap = /* @__PURE__ */ __name((value) => type(value) === "WeakMap", "isWeakMap");
 var isWeakSet = /* @__PURE__ */ __name((value) => type(value) === "WeakSet", "isWeakSet");
@@ -48,6 +49,7 @@ var assert = Object.freeze({
   isRegExp: createAssertion(isRegExp),
   isRequest: createAssertion(isRequest),
   isSet: createAssertion(isSet),
+  isTemplateStringsArray: createAssertion(isTemplateStringsArray),
   isTypedArray: createAssertion(isTypedArray),
   isWeakMap: createAssertion(isWeakMap),
   isWeakSet: createAssertion(isWeakSet),
@@ -107,4 +109,4 @@ var validURL = /* @__PURE__ */ __name((value, options) => {
   }
 }, "validURL");
 
-export { assert, is, isArrayBuffer, isAsyncFunction, isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isConstructor, isDate, isElement, isError, isGeneratorFunction, isIterable, isIterator, isMap, isObject, isPrimitive, isPromise, isRegExp, isRequest, isSet, isTypedArray, isWeakMap, isWeakSet, nullish, type, validURL };
+export { assert, is, isArrayBuffer, isAsyncFunction, isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isConstructor, isDate, isElement, isError, isGeneratorFunction, isIterable, isIterator, isMap, isObject, isPrimitive, isPromise, isRegExp, isRequest, isSet, isTemplateStringsArray, isTypedArray, isWeakMap, isWeakSet, nullish, type, validURL };

@@ -1,5 +1,5 @@
-import { pop, trimLines } from './chunk-MVICGNT5.js';
-import { isObject } from './chunk-KWJFEMZN.js';
+import { pop, trimLines } from './chunk-OH43ZVYP.js';
+import { isObject } from './chunk-PESHTHBB.js';
 import { __name } from './chunk-YRHHOPJS.js';
 
 // src/html/index.ts

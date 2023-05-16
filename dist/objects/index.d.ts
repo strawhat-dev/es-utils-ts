@@ -1,9 +1,8 @@
-import { Union, KeyOf, JsObject, Composite, Maybe, Multi, Nullish, Type, KeyOfDeep, ValueOfDeep, ValueOf } from '../type-utils.js';
+import { JsObject, KeyOf, Union, Composite, Maybe, Multi, Nullish, Type, KeyOfDeep, ValueOfDeep, ValueOf, Fn } from '../type-utils.js';
 import { Writable, Simplify, Merge, PartialDeep, ReadonlyDeep } from 'type-fest';
 import { SimplifyDeep } from 'type-fest/source/merge-deep.js';
 import 'type-fest/source/async-return-type';
 
-type KeyDispatcher = <T extends object, Options extends KeyIterationOptions>(obj: Readonly<T>, options?: Options) => (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
 type ClearFn = <T extends JsObject>(obj: T, options?: Omit<KeyIterationOptions, 'inherited'>) => Partial<T>;
 type PopFn = {
     <T extends JsObject>(obj: Readonly<T>): T[KeyOf<T>];
@@ -11,7 +10,24 @@ type PopFn = {
     <T extends object>(obj: Readonly<T>): T[keyof T];
     <T extends object, Key extends keyof Readonly<T>>(obj: Readonly<T>, key: Key): T[Key];
 };
-type ExtendFn = {
+type KeyDispatcher = {
+    <T extends object>(obj: Readonly<T>): KeyOf<T>[];
+    <T extends object>(obj: Readonly<T>, callback: (key: KeyOf<T>) => unknown): KeyOf<T>[];
+    <T extends object, Options extends KeyDispatcherOptions>(obj: Readonly<T>, options?: Options): (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
+    <T extends object, Options extends KeyDispatcherOptions>(obj: Readonly<T>, callback: (key: KeyOf<T>) => unknown, options: Options): (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
+    <T extends object, Options extends KeyDispatcherOptions>(obj: Readonly<T>, options: Options, callback: (key: KeyOf<T>) => unknown): (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
+};
+type KeyDispatcherOptions = KeyIterationOptions & {
+    /**
+     * if `true`, retrieve *only* keys where the *corresponding values*
+     * are **not any of** `undefined`, `null`, `NaN`, or `false`.
+     * - *provided as a convenience option and
+     *   alternative for the callback parameter*
+     * @defaultValue `false`
+     */
+    defined?: boolean;
+};
+type Extender = {
     <T extends JsObject>(props: Readonly<T>): Readonly<T>;
     <Base extends JsObject, Props extends JsObject>(obj: Readonly<Base>, props: Readonly<Props>): ExtendedResult<Base, Readonly<Props>>;
     <Base extends object, Props extends JsObject>(obj: Readonly<Base>, props: Readonly<Props>): ExtendedResult<Base, Readonly<Props>>;
@@ -56,7 +72,7 @@ type FindKeyFn = {
 };
 type FindKeyOptions = Omit<ObjectOptions, 'freeze'>;
 type FindKeyCallback<T, Options extends FindKeyOptions = {}> = Union<(value: Union<ResolvedValues<T, Options>>, key: Union<ResolvedKeys<T, Options>>) => boolean>;
-type MapFn = {
+type Mapper = {
     <T extends JsObject>(obj: Readonly<T>, callback: MapCallback<Readonly<T>>): MappedResult<T>;
     <T extends object>(obj: Readonly<T>, callback: MapCallback<Readonly<T>>): MappedResult<T>;
     <T extends JsObject, Options extends ObjectOptions>(obj: Readonly<T>, callback: MapCallback<Readonly<T>, Options>, options: Options): MappedResult<T, Options>;
@@ -66,7 +82,7 @@ type MapFn = {
 };
 type MapCallback<T, Options extends ObjectOptions = {}> = Union<(key: Union<ResolvedKeys<T, Options>>, value: Union<ResolvedValues<T, Options>>) => Multi<[unknown, unknown]> | JsObject<unknown> | (false | Nullish)>;
 type MappedResult<T, Options extends ObjectOptions = {}> = SimplifyDeep<ResolvedResult<T, Options> & JsObject>;
-type FilterFn = {
+type Filterer = {
     <T extends JsObject>(obj: Readonly<T>): T;
     <T extends object>(obj: Readonly<T>): T;
     <T extends JsObject>(obj: Readonly<T>, predicate: FilterCallback<Readonly<T>>): FilteredResult<T>;
@@ -121,17 +137,37 @@ type ResolvedResult<T, Options extends ObjectOptions = {}, Result = Options['dee
 type ResolvedKeys<T, Opts extends ObjectOptions = {}> = Opts['deep'] extends true ? KeyOfDeep<Readonly<T>> : KeyOf<Readonly<T>>;
 type ResolvedValues<T, Opts extends ObjectOptions = {}> = Opts['deep'] extends true ? ValueOfDeep<Readonly<T>> : ValueOf<Readonly<T>>;
 
+/**
+ * @internal for {@link keys}
+ * @returns `Object.keys(obj)` + **inherited**.
+ */
+declare const keysIn: (obj: object, _?: Fn) => string[];
+/**
+ * @internal for {@link keys}
+ * @returns `Object.keys(obj)` + **non-enumerable**.
+ */
+declare const keysOf: (obj: object, _?: Fn) => string[];
+/**
+ * @internal for {@link keys}
+ * @returns `Object.keys(obj)` + **inherited** + **non-enumerable**.
+ */
+declare const props: (obj: object, _?: Fn) => unknown[];
+/**
+ * Retrieve an object's keys with better type support,
+ * while also optionally providing a config object and/or
+ * predicate callback, to decide which types of keys to include.
+ */
 declare const keys: KeyDispatcher;
 /**
- * Keys including those that are **inherited**.
- * @internal for {@link keys}
+ * Wrapper for `Object.defineProperties` with better type support. Instead of
+ * a `PropertyDescriptorMap`, the properties may be more semantically assigned, with
+ * the values to be assigned being the direct property for a given property name, and
+ * the `configurable`, `enumerable`, and `writable` options all `false` by default.
+ *
+ * The `configurable`, `enumerable`, and `writable` options may still be optionally provided last,
+ * and the extended result will be correctly typed accordingly (i.e. `readonly` vs non-`readonly`).
  */
-declare const keysIn: <T extends object>(obj: T) => Extract<keyof T, string>[];
-/**
- * Keys including those that are **inherited** and **non-enumerable**.
- * @internal for {@link keys}
- */
-declare const props: <T extends object>(obj: T) => Union<KeyOf<T>>;
+declare const extend: Extender;
 /**
  * Delete all properties from an object,
  * with option to include non-enumerables as well.
@@ -140,32 +176,23 @@ declare const props: <T extends object>(obj: T) => Union<KeyOf<T>>;
 declare const clear: ClearFn;
 /**
  * Delete a property while retrieving its value at the same time.
- * @returns the value deleted from the object
+ * @returns the value of the property deleted from the object
  */
 declare const pop: PopFn;
-/**
- * Wrapper for `Object.defineProperties` with better type support. Instead of
- * a `PropertyDescriptorMap`, the properties may be more semantically assigned, with
- * the values to be assigned being the direct property for a given property name, and
- * the `configurable`, `enumerable`, and `writable` options all `false` by default.
- *
- * The `configurable`, `enumerable`, and `writable` options may still be optionally provided,
- * and the resulting object will be correctly typed accordingly (i.e. `readonly` vs non-`readonly`).
- */
-declare const extend: ExtendFn;
 declare const findkey: FindKeyFn;
-declare const map: MapFn;
-declare const filter: FilterFn;
+declare const map: Mapper;
+declare const filter: Filterer;
 declare const _: Readonly<{
     clear: ClearFn;
-    extend: ExtendFn;
-    filter: FilterFn;
+    extend: Extender;
+    filter: Filterer;
     findkey: FindKeyFn;
     keys: KeyDispatcher;
-    keysIn: <T extends object>(obj: T) => Extract<keyof T, string>[];
-    map: MapFn;
+    keysIn: (obj: object, _?: Fn) => string[];
+    keysOf: (obj: object, _?: Fn) => string[];
+    map: Mapper;
     pop: PopFn;
-    props: <T_1 extends object>(obj: T_1) => Union<KeyOf<T_1>>;
+    props: (obj: object, _?: Fn) => unknown[];
 }>;
 
-export { _, clear, extend, filter, findkey, keys, keysIn, map, pop, props };
+export { _, clear, extend, filter, findkey, keys, keysIn, keysOf, map, pop, props };

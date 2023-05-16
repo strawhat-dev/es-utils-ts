@@ -53,7 +53,7 @@ declare const defined: <T>(value: T) => T extends false | Nullish ? "" : NonNull
 /**
  * @returns an array of *all* **non-empty** lines of the given string.
  */
-declare const lines: (s: string) => string[];
+declare const linesOf: (s: string) => string[];
 /**
  * @returns the *trimmed* string with *all* **empty** lines removed.
  */
@@ -68,9 +68,9 @@ declare const t: TaggedTemplate;
  * Like the `RegExp` constructor with the following enhancements:
  * - When invoked as a **tagged template**, any expression interpolated will be *escaped* for regex.
  * - The `flags` argument may also optionally be provided as an {@link RegexOptions | options object}
- *   that maps to the corresponding flags, with typed completions, for better readability.
- * - Regular expression flags may still be provided when invoked as tag function by simply adding
- *   the desired flags as how you would normally for regular expressions, at the end.
+ *   that maps to the corresponding flags (with typed completions) for better readability.
+ * - Regular expression flags may still be provided when invoked as tag function by simply
+ *   including the desired flags at the end (as with normal regular expressions).
  *
  * @example
  * const currency = '$';
@@ -127,4 +127,4 @@ declare const irange: (start?: number, stop?: number, step?: number) => number[]
  */
 declare const iRange: (start?: number, stop?: number, step?: number, _incl?: boolean) => Readonly<Readonly<{}>>;
 
-export { Range as R, t as a, range as b, cdn as c, defined as d, iRange as e, irange as i, lines as l, re as r, sleep as s, trimLines as t };
+export { Range as R, t as a, range as b, cdn as c, defined as d, iRange as e, irange as i, linesOf as l, re as r, sleep as s, trimLines as t };

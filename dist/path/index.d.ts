@@ -1,5 +1,4 @@
-import { PlatformPath } from 'path/posix';
-import path from 'path';
+import path, { PlatformPath } from 'path';
 
 interface Path extends PlatformPath {
     posix: Path;
@@ -47,25 +46,24 @@ type ExtOptions = {
 };
 
 declare const sep = "/";
+declare const toUnix: (path: string) => string;
 declare const delimiter: ";" | ":";
-declare const toUnix: Path['toUnix'];
 declare const basename: (path: string, suffix?: string | undefined) => string;
 declare const dirname: (path: string) => string;
 declare const extname: (path: string) => string;
-declare const format: (pathObject: path.FormatInputPathObject) => string;
 declare const isAbsolute: (path: string) => boolean;
 declare const join: (...paths: string[]) => string;
 declare const relative: (from: string, to: string) => string;
 declare const resolve: (...paths: string[]) => string;
 declare const toNamespacedPath: (path: string) => string;
-declare const normalize: Path['normalize'];
+declare const format: (pathObject: path.FormatInputPathObject) => string;
 declare const parse: Path['parse'];
+declare const normalize: Path['normalize'];
 declare const trimExt: Path['trimExt'];
 declare const addExt: Path['addExt'];
 declare const removeExt: Path['removeExt'];
 declare const changeExt: Path['changeExt'];
 declare const defaultExt: Path['defaultExt'];
-declare const win32: Path;
 /**
  * Universal drop-in replacement for node.js's path w/ unix style seperators + other utilities.
  * In most contexts windows, already allows forward slashes as the path seperator,
@@ -80,6 +78,8 @@ declare const win32: Path;
  * @see {@link https://nodejs.org/api/path.html}
  * @see {@link https://www.npmjs.com/package/upath}
  */
+declare const upath: Path;
+declare const win32: Path;
 declare const posix: Path;
 
-export { addExt, basename, changeExt, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, normalize, parse, posix, relative, removeExt, resolve, sep, toNamespacedPath, toUnix, trimExt, win32 };
+export { addExt, basename, changeExt, upath as default, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, normalize, parse, posix, relative, removeExt, resolve, sep, toNamespacedPath, toUnix, trimExt, win32 };
