@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { AsyncFunction, Constructor, JsObject, KeyOf, Replace, TypedArray, Union, primitive } from '../type-utils';
-import type { AssertionOptions, AsyncGeneratorFunction, GeneratorFunction, MultiTypeQueryFunction, TypeName } from './types';
+import type { AsyncFunction, Constructor, JsObject, TypedArray, Union, primitive } from '../type-utils';
+import type { AssertionOptions, AssertionType, AsyncGeneratorFunction, GeneratorFunction, MultiTypeQueryFunction, TypeName } from './types';
 
 import { equal, inspect } from '../externals';
 
@@ -31,6 +31,7 @@ export const isPromise = (value: unknown): value is Promise<any> => type(value) 
 export const isRegExp = (value: unknown): value is RegExp => type(value) === 'RegExp';
 export const isRequest = (value: unknown): value is Request => type(value) === 'Request';
 export const isSet = (value: unknown): value is Set<any> => type(value) === 'Set';
+export const isTemplateStringsArray = (value: unknown): value is TemplateStringsArray => Array.isArray(value) && 'raw' in value;
 export const isTypedArray = (value: unknown): value is TypedArray => ArrayBuffer.isView(value) && !(value instanceof DataView);
 export const isWeakMap = (value: unknown): value is WeakMap<object, any> => type(value) === 'WeakMap';
 export const isWeakSet = (value: unknown): value is WeakSet<object> => type(value) === 'WeakSet';
@@ -71,6 +72,7 @@ export const assert = Object.freeze({
   isRegExp: createAssertion(isRegExp),
   isRequest: createAssertion(isRequest),
   isSet: createAssertion(isSet),
+  isTemplateStringsArray: createAssertion(isTemplateStringsArray),
   isTypedArray: createAssertion(isTypedArray),
   isWeakMap: createAssertion(isWeakMap),
   isWeakSet: createAssertion(isWeakSet),
@@ -86,9 +88,6 @@ export const assert = Object.freeze({
   isSymbol: createAssertion((value) => typeof value === 'symbol', 'Symbol'),
   isUndefined: createAssertion((value) => typeof value === 'undefined', 'Undefined'),
 } as const);
-
-/** @internal */
-export type AssertionType = Replace<KeyOf<typeof assert>, 'is', ''>;
 
 /** @internal */
 const querycallback = (value: unknown) => {

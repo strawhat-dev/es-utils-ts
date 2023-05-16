@@ -1,10 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Type } from '../type-utils';
-import type { AssertionType } from './type-checking';
+import type { KeyOf, Replace, Type } from '../type-utils';
 
 export type GeneratorFunction = (...args: any[]) => Generator;
 
 export type AsyncGeneratorFunction = (...args: any[]) => AsyncGenerator;
+
+export type AssertionType = Replace<
+  KeyOf<typeof import('./type-checking').assert>,
+  'is',
+  ''
+>;
 
 export type AssertionOptions = {
   /**
