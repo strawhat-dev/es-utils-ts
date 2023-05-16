@@ -1,7 +1,7 @@
 {
   "name": "es-utils-ts",
   "author": "strawhat-dev",
-  "description": "esm-first simple typed utilities",
+  "description": "esm first simple typed utilities",
   "repository": "github:strawhat-dev/es-utils-ts",
   "version": "0.0.53",
   "license": "MIT",
