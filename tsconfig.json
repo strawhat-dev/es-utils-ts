@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "lib": ["esnext", "dom", "dom.iterable"],
-    "target": "es2021",
+    "target": "es2020",
     "module": "esnext",
     "moduleDetection": "force",
     "moduleResolution": "bundler",
