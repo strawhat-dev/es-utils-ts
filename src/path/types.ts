@@ -1,4 +1,4 @@
-import type { PlatformPath } from 'path/posix';
+import type { PlatformPath } from 'path';
 
 export interface Path extends PlatformPath {
   posix: Path;

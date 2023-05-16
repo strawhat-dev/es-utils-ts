@@ -1,25 +1,36 @@
-import type { Fn } from '../type-utils';
+/* eslint-disable tree-shaking/no-side-effects-in-initialization */
 import type { Path } from './types';
 
 import path from 'path';
 import { re } from '../common';
-import { _format, _parse } from './internal';
+import {
+  _format,
+  _parse,
+  isValidExt,
+  toUnix as _toUnix,
+  unixify,
+} from './internal';
 
 export const sep = '/';
+export const toUnix = _toUnix;
 export const delimiter = path.delimiter;
-
-// prettier-ignore
-export const toUnix: Path['toUnix'] = (p) => p?.replace(/\\/g, sep).replace(/(?<!^)\/+/g, sep);
-
 export const basename = unixify(path.basename);
 export const dirname = unixify(path.dirname);
 export const extname = unixify(path.extname);
-export const format = unixify(_format);
 export const isAbsolute = unixify(path.isAbsolute);
 export const join = unixify(path.join);
 export const relative = unixify(path.relative);
 export const resolve = unixify(path.resolve);
 export const toNamespacedPath = unixify(path.toNamespacedPath);
+
+export const format = unixify(_format);
+
+export const parse: Path['parse'] = (p) => {
+  const ret = _parse(toUnix(p));
+  const [root] = ret.dir.split(sep);
+  root.endsWith(':') && (ret.root ||= `${root}/`);
+  return ret;
+};
 
 export const normalize: Path['normalize'] = (p) => {
   p = toUnix(p);
@@ -31,13 +42,6 @@ export const normalize: Path['normalize'] = (p) => {
   }
 
   return ret.endsWith(sep) ? ret.slice(0, -1) : ret;
-};
-
-export const parse: Path['parse'] = (p) => {
-  const ret = _parse(toUnix(p));
-  const [root] = ret.dir.split(sep);
-  root.endsWith(':') && (ret.root ||= `${root}/`);
-  return ret;
 };
 
 export const trimExt: Path['trimExt'] = (p, opts) => {
@@ -69,6 +73,20 @@ export const defaultExt: Path['defaultExt'] = (p, ext, opts) => (
   isValidExt(p, opts) ? extname(p) : addExt(p, ext)
 );
 
+/**
+ * Universal drop-in replacement for node.js's path w/ unix style seperators + other utilities.
+ * In most contexts windows, already allows forward slashes as the path seperator,
+ * so there is no reason to stick with the legacy back slash. As a universal
+ * path solution for both *windows + unix*, this allows one to just use `'/'`,
+ * throughout their code and worrying about it. Adapted and refactored from `upath`.
+ *
+ * Note: In non-node.js environments, you usually do not have to install `path-browserify` yourself.
+ * If your code runs in the browser, bundlers like browserify or webpack include the path-browserify
+ * module by default.
+ *
+ * @see {@link https://nodejs.org/api/path.html}
+ * @see {@link https://www.npmjs.com/package/upath}
+ */
 const upath = {
   addExt,
   basename,
@@ -95,40 +113,5 @@ upath['win32'] = upath;
 upath['posix'] = upath;
 Object.freeze(upath);
 export const win32 = upath;
-
-/**
- * Universal drop-in replacement for node.js's path w/ unix style seperators + other utilities.
- * In most contexts windows, already allows forward slashes as the path seperator,
- * so there is no reason to stick with the legacy back slash. As a universal
- * path solution for both *windows + unix*, this allows one to just use `'/'`,
- * throughout their code and worrying about it. Adapted and refactored from `upath`.
- *
- * Note: In non-node.js environments, you usually do not have to install `path-browserify` yourself.
- * If your code runs in the browser, bundlers like browserify or webpack include the path-browserify
- * module by default.
- *
- * @see {@link https://nodejs.org/api/path.html}
- * @see {@link https://www.npmjs.com/package/upath}
- */
 export const posix = upath;
-
-/** @internal */
-function unixify<T extends Fn>(fn: T) {
-  return ((...args) => {
-    for (let i = 0; i < args.length; ++i) {
-      typeof args[i] === 'string' && (args[i] = toUnix(args[i]));
-    }
-
-    const ret = fn(...args);
-    return typeof ret === 'string' ? toUnix(ret) : ret;
-  }) as T;
-}
-
-/** @internal */
-function isValidExt(ext = '', { ignore = [] as string[], maxLength = 7 } = {}) {
-  return (
-    ext &&
-    ext.length <= maxLength &&
-    !ignore.some((val) => (val?.[0] === '.' || (val = `.${ext}`), val === ext))
-  );
-}
+export default upath;

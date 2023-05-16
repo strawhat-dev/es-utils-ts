@@ -3,4 +3,4 @@ export * from './conditionals';
 export * from './externals';
 export * from './html';
 export * from './objects';
-export { posix as path } from './path';
+export { default as path } from './path';

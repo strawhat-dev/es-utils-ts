@@ -1,6 +1,33 @@
 import type { Path } from './types';
+import type { Fn } from '../type-utils';
 
 import { assert } from '../conditionals';
+
+// prettier-ignore
+export const toUnix: Path['toUnix'] = (p) => p?.replace(/\\/g, '/').replace(/(?<!^)\/+/g, '/');
+
+/** @internal */
+export const unixify = <T extends Fn>(fn: T) => {
+  return ((...args) => {
+    for (let i = 0; i < args.length; ++i) {
+      typeof args[i] === 'string' && (args[i] = toUnix(args[i]));
+    }
+
+    const ret = fn(...args);
+    return typeof ret === 'string' ? toUnix(ret) : ret;
+  }) as T;
+};
+
+/** @internal */
+// prettier-ignore
+export const isValidExt = (
+  ext = '',
+  { ignore = [] as string[], maxLength = 7 } = {}
+) => (
+  ext &&
+  ext.length <= maxLength &&
+  !ignore.some((val) => (val?.[0] === '.' || (val = `.${ext}`), val === ext))
+);
 
 /** @internal */
 // https://github.com/browserify/path-browserify/blob/master/index.js#L99
