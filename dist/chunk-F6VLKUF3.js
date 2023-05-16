@@ -1,6 +1,6 @@
-import { pop, trimLines } from './chunk-OTN365LN.js';
-import { isObject } from './chunk-PESHTHBB.js';
-import { __name } from './chunk-YRHHOPJS.js';
+import { pop, trimLines } from './chunk-ENDXPDAH.js';
+import { isObject } from './chunk-R2HOTKJN.js';
+import { __name } from './chunk-ETHVEPTR.js';
 
 // src/html/index.ts
 var querySelectorMatchAll = /* @__PURE__ */ __name((regex, selectors = "*", document = globalThis["document"]) => {
@@ -19,7 +19,7 @@ var createElement = /* @__PURE__ */ __name((tag, properties, document = globalTh
 }, "createElement");
 var createLink = /* @__PURE__ */ __name((href, options = {}, document = globalThis["document"]) => {
   let { newtab, textContent = href } = { ...options };
-  newtab &&= { target: "_blank", rel: "noreferrer noopener" };
+  newtab && (newtab = { target: "_blank", rel: "noreferrer noopener" });
   return createElement("a", { href, textContent, ...newtab }, document);
 }, "createLink");
 var createHTMLDoc = /* @__PURE__ */ __name(({ head = "", body = "" } = {}) => trimLines(

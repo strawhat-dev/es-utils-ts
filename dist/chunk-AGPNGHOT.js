@@ -1,6 +1,6 @@
-import { re } from './chunk-OTN365LN.js';
-import { assert } from './chunk-PESHTHBB.js';
-import { __name } from './chunk-YRHHOPJS.js';
+import { re } from './chunk-ENDXPDAH.js';
+import { assert } from './chunk-R2HOTKJN.js';
+import { __name } from './chunk-ETHVEPTR.js';
 import path from 'path';
 
 // src/path/internal.ts
@@ -99,7 +99,7 @@ var format = unixify(_format);
 var parse = /* @__PURE__ */ __name((p) => {
   const ret = _parse(toUnix2(p));
   const [root] = ret.dir.split(sep);
-  root.endsWith(":") && (ret.root ||= `${root}/`);
+  root.endsWith(":") && (ret.root || (ret.root = `${root}/`));
   return ret;
 }, "parse");
 var normalize = /* @__PURE__ */ __name((p) => {

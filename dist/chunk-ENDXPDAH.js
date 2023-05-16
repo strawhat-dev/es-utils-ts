@@ -1,5 +1,5 @@
-import { isTemplateStringsArray, nullish, isObject } from './chunk-PESHTHBB.js';
-import { __name, escapeRegex, deepcopy, deepmergeInto } from './chunk-YRHHOPJS.js';
+import { isTemplateStringsArray, nullish, isObject } from './chunk-R2HOTKJN.js';
+import { __name, escapeRegex, deepcopy, deepmergeInto } from './chunk-ETHVEPTR.js';
 
 // src/common/lib.ts
 var RE_FLAG_PATTERN = /[/]\b(?!\w*(\w)\w*\1)[dgimsuy]+\b$/;
@@ -101,8 +101,12 @@ var iRange = /* @__PURE__ */ __name((...args) => Range(...args), "iRange");
 // src/objects/index.ts
 var keysIn = /* @__PURE__ */ __name((obj, f) => {
   const ret = [];
-  for (const key in obj)
-    (f ? f?.(key) : 1) && ret.push(key);
+  for (const key in obj) {
+    let include = true;
+    if (typeof f === "function")
+      include = f(key);
+    include && ret.push(key);
+  }
   return ret;
 }, "keysIn");
 var keysOf = /* @__PURE__ */ __name((obj, f) => {
@@ -111,8 +115,11 @@ var keysOf = /* @__PURE__ */ __name((obj, f) => {
     return result;
   const ret = [];
   for (let i = 0; i < result.length; ++i) {
+    let include = true;
     const key = result[i];
-    (f ? f?.(key) : 1) && ret.push(key);
+    if (typeof f === "function")
+      include = f(key);
+    include && ret.push(key);
   }
   return ret;
 }, "keysOf");
@@ -205,7 +212,7 @@ var filter = /* @__PURE__ */ __name((obj, ...args) => {
     opts: { deep: !args.length, withRest: false },
     callback: (entry) => !nullish(entry["value"])
   });
-  opts["withRest"] &&= {};
+  opts["withRest"] && (opts["withRest"] = {});
   const { deep, freeze, withRest, ...keyopts } = opts;
   for (const key of keys(obj, keyopts)) {
     const value = obj[key];

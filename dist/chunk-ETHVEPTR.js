@@ -10,7 +10,10 @@ var __name = (target, value) => __defProp(target, "name", { value, configurable:
 var escapeRegex = /* @__PURE__ */ __name((s) => escapeStringRegexp((s ?? "").toString()), "escapeRegex");
 var deepcopy = Rfdc?.({ circles: true });
 var deepclone = rfdc;
-var inspect = /* @__PURE__ */ __name((obj, opts = {}) => (opts["indent"] ??= 2, objectInspect(obj, opts)), "inspect");
-var equal = /* @__PURE__ */ __name((...args) => (args[2] ? args[2]["strict"] ??= true : args[2] = { strict: true }, deepEqual(...args)), "equal");
+var inspect = /* @__PURE__ */ __name((obj, opts = {}) => (opts["indent"] ?? (opts["indent"] = 2), objectInspect(obj, opts)), "inspect");
+var equal = /* @__PURE__ */ __name((...args) => {
+  var _a;
+  return args[2] ? (_a = args[2])["strict"] ?? (_a["strict"] = true) : args[2] = { strict: true }, deepEqual(...args);
+}, "equal");
 
 export { __name, deepclone, deepcopy, equal, escapeRegex, inspect };
