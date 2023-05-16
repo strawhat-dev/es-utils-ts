@@ -141,17 +141,17 @@ type ResolvedValues<T, Opts extends ObjectOptions = {}> = Opts['deep'] extends t
  * @internal for {@link keys}
  * @returns `Object.keys(obj)` + **inherited**.
  */
-declare const keysIn: (obj: object, _?: Fn) => string[];
+declare const keysIn: (obj: object, f?: Fn) => string[];
 /**
  * @internal for {@link keys}
  * @returns `Object.keys(obj)` + **non-enumerable**.
  */
-declare const keysOf: (obj: object, _?: Fn) => string[];
+declare const keysOf: (obj: object, f?: Fn) => string[];
 /**
  * @internal for {@link keys}
  * @returns `Object.keys(obj)` + **inherited** + **non-enumerable**.
  */
-declare const props: (obj: object, _?: Fn) => unknown[];
+declare const props: (obj: object, f?: Fn) => unknown[];
 /**
  * Retrieve an object's keys with better type support,
  * while also optionally providing a config object and/or
@@ -188,11 +188,11 @@ declare const _: Readonly<{
     filter: Filterer;
     findkey: FindKeyFn;
     keys: KeyDispatcher;
-    keysIn: (obj: object, _?: Fn) => string[];
-    keysOf: (obj: object, _?: Fn) => string[];
+    keysIn: (obj: object, f?: Fn) => string[];
+    keysOf: (obj: object, f?: Fn) => string[];
     map: Mapper;
     pop: PopFn;
-    props: (obj: object, _?: Fn) => unknown[];
+    props: (obj: object, f?: Fn) => unknown[];
 }>;
 
 export { _, clear, extend, filter, findkey, keys, keysIn, keysOf, map, pop, props };

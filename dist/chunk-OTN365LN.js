@@ -99,30 +99,30 @@ var irange = /* @__PURE__ */ __name((...args) => {
 var iRange = /* @__PURE__ */ __name((...args) => Range(...args), "iRange");
 
 // src/objects/index.ts
-var keysIn = /* @__PURE__ */ __name((obj, _2) => {
+var keysIn = /* @__PURE__ */ __name((obj, f) => {
   const ret = [];
   for (const key in obj)
-    (!_2 || _2(key)) && ret.push(key);
+    (f ? f?.(key) : 1) && ret.push(key);
   return ret;
 }, "keysIn");
-var keysOf = /* @__PURE__ */ __name((obj, _2) => {
-  const names = Object.getOwnPropertyNames(obj);
-  if (!_2)
-    return names;
+var keysOf = /* @__PURE__ */ __name((obj, f) => {
+  const result = Object.getOwnPropertyNames(obj);
+  if (!f)
+    return result;
   const ret = [];
-  for (let i = 0; i < names.length; ++i) {
-    const key = names[i];
-    _2(key) && ret.push(key);
+  for (let i = 0; i < result.length; ++i) {
+    const key = result[i];
+    (f ? f?.(key) : 1) && ret.push(key);
   }
   return ret;
 }, "keysOf");
-var props = /* @__PURE__ */ __name((obj, _2) => {
+var props = /* @__PURE__ */ __name((obj, f) => {
   const set = /* @__PURE__ */ new Set();
-  let current = keysOf(obj, _2);
+  let current = keysOf(obj, f);
   do
     for (let i = 0; i < current.length; ++i)
       set.add(current[i]);
-  while ((obj = Object.getPrototypeOf(obj)) && obj !== Object.prototype && (current = keysOf(obj, _2)));
+  while ((obj = Object.getPrototypeOf(obj)) && obj !== Object.prototype && (current = keysOf(obj, f)));
   return [...set];
 }, "props");
 var keys = /* @__PURE__ */ __name((obj, ...args) => {

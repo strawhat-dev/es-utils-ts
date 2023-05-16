@@ -20,9 +20,9 @@ import { deepcopy, deepmergeInto } from '../externals';
  * @internal for {@link keys}
  * @returns `Object.keys(obj)` + **inherited**.
  */
-export const keysIn = (obj: object, _?: Fn) => {
+export const keysIn = (obj: object, f?: Fn) => {
   const ret = [];
-  for (const key in obj) (!_ || _(key)) && ret.push(key);
+  for (const key in obj) (f ? f?.(key) : 1) && ret.push(key);
   return ret;
 };
 
@@ -30,13 +30,13 @@ export const keysIn = (obj: object, _?: Fn) => {
  * @internal for {@link keys}
  * @returns `Object.keys(obj)` + **non-enumerable**.
  */
-export const keysOf = (obj: object, _?: Fn) => {
-  const names = Object.getOwnPropertyNames(obj);
-  if (!_) return names;
+export const keysOf = (obj: object, f?: Fn) => {
+  const result = Object.getOwnPropertyNames(obj);
+  if (!f) return result;
   const ret = [];
-  for (let i = 0; i < names.length; ++i) {
-    const key = names[i];
-    _(key) && ret.push(key);
+  for (let i = 0; i < result.length; ++i) {
+    const key = result[i];
+    (f ? f?.(key) : 1) && ret.push(key);
   }
 
   return ret;
@@ -46,14 +46,14 @@ export const keysOf = (obj: object, _?: Fn) => {
  * @internal for {@link keys}
  * @returns `Object.keys(obj)` + **inherited** + **non-enumerable**.
  */
-export const props = (obj: object, _?: Fn) => {
+export const props = (obj: object, f?: Fn) => {
   const set = new Set();
-  let current = keysOf(obj, _);
+  let current = keysOf(obj, f);
   do for (let i = 0; i < current.length; ++i) set.add(current[i]);
   while (
     (obj = Object.getPrototypeOf(obj)) &&
     obj !== Object.prototype &&
-    (current = keysOf(obj, _))
+    (current = keysOf(obj, f))
   );
 
   return [...set];
