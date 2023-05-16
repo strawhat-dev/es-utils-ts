@@ -109,20 +109,6 @@ type FilterCallback<T, Options extends FilterOptions = {}> = Union<(entry: {
     value: Union<ResolvedValues<T, Options>>;
 }) => boolean>;
 type FilteredResult<T, Options extends FilterOptions = {}> = SimplifyDeep<Options['withRest'] extends true ? [ResolvedResult<T, Options>, ResolvedResult<T, Options>] : ResolvedResult<T, Options>>;
-type KeyIterationOptions = {
-    /**
-     * if `true`, inherited keys *(i.e. those from its prototype chain)*
-     * are also included while traversing this object
-     * @defaultValue `false`
-     */
-    inherited?: boolean;
-    /**
-     * if `true`, non-enumerable keys are also
-     * included while traversing this object
-     * @defaultValue `false`
-     */
-    nonEnumerable?: boolean;
-};
 type ObjectOptions = KeyIterationOptions & {
     /**
      * if `true`, changes the usage to recursively iterate
@@ -135,6 +121,27 @@ type ObjectOptions = KeyIterationOptions & {
      * @defaultValue `false`
      */
     freeze?: boolean;
+};
+type KeyIterationOptions = {
+    /**
+     * if `true`, *inherited* keys *(i.e. those from its prototype chain)*
+     * are also included while traversing this object
+     * @defaultValue `false`
+     */
+    inherited?: boolean;
+    /**
+     * if `true`, *non-enumerable* keys are also
+     * included while traversing this object
+     * @defaultValue `false`
+     */
+    nonEnumerable?: boolean;
+    /**
+     * if `true`, *non-enumerable* keys are also
+     * included while traversing this object
+     * - *alias for `'nonEnumerable'`*
+     * @defaultValue `false`
+     */
+    hidden?: boolean;
 };
 type ResolvedResult<T, Options extends ObjectOptions = {}, Result = Options['deep'] extends true ? PartialDeep<T> : Partial<T>> = Type<Options['freeze'] extends true ? Options['deep'] extends true ? ReadonlyDeep<Result> : Readonly<Result> : Result>;
 type ResolvedKeys<T, Opts extends ObjectOptions = {}> = Opts['deep'] extends true ? KeyOfDeep<Readonly<T>> : KeyOf<Readonly<T>>;

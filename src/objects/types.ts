@@ -319,21 +319,6 @@ type FilteredResult<T, Options extends FilterOptions = {}> = SimplifyDeep<
 >;
 
 // common
-type KeyIterationOptions = {
-  /**
-   * if `true`, inherited keys *(i.e. those from its prototype chain)*
-   * are also included while traversing this object
-   * @defaultValue `false`
-   */
-  inherited?: boolean;
-  /**
-   * if `true`, non-enumerable keys are also
-   * included while traversing this object
-   * @defaultValue `false`
-   */
-  nonEnumerable?: boolean;
-};
-
 type ObjectOptions = KeyIterationOptions & {
   /**
    * if `true`, changes the usage to recursively iterate
@@ -346,6 +331,28 @@ type ObjectOptions = KeyIterationOptions & {
    * @defaultValue `false`
    */
   freeze?: boolean;
+};
+
+type KeyIterationOptions = {
+  /**
+   * if `true`, *inherited* keys *(i.e. those from its prototype chain)*
+   * are also included while traversing this object
+   * @defaultValue `false`
+   */
+  inherited?: boolean;
+  /**
+   * if `true`, *non-enumerable* keys are also
+   * included while traversing this object
+   * @defaultValue `false`
+   */
+  nonEnumerable?: boolean;
+  /**
+   * if `true`, *non-enumerable* keys are also
+   * included while traversing this object
+   * - *alias for `'nonEnumerable'`*
+   * @defaultValue `false`
+   */
+  hidden?: boolean;
 };
 
 type ResolvedResult<

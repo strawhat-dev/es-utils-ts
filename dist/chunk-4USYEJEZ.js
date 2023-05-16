@@ -115,8 +115,8 @@ var keysOf = /* @__PURE__ */ __name((obj, f) => {
     return result;
   const ret = [];
   for (let i = 0; i < result.length; ++i) {
-    let include = true;
     const key = result[i];
+    let include = true;
     if (typeof f === "function")
       include = f(key);
     include && ret.push(key);
@@ -250,6 +250,8 @@ var mapargs = /* @__PURE__ */ __name((args, init) => {
   if (typeof opts === "function" || typeof callback === "object") {
     [callback = init?.callback, opts = initopts] = [opts, callback];
   }
+  if (opts["hidden"])
+    opts["nonEnumerable"] || (opts["nonEnumerable"] = true);
   return { opts, callback };
 }, "mapargs");
 var mapd = /* @__PURE__ */ __name((property, value, options, resolver = (d) => Array.isArray(d) ? d.includes(property) : !!d) => ({

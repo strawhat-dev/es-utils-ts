@@ -40,8 +40,8 @@ export const keysOf = (obj: object, f?: Fn) => {
   if (!f) return result;
   const ret = [];
   for (let i = 0; i < result.length; ++i) {
-    let include = true;
     const key = result[i];
+    let include = true;
     if (typeof f === 'function') include = f(key);
     include && ret.push(key);
   }
@@ -214,6 +214,7 @@ const mapargs = (
     [callback = init?.callback, opts = initopts] = [opts, callback];
   }
 
+  if ((opts as any)['hidden']) (opts as any)['nonEnumerable'] ||= true;
   return { opts, callback } as { opts: JsObject<boolean>; callback?: Fn };
 };
 
