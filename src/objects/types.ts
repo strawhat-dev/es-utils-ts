@@ -49,19 +49,19 @@ export type KeyDispatcher = {
   <T extends object, Options extends KeyDispatcherOptions>(
     obj: Readonly<T>,
     options?: Options
-  ): (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
+  ): KeyDispatcherResult<T, Options>;
 
   <T extends object, Options extends KeyDispatcherOptions>(
     obj: Readonly<T>,
     callback: (key: KeyOf<T>) => unknown,
     options: Options
-  ): (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
+  ): KeyDispatcherResult<T, Options>;
 
   <T extends object, Options extends KeyDispatcherOptions>(
     obj: Readonly<T>,
     options: Options,
     callback: (key: KeyOf<T>) => unknown
-  ): (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
+  ): KeyDispatcherResult<T, Options>;
 };
 
 type KeyDispatcherOptions = KeyIterationOptions & {
@@ -74,6 +74,22 @@ type KeyDispatcherOptions = KeyIterationOptions & {
    */
   defined?: boolean;
 };
+
+type KeyDispatcherResult<
+  T,
+  Options extends KeyDispatcherOptions,
+  root = true
+> = Type<
+  (Options['inherited'] extends true
+    ? T extends { __proto__: infer Proto }
+      ?
+          | Exclude<KeyOf<T>, '__proto__'>
+          | KeyDispatcherResult<Proto, Options, false>[number]
+      : root extends true
+      ? Union<KeyOf<T>>
+      : KeyOf<T>
+    : KeyOf<T>)[]
+>;
 
 export type Extender = {
   <T extends JsObject>(props: Readonly<T>): Readonly<T>;

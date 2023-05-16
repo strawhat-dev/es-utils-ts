@@ -1,4 +1,4 @@
-import { JsObject, KeyOf, Union, Composite, Maybe, Multi, Nullish, Type, KeyOfDeep, ValueOfDeep, ValueOf, Fn } from '../type-utils.js';
+import { JsObject, KeyOf, Type, Union, Composite, Maybe, Multi, Nullish, KeyOfDeep, ValueOfDeep, ValueOf, Fn } from '../type-utils.js';
 import { Writable, Simplify, Merge, PartialDeep, ReadonlyDeep } from 'type-fest';
 import { SimplifyDeep } from 'type-fest/source/merge-deep.js';
 import 'type-fest/source/async-return-type';
@@ -13,9 +13,9 @@ type PopFn = {
 type KeyDispatcher = {
     <T extends object>(obj: Readonly<T>): KeyOf<T>[];
     <T extends object>(obj: Readonly<T>, callback: (key: KeyOf<T>) => unknown): KeyOf<T>[];
-    <T extends object, Options extends KeyDispatcherOptions>(obj: Readonly<T>, options?: Options): (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
-    <T extends object, Options extends KeyDispatcherOptions>(obj: Readonly<T>, callback: (key: KeyOf<T>) => unknown, options: Options): (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
-    <T extends object, Options extends KeyDispatcherOptions>(obj: Readonly<T>, options: Options, callback: (key: KeyOf<T>) => unknown): (Options['inherited'] extends true ? Union<KeyOf<T>> : KeyOf<T>)[];
+    <T extends object, Options extends KeyDispatcherOptions>(obj: Readonly<T>, options?: Options): KeyDispatcherResult<T, Options>;
+    <T extends object, Options extends KeyDispatcherOptions>(obj: Readonly<T>, callback: (key: KeyOf<T>) => unknown, options: Options): KeyDispatcherResult<T, Options>;
+    <T extends object, Options extends KeyDispatcherOptions>(obj: Readonly<T>, options: Options, callback: (key: KeyOf<T>) => unknown): KeyDispatcherResult<T, Options>;
 };
 type KeyDispatcherOptions = KeyIterationOptions & {
     /**
@@ -27,6 +27,9 @@ type KeyDispatcherOptions = KeyIterationOptions & {
      */
     defined?: boolean;
 };
+type KeyDispatcherResult<T, Options extends KeyDispatcherOptions, root = true> = Type<(Options['inherited'] extends true ? T extends {
+    __proto__: infer Proto;
+} ? Exclude<KeyOf<T>, '__proto__'> | KeyDispatcherResult<Proto, Options, false>[number] : root extends true ? Union<KeyOf<T>> : KeyOf<T> : KeyOf<T>)[]>;
 type Extender = {
     <T extends JsObject>(props: Readonly<T>): Readonly<T>;
     <Base extends JsObject, Props extends JsObject>(obj: Readonly<Base>, props: Readonly<Props>): ExtendedResult<Base, Readonly<Props>>;
