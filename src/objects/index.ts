@@ -22,7 +22,12 @@ import { deepcopy, deepmergeInto } from '../externals';
  */
 export const keysIn = (obj: object, f?: Fn) => {
   const ret = [];
-  for (const key in obj) (f ? f?.(key) : 1) && ret.push(key);
+  for (const key in obj) {
+    let include = true;
+    if (typeof f === 'function') include = f(key);
+    include && ret.push(key);
+  }
+
   return ret;
 };
 
@@ -35,8 +40,10 @@ export const keysOf = (obj: object, f?: Fn) => {
   if (!f) return result;
   const ret = [];
   for (let i = 0; i < result.length; ++i) {
+    let include = true;
     const key = result[i];
-    (f ? f?.(key) : 1) && ret.push(key);
+    if (typeof f === 'function') include = f(key);
+    include && ret.push(key);
   }
 
   return ret;
