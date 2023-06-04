@@ -1,12 +1,12 @@
 {
-  "include": ["src/**/*.ts", "tsup.config.ts"],
+  "include": ["src/**/*.ts"],
   "compilerOptions": {
     "outDir": "dist",
     "lib": ["esnext", "dom", "dom.iterable"],
     "target": "es2020",
-    "module": "esnext",
+    "module": "nodenext",
     "moduleDetection": "force",
-    "moduleResolution": "bundler",
+    "moduleResolution": "nodenext",
     "strict": true,
     "declaration": true,
     "skipLibCheck": true,
