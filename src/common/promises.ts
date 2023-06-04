@@ -1,11 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { NumberLike } from '../type-utils';
+import type { NumberLike } from '../type-utils.js';
 
 const ESM_CDN_URL = 'https://esm.run';
 
+/**
+ * Schedules a `Promise` that resolves after a delay of `ms` milliseconds.
+ */
 // prettier-ignore
-/** Schedules a `Promise` that resolves after a delay of `ms` milliseconds. */
-export const sleep = async (ms: NumberLike): Promise<void> => new Promise((res) => setTimeout(res, +ms));
+export const sleep = async (ms: NumberLike): Promise<void> => (
+  new Promise((res) => setTimeout(res, +ms))
+);
 
 /**
  * Dynamically import any *esm* module using a cdn (jsdelivr).

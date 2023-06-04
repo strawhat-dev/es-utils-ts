@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { nullish } from '../conditionals';
+import { nullish } from '../conditionals/index.js';
 
 /**
  * Note: A decreasing range (`step = -1`) will be
@@ -31,6 +31,7 @@ export const range = (start = 0, stop?: number, step?: number) => {
  * @example
  * if (score in Range(90, 100)) return 'A';
  */
+// prettier-ignore
 export const Range = (
   start = 0,
   stop?: number,
@@ -39,8 +40,7 @@ export const Range = (
 ) => {
   if (nullish(stop)) [start, stop] = [0, start];
   if (nullish(step)) step = stop < start ? -1 : 1;
-  return Object.freeze(
-    new Proxy(Object.freeze({}), {
+  return new Proxy({}, {
       has(_, n: never) {
         if (!/^\d+$/.test(n)) return false;
         if (+n % step!) return false;
@@ -51,7 +51,7 @@ export const Range = (
 
         return +n >= start && (_incl ? +n <= stop! : +n < stop!);
       },
-    })
+    }
   );
 };
 
