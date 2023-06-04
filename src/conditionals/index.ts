@@ -1,2 +1,2 @@
-export * from './type-checking';
-export * from './validation';
+export * from './type-checking.js';
+export * from './validation.js';

@@ -1,4 +1,4 @@
-import type { Nullish, Union } from '../type-utils';
+import type { Nullish, Union } from '../type-utils.js';
 
 /**
  * Checks if a value is `nullish`, but **also considers `NaN`** *(because the

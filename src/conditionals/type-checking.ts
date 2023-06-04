@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { AsyncFunction, Constructor, JsObject, TypedArray, Union, primitive } from '../type-utils';
-import type { AssertionOptions, AssertionType, AsyncGeneratorFunction, GeneratorFunction, MultiTypeQueryFunction, TypeName } from './types';
+import type { AsyncFunction, Constructor, JsObject, TypedArray, Union, primitive } from '../type-utils.js';
+import type { AssertionOptions, AssertionType, AsyncGeneratorFunction, GeneratorFunction, MultiTypeQueryFunction, TypeName } from './types.js';
 
-import { equal, inspect } from '../externals';
+import { inspect } from 'util';
+import { equal } from '../externals.js';
 
 /**
  * Used internally for some type checking methods in this module
@@ -110,7 +111,8 @@ function createAssertion(assertion: (value: unknown) => boolean, expected = asse
     if (onError && !quiet) {
       const code = 'AssertionError';
       const cause = { code, value, expected, actual: type(value) };
-      const err = new Error(`[${code}] expected instance of ${expected}; received ${inspect(value)}`, { cause });
+      const received = inspect(value, { depth: 0 });
+      const err = new Error(`[${code}] expected instance of ${expected}; received ${received}`, { cause });
       if (onError === 'throw') throw err;
       else if (typeof onError === 'function') onError(err);
     }
