@@ -1,6 +1,6 @@
-export * from './common';
-export * from './conditionals';
-export * from './externals';
-export * from './html';
-export * from './objects';
-export { default as path } from './path';
+export * from './common/index.js';
+export * from './conditionals/index.js';
+export * from './externals.js';
+export * from './html/index.js';
+export * from './objects/index.js';
+export { default as path } from './path/index.js';

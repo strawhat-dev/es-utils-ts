@@ -5,21 +5,15 @@
  * Chosen based on combination of necessity, performance, popularity, and update recency.
  */
 
-import type { JsObject, Value } from './type-utils';
+import type { JsObject, Value } from './type-utils.js';
 
 // @ts-ignore
 import rfdc from 'rfdc/default';
 import Rfdc from 'rfdc';
 import deepEqual from 'deep-equal';
-import objectInspect from 'object-inspect';
 import escapeStringRegexp from 'escape-string-regexp';
 
-export {
-  deepmerge,
-  deepmergeCustom,
-  deepmergeInto,
-  deepmergeIntoCustom,
-} from 'deepmerge-ts';
+export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from 'deepmerge-ts';
 
 // prettier-ignore
 export const escapeRegex = ((s) =>
@@ -44,16 +38,6 @@ export const deepcopy = Rfdc?.({ circles: true });
 export const deepclone = rfdc as typeof deepcopy;
 
 /**
- * *object-inspect* -
- * String representations of objects in node.js and the browser. \
- * *Note: indentation defaults to `2` if not provided*
- * @see {@link https://www.npmjs.com/package/object-inspect}
- */
-export const inspect = ((obj, opts = {}) => (
-  (opts['indent'] ??= 2), objectInspect(obj, opts)
-)) as typeof objectInspect;
-
-/**
  * Enhanced *deep-equal* module w/
  * **type-gaurding** + **strict on** by default. \
  * Compare objects `a` and `b`, returning whether they
@@ -61,8 +45,7 @@ export const inspect = ((obj, opts = {}) => (
  * @see {@link https://www.npmjs.com/package/deep-equal}
  */
 export const equal = ((...args: Parameters<typeof deepEqual>) => (
-  args[2] ? (args[2]['strict'] ??= true) : (args[2] = { strict: true }),
-  deepEqual(...args)
+  args[2] ? (args[2]['strict'] ??= true) : (args[2] = { strict: true }), deepEqual(...args)
 )) as {
   <A extends JsObject, B extends Readonly<A>>(
     a: Readonly<A>,

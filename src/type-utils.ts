@@ -14,7 +14,7 @@ import type {
 // re-exported type-fest utilities
 export type * from 'type-fest';
 export type { SimplifyDeep } from 'type-fest/source/merge-deep.js';
-export type { AsyncFunction } from 'type-fest/source/async-return-type';
+export type { AsyncFunction } from 'type-fest/source/async-return-type.js';
 
 export interface NonNullish {}
 export type Nullish = null | undefined;
@@ -23,10 +23,9 @@ export type Nullable<T> = T | null;
 export type Multi<T> = T | T[];
 export type Numeric = number | bigint;
 export type NumberLike = number | `${number}`;
-export type Fn<
-  ReturnValue extends Value = any,
-  Params extends Value[] = any[]
-> = (...args: Params) => ReturnValue;
+export type Fn<ReturnValue extends Value = any, Params extends Value[] = any[]> = (
+  ...args: Params
+) => ReturnValue;
 
 /**
  * **all** primitives *(i.e. any non-object)*
@@ -66,10 +65,9 @@ export type KeyOf<T, Resolved = Composite<T>> = Type<
  * Like {@link KeyOf}, but for extracting a
  * union type from the **values** instead.
  */
-export type ValueOf<
-  T,
-  Resolved = Composite<T>
-> = KeyOf<T> extends keyof Resolved ? Resolved[KeyOf<T>] : NonNullish;
+export type ValueOf<T, Resolved = Composite<T>> = KeyOf<T> extends keyof Resolved
+  ? Resolved[KeyOf<T>]
+  : NonNullish;
 
 /**
  * Like {@link KeyOf}, but recursively extracts nested keys.
@@ -78,9 +76,7 @@ export type KeyOfDeep<
   T,
   current = Composite<T>,
   nested extends keyof current = ConditionalKeys<current, JsObject<any>>
-> = Type<
-  KeyOf<current> | (nested extends never ? never : KeyOfDeep<current[nested]>)
->;
+> = Type<KeyOf<current> | (nested extends never ? never : KeyOfDeep<current[nested]>)>;
 
 /**
  * Like {@link ValueOf}, but recursively extracts nested values. \
@@ -102,10 +98,7 @@ export type ValueOfDeep<
  * - Inverse of type-fest's
  *   {@link https://github.com/sindresorhus/type-fest/blob/main/source/conditional-keys.d.ts | ConditionalKeys}.
  */
-export type KeysExcept<T, ExcludedTypes> = keyof ConditionalExcept<
-  T,
-  ExcludedTypes
->;
+export type KeysExcept<T, ExcludedTypes> = keyof ConditionalExcept<T, ExcludedTypes>;
 
 /**
  * **Improved catch-all solution for type-fest's
@@ -117,8 +110,7 @@ export type KeysExcept<T, ExcludedTypes> = keyof ConditionalExcept<
  *   it will just be {@link Narrow}'ed down or returned as is.
  */
 export type Union<T> = Type<
-  | T
-  | (IsLiteral<T> extends true ? LiteralToPrimitive<T> & NonNullish : Narrow<T>)
+  T | (IsLiteral<T> extends true ? LiteralToPrimitive<T> & NonNullish : Narrow<T>)
 >;
 
 /**
@@ -139,19 +131,21 @@ export type Composite<T, Intersection = UnionToIntersection<T>> = Type<
 /**
  * Recursively narrow down a type to a common base type. \
  * Base Types:
- * - {@link JsObject} (plain objects)
+ * - `primitive` (non-objects)
+ * - `Function`
  * - `Array`
  * - `Set`
  * - `Map`
  * - `Promise`
- * - `Function`
- * - `object` (non-`primitive`)
- * - `primitive` (converted down to its base type)
- * - {@link NonNullish}
+ * - `JsObject` (plain objects)
+ * - `object` (non-primitives)
+ * - `NonNullish` (fallback)
  */
 export type Narrow<T> = Type<
-  T extends JsObject<infer Values>
-    ? JsObject<Narrow<Values>>
+  T extends primitive
+    ? LiteralToPrimitive<T>
+    : T extends Function
+    ? Function
     : T extends readonly (infer Item)[]
     ? Narrow<Item | unknown>[]
     : T extends ReadonlySet<infer Item>
@@ -160,12 +154,10 @@ export type Narrow<T> = Type<
     ? Map<Narrow<K>, Narrow<V>>
     : T extends Promise<infer Resolved>
     ? Promise<Narrow<Resolved>>
-    : T extends Function
-    ? Function
+    : T extends JsObject<infer Values>
+    ? JsObject<Narrow<Values>>
     : T extends object
     ? object
-    : T extends primitive
-    ? LiteralToPrimitive<T>
     : NonNullish
 >;
 
