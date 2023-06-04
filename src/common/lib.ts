@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { Nullish, Value } from '../type-utils.js';
 
-import { realpathSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { normalize } from '../path/index.js';
 import { nullish } from '../conditionals/index.js';
 
 /**
@@ -29,12 +26,3 @@ export const browser = () => (
   typeof globalThis['window']?.document !== 'undefined' &&
   globalThis['navigator']
 );
-
-// prettier-ignore
-export const ismain = ({ url }: ImportMeta) => {
-  try {
-    const name = normalize(fileURLToPath(url));
-    const main = normalize(realpathSync(process.argv[1]));
-    return name === main;
-  } catch { return false; }
-};

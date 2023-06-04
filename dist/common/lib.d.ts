@@ -13,4 +13,3 @@ export declare const defined: <T, Options extends {
     fallback: '';
 }>(value: T, { fallback }?: Readonly<Options>) => T extends false | Nullish ? Options["fallback"] : NonNullable<T>;
 export declare const browser: () => false | Navigator;
-export declare const ismain: ({ url }: ImportMeta) => boolean;

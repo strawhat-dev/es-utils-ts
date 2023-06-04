@@ -1,6 +1,3 @@
-import { realpathSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { normalize } from '../path/index.js';
 import { nullish } from '../conditionals/index.js';
 /**
  * Coerces the given `value` to an **empty string** *(by default)*
@@ -15,14 +12,3 @@ export const defined = (value, { fallback = '' } = { fallback: '' }) => (value =
 // prettier-ignore
 export const browser = () => (typeof globalThis['window']?.document !== 'undefined' &&
     globalThis['navigator']);
-// prettier-ignore
-export const ismain = ({ url }) => {
-    try {
-        const name = normalize(fileURLToPath(url));
-        const main = normalize(realpathSync(process.argv[1]));
-        return name === main;
-    }
-    catch {
-        return false;
-    }
-};
