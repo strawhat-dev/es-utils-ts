@@ -1,40 +1,27 @@
-import { JsObject, Value } from './type-utils.js';
-import objectInspect from 'object-inspect';
-import escapeStringRegexp from 'escape-string-regexp';
-export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from 'deepmerge-ts';
-import 'type-fest';
-import 'type-fest/source/merge-deep.js';
-import 'type-fest/source/async-return-type';
-
 /**
  * @overview - Other external "essential" utilities that should really
  * be part of the standard library, as named exports (tree-shakeable!).
  * Some may be a dependency for some internal utilities or have changed defaults.
  * Chosen based on combination of necessity, performance, popularity, and update recency.
  */
-
-declare const escapeRegex: typeof escapeStringRegexp;
+import type { JsObject, Value } from './type-utils.js';
+import escapeStringRegexp from 'escape-string-regexp';
+export { deepmerge, deepmergeCustom, deepmergeInto, deepmergeIntoCustom } from 'deepmerge-ts';
+export declare const escapeRegex: typeof escapeStringRegexp;
 /**
  * *rfdc (Really Fast Deep Clone)* w/ circular reference support \
  * Note: 25% additional performance overhead with circular reference support.
  * Use {@link deepclone} if the object is guaranteed to have no circular references.
  * @see {@link https://www.npmjs.com/package/rfdc}
  */
-declare const deepcopy: <T>(input: T) => T;
+export declare const deepcopy: <T>(input: T) => T;
 /**
  * *rfdc (Really Fast Deep Clone)* \
  * Note: Will **fail** if the object contains circular references.
  * Use {@link deepcopy} if the object can contain circular references.
  * @see {@link https://www.npmjs.com/package/rfdc}
  */
-declare const deepclone: <T>(input: T) => T;
-/**
- * *object-inspect* -
- * String representations of objects in node.js and the browser. \
- * *Note: indentation defaults to `2` if not provided*
- * @see {@link https://www.npmjs.com/package/object-inspect}
- */
-declare const inspect: typeof objectInspect;
+export declare const deepclone: <T>(input: T) => T;
 /**
  * Enhanced *deep-equal* module w/
  * **type-gaurding** + **strict on** by default. \
@@ -42,7 +29,7 @@ declare const inspect: typeof objectInspect;
  * are equal according to a recursive equality algorithm.
  * @see {@link https://www.npmjs.com/package/deep-equal}
  */
-declare const equal: {
+export declare const equal: {
     <A extends JsObject, B extends Readonly<A>>(a: Readonly<A>, b: Readonly<B>, options?: {
         /** @defaultValue `true` */
         strict: boolean;
@@ -68,5 +55,3 @@ declare const equal: {
         strict: boolean;
     }): boolean;
 };
-
-export { deepclone, deepcopy, equal, escapeRegex, inspect };
