@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type { Fn, JsObject, Merge } from '../type-utils';
+import type { Fn, JsObject, Merge } from '../type-utils.js';
 import type {
   ClearFn,
   ExtendOptions,
@@ -10,23 +10,19 @@ import type {
   KeyDispatcher,
   Mapper,
   PopFn,
-} from './types';
+} from './types.js';
 
-import { isObject, nullish } from '../conditionals';
-import { deepcopy, deepmergeInto } from '../externals';
+import { deepcopy, deepmergeInto } from '../externals.js';
+import { isObject, nullish } from '../conditionals/index.js';
 
 /**
  * @internal for {@link keys}
  * @returns `Object.keys(obj)` + **inherited**.
  */
-export const keysIn = (obj: object, f?: Fn) => {
-  const ret = [];
-  for (const key in obj) {
-    let include = true;
-    if (typeof f === 'function') include = f(key);
-    include && ret.push(key);
-  }
-
+export const keysIn = (obj: object, predicate?: Fn) => {
+  const ret: string[] = [];
+  if (typeof predicate !== 'function') return ret;
+  for (const key in obj) predicate(key) && ret.push(key);
   return ret;
 };
 
@@ -34,32 +30,24 @@ export const keysIn = (obj: object, f?: Fn) => {
  * @internal for {@link keys}
  * @returns `Object.keys(obj)` + **non-enumerable**.
  */
-export const keysOf = (obj: object, f?: Fn) => {
-  const result = Object.getOwnPropertyNames(obj);
-  if (!f) return result;
-  const ret = [];
-  for (let i = 0; i < result.length; ++i) {
-    const key = result[i];
-    let include = true;
-    if (typeof f === 'function') include = f(key);
-    include && ret.push(key);
-  }
-
-  return ret;
+export const keysOf = (obj: object, predicate?: Fn) => {
+  const ret = Object.getOwnPropertyNames(obj);
+  if (typeof predicate !== 'function') return ret;
+  return ret.filter(predicate);
 };
 
 /**
  * @internal for {@link keys}
  * @returns `Object.keys(obj)` + **inherited** + **non-enumerable**.
  */
-export const props = (obj: object, f?: Fn) => {
+export const props = (obj: object, predicate?: Fn) => {
   const set = new Set();
-  let current = keysOf(obj, f);
+  let current = keysOf(obj, predicate);
   do for (let i = 0; i < current.length; ++i) set.add(current[i]);
   while (
     (obj = Object.getPrototypeOf(obj)) &&
     obj !== Object.prototype &&
-    (current = keysOf(obj, f))
+    (current = keysOf(obj, predicate))
   );
 
   return [...set];
@@ -68,19 +56,18 @@ export const props = (obj: object, f?: Fn) => {
 /**
  * Retrieve an object's keys with better type support,
  * while also optionally providing a config object and/or
- * predicate callback, to decide which types of keys to include.
+ * a filter callback, to decide which types of keys to include.
  */
 export const keys = ((obj: JsObject, ...args: unknown[]) => {
   if (nullish(obj)) return [];
   let { opts, callback } = mapargs(args);
   const { inherited, nonEnumerable } = opts;
-  if (opts['defined']) callback = (k) => !(nullish(obj[k]) || obj[k] === false);
+  if (opts['definedOnly']) callback = (k) => !(nullish(obj[k]) || obj[k] === false);
   if (inherited && nonEnumerable) return props(obj, callback);
   if (nonEnumerable) return keysOf(obj, callback);
   if (inherited) return keysIn(obj, callback);
-  return typeof callback === 'function'
-    ? keysIn(obj, (k) => Object.hasOwn(obj, k) && callback?.(k))
-    : Object.keys(obj);
+  if (typeof callback !== 'function') return Object.keys(obj);
+  return Object.keys(obj).filter(callback);
 }) as KeyDispatcher;
 
 /**
@@ -115,10 +102,7 @@ export const clear: ClearFn = (obj, options) => {
  * Delete a property while retrieving its value at the same time.
  * @returns the value of the property deleted from the object
  */
-export const pop: PopFn = (
-  obj: JsObject,
-  key = Object.keys(obj ?? {}).pop()
-) => {
+export const pop: PopFn = (obj: JsObject, key = Object.keys(obj ?? {}).pop()) => {
   if (nullish(obj)) return;
   const value = obj[key!];
   delete obj[key!];
@@ -137,26 +121,19 @@ export const findkey: FindKeyFn = (obj: JsObject, ...args: unknown[]) => {
   }
 };
 
-// prettier-ignore
 export const map: Mapper = (obj: JsObject, ...args: unknown[]) => {
   const result: JsObject = {};
   const { opts, callback } = mapargs(args);
   const { deep, freeze, ...keyopts } = opts;
   for (const key of keys(obj, keyopts)) {
+    let entry;
     const value = obj[key];
-    const entry = (
-      deep && isObject(value)
-        ? [key, (map as Fn)(value, opts, callback!)]
-        : callback?.(key, value)
-    ) as object;
-
+    if (deep && isObject(value)) entry = [key, (map as Fn)(value, opts, callback!)];
+    else entry = callback?.(key, value);
     if (isObject(entry)) deepmergeInto(result, entry);
     else if (Array.isArray(entry)) {
       if (!Array.isArray(entry[0])) result[entry[0]] = entry[1];
-      else for (let i = 0; i < entry.length; ++i) {
-        const [key, value] = entry[i];
-        result[key] = value;
-      }
+      else entry.forEach(([k, v]) => (result[k] = v));
     }
   }
 
@@ -191,35 +168,16 @@ export const filter: Filterer = (obj: JsObject, ...args: unknown[]) => {
   return withRest ? [result, withRest] : result;
 };
 
-export const _ = Object.freeze({
-  clear,
-  extend,
-  filter,
-  findkey,
-  keys,
-  keysIn,
-  keysOf,
-  map,
-  pop,
-  props,
-});
-
-/** @internal */
-const mapargs = (
-  args: unknown[],
-  init?: { opts?: JsObject<boolean>; callback?: Fn }
-) => {
+const mapargs = (args: unknown[], init?: { opts?: JsObject<boolean>; callback?: Fn }) => {
   const initopts = init?.opts ?? {};
   let [callback = init?.callback, opts = initopts] = args;
   if (typeof opts === 'function' || typeof callback === 'object') {
     [callback = init?.callback, opts = initopts] = [opts, callback];
   }
 
-  if ((opts as any)['hidden']) (opts as any)['nonEnumerable'] ||= true;
   return { opts, callback } as { opts: JsObject<boolean>; callback?: Fn };
 };
 
-/** @internal */
 const mapd = (
   property: string,
   value: unknown,

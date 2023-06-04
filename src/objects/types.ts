@@ -17,7 +17,7 @@ import type {
   ValueOf,
   ValueOfDeep,
   Writable,
-} from '../type-utils';
+} from '../type-utils.js';
 
 export type ClearFn = <T extends JsObject>(
   obj: T,
@@ -26,41 +26,26 @@ export type ClearFn = <T extends JsObject>(
 
 export type PopFn = {
   <T extends JsObject>(obj: Readonly<T>): T[KeyOf<T>];
-  <T extends JsObject, Key extends KeyOf<Readonly<T>>>(
-    obj: Readonly<T>,
-    key: Key
-  ): T[Key];
+  <T extends JsObject, Key extends KeyOf<Readonly<T>>>(obj: Readonly<T>, key: Key): T[Key];
 
   <T extends object>(obj: Readonly<T>): T[keyof T];
-  <T extends object, Key extends keyof Readonly<T>>(
-    obj: Readonly<T>,
-    key: Key
-  ): T[Key];
+  <T extends object, Key extends keyof Readonly<T>>(obj: Readonly<T>, key: Key): T[Key];
 };
 
 export type KeyDispatcher = {
   <T extends object>(obj: Readonly<T>): KeyOf<T>[];
-
-  <T extends object>(
-    obj: Readonly<T>,
-    callback: (key: KeyOf<T>) => unknown
-  ): KeyOf<T>[];
 
   <T extends object, Options extends KeyDispatcherOptions>(
     obj: Readonly<T>,
     options?: Options
   ): KeyDispatcherResult<T, Options>;
 
-  <T extends object, Options extends KeyDispatcherOptions>(
-    obj: Readonly<T>,
-    callback: (key: KeyOf<T>) => unknown,
-    options: Options
-  ): KeyDispatcherResult<T, Options>;
+  <T extends object>(obj: Readonly<T>, predicate: (key: KeyOf<T>) => unknown): KeyOf<T>[];
 
   <T extends object, Options extends KeyDispatcherOptions>(
     obj: Readonly<T>,
-    options: Options,
-    callback: (key: KeyOf<T>) => unknown
+    options: Omit<Options, 'definedOnly'>,
+    predicate: (key: KeyOf<T>) => unknown
   ): KeyDispatcherResult<T, Options>;
 };
 
@@ -68,24 +53,17 @@ type KeyDispatcherOptions = KeyIterationOptions & {
   /**
    * if `true`, retrieve *only* keys where the *corresponding values*
    * are **not any of** `undefined`, `null`, `NaN`, or `false`.
-   * - *provided as a convenience option and
-   *   alternative for the callback parameter*
+   * - *Note: Replaces usage of the filter callback parameter*
    * @defaultValue `false`
    */
-  defined?: boolean;
+  definedOnly?: boolean;
 };
 
-type KeyDispatcherResult<
-  T,
-  Options extends KeyDispatcherOptions,
-  root = true
-> = Type<
+type KeyDispatcherResult<T, Options extends KeyDispatcherOptions, _root = true> = Type<
   (Options['inherited'] extends true
     ? T extends { __proto__: infer Proto }
-      ?
-          | Exclude<KeyOf<T>, '__proto__'>
-          | KeyDispatcherResult<Proto, Options, false>[number]
-      : root extends true
+      ? Exclude<KeyOf<T>, '__proto__'> | KeyDispatcherResult<Proto, Options, false>[number]
+      : _root extends true
       ? Union<KeyOf<T>>
       : KeyOf<T>
     : KeyOf<T>)[]
@@ -104,21 +82,13 @@ export type Extender = {
     props: Readonly<Props>
   ): ExtendedResult<Base, Readonly<Props>>;
 
-  <
-    Base extends JsObject,
-    Props extends JsObject,
-    Options extends ExtendOptions<Props>
-  >(
+  <Base extends JsObject, Props extends JsObject, Options extends ExtendOptions<Props>>(
     obj: Readonly<Base>,
     props: Readonly<Props>,
     options: Options
   ): ExtendedResult<Base, Props, Options>;
 
-  <
-    Base extends object,
-    Props extends JsObject,
-    Options extends ExtendOptions<Props>
-  >(
+  <Base extends object, Props extends JsObject, Options extends ExtendOptions<Props>>(
     obj: Readonly<Base>,
     props: Readonly<Props>,
     options: Options
@@ -166,26 +136,20 @@ type ExtendedResult<
       ? Writable<Readonly<T2>, P>
       : never
     : Readonly<T2>,
-  Result = T1 extends Function
-    ? T1 & Simplify<Props>
-    : Merge<T1, Composite<Props>>
+  Result = T1 extends Function ? T1 & Simplify<Props> : Merge<T1, Composite<Props>>
 > = Options['freeze'] extends true ? Readonly<Result> : Result;
 
 export type FindKeyFn = {
   <T extends object>(obj: Readonly<T>): Maybe<KeyOf<Readonly<T>>>;
 
-  <T extends object>(obj: Readonly<T>, predicate: FindKeyCallback<T>): Maybe<
-    KeyOf<Readonly<T>>
-  >;
+  <T extends object>(obj: Readonly<T>, predicate: FindKeyCallback<T>): Maybe<KeyOf<Readonly<T>>>;
 
   <T extends object, Options extends FindKeyOptions>(
     obj: Readonly<T>,
     predicate: FindKeyCallback<T, Options>,
     options: Options
   ): Maybe<
-    Options['inherited'] extends true
-      ? Union<ResolvedKeys<T, Options>>
-      : ResolvedKeys<T, Options>
+    Options['inherited'] extends true ? Union<ResolvedKeys<T, Options>> : ResolvedKeys<T, Options>
   >;
 
   <T extends object, Options extends FindKeyOptions>(
@@ -193,31 +157,20 @@ export type FindKeyFn = {
     options: Options,
     predicate: FindKeyCallback<T, Options>
   ): Maybe<
-    Options['inherited'] extends true
-      ? Union<ResolvedKeys<T, Options>>
-      : ResolvedKeys<T, Options>
+    Options['inherited'] extends true ? Union<ResolvedKeys<T, Options>> : ResolvedKeys<T, Options>
   >;
 };
 
 type FindKeyOptions = Omit<ObjectOptions, 'freeze'>;
 
 type FindKeyCallback<T, Options extends FindKeyOptions = {}> = Union<
-  (
-    value: Union<ResolvedValues<T, Options>>,
-    key: Union<ResolvedKeys<T, Options>>
-  ) => boolean
+  (value: Union<ResolvedValues<T, Options>>, key: Union<ResolvedKeys<T, Options>>) => boolean
 >;
 
 export type Mapper = {
-  <T extends JsObject>(
-    obj: Readonly<T>,
-    callback: MapCallback<Readonly<T>>
-  ): MappedResult<T>;
+  <T extends JsObject>(obj: Readonly<T>, callback: MapCallback<Readonly<T>>): MappedResult<T>;
 
-  <T extends object>(
-    obj: Readonly<T>,
-    callback: MapCallback<Readonly<T>>
-  ): MappedResult<T>;
+  <T extends object>(obj: Readonly<T>, callback: MapCallback<Readonly<T>>): MappedResult<T>;
 
   <T extends JsObject, Options extends ObjectOptions>(
     obj: Readonly<T>,
@@ -260,15 +213,9 @@ export type Filterer = {
 
   <T extends object>(obj: Readonly<T>): T;
 
-  <T extends JsObject>(
-    obj: Readonly<T>,
-    predicate: FilterCallback<Readonly<T>>
-  ): FilteredResult<T>;
+  <T extends JsObject>(obj: Readonly<T>, predicate: FilterCallback<Readonly<T>>): FilteredResult<T>;
 
-  <T extends object>(
-    obj: Readonly<T>,
-    predicate: FilterCallback<Readonly<T>>
-  ): FilteredResult<T>;
+  <T extends object>(obj: Readonly<T>, predicate: FilterCallback<Readonly<T>>): FilteredResult<T>;
 
   <T extends JsObject, Options extends FilterOptions>(
     obj: Readonly<T>,
@@ -367,12 +314,10 @@ type ResolvedResult<
     : Result
 >;
 
-type ResolvedKeys<
-  T,
-  Opts extends ObjectOptions = {}
-> = Opts['deep'] extends true ? KeyOfDeep<Readonly<T>> : KeyOf<Readonly<T>>;
+type ResolvedKeys<T, Opts extends ObjectOptions = {}> = Opts['deep'] extends true
+  ? KeyOfDeep<Readonly<T>>
+  : KeyOf<Readonly<T>>;
 
-type ResolvedValues<
-  T,
-  Opts extends ObjectOptions = {}
-> = Opts['deep'] extends true ? ValueOfDeep<Readonly<T>> : ValueOf<Readonly<T>>;
+type ResolvedValues<T, Opts extends ObjectOptions = {}> = Opts['deep'] extends true
+  ? ValueOfDeep<Readonly<T>>
+  : ValueOf<Readonly<T>>;
