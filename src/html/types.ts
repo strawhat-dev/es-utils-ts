@@ -1,4 +1,4 @@
-import type { ConditionalExcept, PartialDeep } from '../type-utils';
+import type { ConditionalExcept, PartialDeep } from '../type-utils.js';
 
 export type HTMLTag = keyof HTMLElementTagNameMap;
 
