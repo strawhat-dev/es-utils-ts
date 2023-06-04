@@ -1,7 +1,7 @@
-import type { Path } from './types';
-import type { Fn } from '../type-utils';
+import type { Path } from './types.js';
+import type { Fn } from '../type-utils.js';
 
-import { assert } from '../conditionals';
+import { assert } from '../conditionals/index.js';
 
 // prettier-ignore
 export const toUnix: Path['toUnix'] = (p) => p?.replace(/\\/g, '/').replace(/(?<!^)\/+/g, '/');
@@ -87,14 +87,9 @@ export const _parse: Path['parse'] = (path) => {
       } else ret.base = ret.name = path.slice(startPart, end);
     }
   } else {
-    if (!startPart && isAbsolute) {
-      ret.name = path.slice(1, startDot);
-      ret.base = path.slice(1, end);
-    } else {
-      ret.name = path.slice(startPart, startDot);
-      ret.base = path.slice(startPart, end);
-    }
-
+    const start = !startPart && isAbsolute ? 1 : startPart;
+    ret.base = path.slice(start, end);
+    ret.name = path.slice(start, startDot);
     ret.ext = path.slice(startDot, end);
   }
 

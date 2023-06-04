@@ -1,29 +1,23 @@
 /* eslint-disable tree-shaking/no-side-effects-in-initialization */
-import type { Path } from './types';
+import type { Path } from './types.js';
 
 import path from 'path';
-import { re } from '../common';
-import {
-  _format,
-  _parse,
-  isValidExt,
-  toUnix as _toUnix,
-  unixify,
-} from './internal';
+import { re } from '../common/index.js';
+import { _format, _parse, isValidExt, toUnix as _toUnix, unixify } from './internal.js';
 
 export const sep = '/';
 export const toUnix = _toUnix;
 export const delimiter = path.delimiter;
+
 export const basename = unixify(path.basename);
 export const dirname = unixify(path.dirname);
 export const extname = unixify(path.extname);
+export const format = unixify(_format);
 export const isAbsolute = unixify(path.isAbsolute);
 export const join = unixify(path.join);
 export const relative = unixify(path.relative);
 export const resolve = unixify(path.resolve);
 export const toNamespacedPath = unixify(path.toNamespacedPath);
-
-export const format = unixify(_format);
 
 export const parse: Path['parse'] = (p) => {
   const ret = _parse(toUnix(p));
@@ -57,21 +51,21 @@ export const addExt: Path['addExt'] = (p, ext) => {
   return p;
 };
 
+// prettier-ignore
+export const defaultExt: Path['defaultExt'] = (p, ext, opts) => (
+  isValidExt(p, opts) ? extname(p) : addExt(p, ext)
+);
+
+export const changeExt: Path['changeExt'] = (p, ext, opts) => (
+  ext[0] === '.' || (ext = `.${ext}`), `${trimExt(p, opts)}${ext}`
+);
+
 export const removeExt: Path['removeExt'] = (p, ext) => {
   if (!ext) return p;
   ext[0] === '.' || (ext = `.${ext}`);
   if (extname(p) === ext) return trimExt(p, { maxLength: ext.length });
   return p;
 };
-
-export const changeExt: Path['changeExt'] = (p, ext, opts) => (
-  ext[0] === '.' || (ext = `.${ext}`), `${trimExt(p, opts)}${ext}`
-);
-
-// prettier-ignore
-export const defaultExt: Path['defaultExt'] = (p, ext, opts) => (
-  isValidExt(p, opts) ? extname(p) : addExt(p, ext)
-);
 
 /**
  * Universal drop-in replacement for node.js's path w/ unix style seperators + other utilities.
