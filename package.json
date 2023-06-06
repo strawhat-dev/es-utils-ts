@@ -8,6 +8,7 @@
   "type": "module",
   "sideEffects": false,
   "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
     "./common": "./dist/common/index.js",
