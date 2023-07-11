@@ -3,7 +3,10 @@ import { JsObject, Value } from '../type-utils.js';
 import 'type-fest/source/spread.js';
 import 'type-fest';
 
-/** Custom version of `deepmerge` which ensures **unique** array items. */
+/**
+ * Custom version of `deepmerge` which ensures **unique** array items,
+ * while also filtering out and ignoring non-objects from the merge.
+ */
 declare const deepmerge: <Ts extends readonly unknown[]>(...objects: Ts) => deepmerge_ts.DeepMergeHKT<Ts, Readonly<{
     DeepMergeRecordsURI: "DeepMergeRecordsDefaultURI";
     DeepMergeArraysURI: "DeepMergeArraysDefaultURI";
@@ -14,7 +17,10 @@ declare const deepmerge: <Ts extends readonly unknown[]>(...objects: Ts) => deep
     key: PropertyKey;
     parents: readonly Readonly<Record<PropertyKey, unknown>>[];
 }>>;
-/** Custom version of `deepmergeInto` which ensures **unique** array items. */
+/**
+ * Custom version of `deepmergeInto` which ensures **unique** array items,
+ * while also filtering out and ignoring non-objects from the merge.
+ */
 declare const deepmergeInto: <Target extends object, Ts extends readonly unknown[]>(target: Target, ...objects: Ts) => void;
 
 /**

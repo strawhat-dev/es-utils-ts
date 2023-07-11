@@ -86,7 +86,7 @@ export const props = (obj: object, predicate?: Fn) => {
 export const extend = ((...args: any[]) => {
   const [target, props, options] = args.length === 1 ? [{}, args.pop()] : args;
   for (const [prop, value] of Object.entries(props)) {
-    Object.defineProperty(target, prop, mapd(prop, value, options));
+    Object.defineProperty(target, prop, options ? mapd(prop, value, options) : { value });
   }
 
   return target;
@@ -175,9 +175,11 @@ export const filter: FilterFn = (obj: JsObject, ...args: unknown[]) => {
 };
 
 const mapargs = (args: unknown[], init?: { opts?: JsObject<boolean>; callback?: Fn }) => {
-  let [callback = init?.callback, opts = init?.opts || {}] = args;
-  if (typeof callback === 'object' || typeof opts === 'function') {
-    [callback = init?.callback, opts = init?.opts || {}] = [opts, callback];
+  let { opts = {}, callback } = init || {};
+  for (const arg of args) {
+    if (!arg) continue;
+    typeof arg === 'object' && (opts = arg as never);
+    typeof arg === 'function' && (callback = arg as never);
   }
 
   return { opts, callback } as { opts: JsObject<boolean>; callback: Fn };

@@ -1,4 +1,4 @@
-import { deepmergeInto } from './chunk-QS2DNIES.js';
+import { deepmergeInto } from './chunk-2EVM2WRW.js';
 import { nullish, isObject, nullishOrFalse } from './chunk-WEJR7A5E.js';
 
 // src/objects/index.ts
@@ -48,7 +48,7 @@ var props = (obj, predicate) => {
 var extend = (...args) => {
   const [target, props2, options] = args.length === 1 ? [{}, args.pop()] : args;
   for (const [prop, value] of Object.entries(props2)) {
-    Object.defineProperty(target, prop, mapd(prop, value, options));
+    Object.defineProperty(target, prop, options ? mapd(prop, value, options) : { value });
   }
   return target;
 };
@@ -123,9 +123,12 @@ var filter = (obj, ...args) => {
   return withRest ? [result, withRest] : result;
 };
 var mapargs = (args, init) => {
-  let [callback = init?.callback, opts = init?.opts || {}] = args;
-  if (typeof callback === "object" || typeof opts === "function") {
-    [callback = init?.callback, opts = init?.opts || {}] = [opts, callback];
+  let { opts = {}, callback } = init || {};
+  for (const arg of args) {
+    if (!arg)
+      continue;
+    typeof arg === "object" && (opts = arg);
+    typeof arg === "function" && (callback = arg);
   }
   return { opts, callback };
 };

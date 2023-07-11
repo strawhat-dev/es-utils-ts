@@ -1,5 +1,5 @@
+import { pop } from './chunk-O5WSUXZT.js';
 import { trimLines } from './chunk-LIVVYGBL.js';
-import { pop } from './chunk-HYCK7GR5.js';
 
 // src/html/index.ts
 var querySelectorMatchAll = (regex, selectors = "*", document = globalThis["document"]) => {
