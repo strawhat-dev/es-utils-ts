@@ -1,17 +1,25 @@
-/** @type {import('eslint').Linter.Config} */
-module.exports = {
+const { defineConfig } = require('eslint-define-config');
+
+module.exports = defineConfig({
   root: true,
-  env: { es2022: true, node: true },
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'tree-shaking'],
-  extends: ['plugin:@typescript-eslint/recommended', 'prettier'],
+  env: { es2021: true, node: true },
   ignorePatterns: ['dist', 'tsup.config.ts', '.eslintrc.cjs'],
+  plugins: ['import', '@typescript-eslint'],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    sourceType: 'module',
+    ecmaVersion: 'latest',
+    project: 'tsconfig.json',
+  },
+  settings: {
+    'import/parsers': { '@typescript-eslint/parser': ['.ts'] },
+    'import/resolver': { 'import/resolver': { typescript: { alwaysTryTypes: true } } },
+  },
+  extends: ['plugin:import/typescript', 'plugin:@typescript-eslint/recommended', 'prettier'],
   rules: {
     '@typescript-eslint/ban-types': 'off',
-    '@typescript-eslint/ban-ts-comment': 'off',
-    'tree-shaking/no-side-effects-in-initialization': [
-      1,
-      { noSideEffectsWhenCalled: [{ function: 'Object.freeze' }] },
-    ],
+    '@typescript-eslint/consistent-type-imports': 'error',
+    '@typescript-eslint/no-import-type-side-effects': 'error',
+    'import/consistent-type-specifier-style': 'error',
   },
-};
+});

@@ -1,10 +1,5 @@
 {
   "printWidth": 100,
   "singleQuote": true,
-  "overrides": [
-    {
-      "options": { "printWidth": 175 },
-      "files": "src/conditionals/type-checking.ts"
-    }
-  ]
+  "overrides": [{ "options": { "printWidth": 175 }, "files": "src/conditionals/type-checking.ts" }]
 }

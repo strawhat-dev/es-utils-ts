@@ -1,29 +1,24 @@
-import type { Path } from './types.js';
 import type { Fn } from '../type-utils.js';
+import type { Path } from './path.types.js';
 
-import { assert } from '../conditionals/index.js';
-
-// prettier-ignore
-export const toUnix: Path['toUnix'] = (p) => p?.replace(/\\/g, '/').replace(/(?<!^)\/+/g, '/');
+export const _toUnix: Path['toUnix'] = (p) => p?.replace(/\\/g, '/').replace(/(?<!^)\/+/g, '/');
 
 /** @internal */
 export const unixify = <T extends Fn>(fn: T) => {
-  return ((...args) => {
+  return ((...args: Parameters<T>) => {
     for (let i = 0; i < args.length; ++i) {
-      typeof args[i] === 'string' && (args[i] = toUnix(args[i]));
+      typeof args[i] === 'string' && (args[i] = _toUnix(args[i] as string));
     }
 
-    const ret = fn(...args);
-    return typeof ret === 'string' ? toUnix(ret) : ret;
+    let ret = fn(...args);
+    typeof ret === 'string' && (ret = _toUnix(ret));
+    return ret;
   }) as T;
 };
 
 /** @internal */
 // prettier-ignore
-export const isValidExt = (
-  ext = '',
-  { ignore = [] as string[], maxLength = 7 } = {}
-) => (
+export const isValidExt = (ext = '', { ignore = [] as string[], maxLength = 7 } = {}) => (
   ext &&
   ext.length <= maxLength &&
   !ignore.some((val) => (val?.[0] === '.' || (val = `.${ext}`), val === ext))
@@ -32,18 +27,20 @@ export const isValidExt = (
 /** @internal */
 // https://github.com/browserify/path-browserify/blob/master/index.js#L99
 export const _format: Path['format'] = (pathObj) => {
-  assert.isObject(pathObj, { onError: 'throw' });
   const dir = pathObj.dir || pathObj.root;
   const base = pathObj.base || (pathObj.name || '') + (pathObj.ext || '');
   if (!dir) return base;
-  if (dir === pathObj.root) return `${dir}${base}`;
+  if (dir === pathObj.root) return dir + base;
   return `${dir}/${base}`;
 };
 
 /** @internal */
 // https://github.com/browserify/path-browserify/blob/master/index.js#L445
 export const _parse: Path['parse'] = (path) => {
-  assert.isString(path, { onError: 'throw' });
+  if (typeof path !== 'string') {
+    throw new TypeError('Path must be a string. Received ' + JSON.stringify(path));
+  }
+
   const ret = { root: '', dir: '', base: '', ext: '', name: '' };
   if (!path.length) return ret;
   let code = path.charCodeAt(0);

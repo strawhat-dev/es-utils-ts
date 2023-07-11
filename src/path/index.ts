@@ -1,14 +1,13 @@
-/* eslint-disable tree-shaking/no-side-effects-in-initialization */
-import type { Path } from './types.js';
+/* eslint-disable @typescript-eslint/unbound-method */
+import type { Path } from './path.types.js';
 
 import path from 'path';
-import { re } from '../common/index.js';
-import { _format, _parse, isValidExt, toUnix as _toUnix, unixify } from './internal.js';
+import { re } from '../common/string-utils.js';
+import { _format, _parse, _toUnix, isValidExt, unixify } from './internal.js';
 
 export const sep = '/';
 export const toUnix = _toUnix;
 export const delimiter = path.delimiter;
-
 export const basename = unixify(path.basename);
 export const dirname = unixify(path.dirname);
 export const extname = unixify(path.extname);

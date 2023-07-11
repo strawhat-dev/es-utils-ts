@@ -1,14 +1,14 @@
 {
   "include": ["src/**/*.ts"],
+  "exclude": ["dist", "node_modules"],
   "compilerOptions": {
-    "outDir": "dist",
-    "lib": ["esnext", "dom", "dom.iterable"],
-    "target": "es2020",
+    "target": "es2021",
     "module": "nodenext",
     "moduleDetection": "force",
     "moduleResolution": "nodenext",
+    "lib": ["esnext", "dom", "dom.iterable"],
     "strict": true,
-    "declaration": true,
+    "noEmit": true,
     "skipLibCheck": true,
     "isolatedModules": true,
     "esModuleInterop": true,

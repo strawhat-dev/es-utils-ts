@@ -3,18 +3,17 @@
   "author": "strawhat-dev",
   "description": "esm first simple typed utilities",
   "repository": "github:strawhat-dev/es-utils-ts",
-  "version": "0.0.63",
+  "version": "0.0.62",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
   "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
     "./common": "./dist/common/index.js",
     "./conditionals": "./dist/conditionals/index.js",
-    "./externals": "./dist/externals.js",
     "./html": "./dist/html/index.js",
+    "./lib": "./dist/lib/index.js",
     "./objects": "./dist/objects/index.js",
     "./path": "./dist/path/index.js",
     "./type-utils": {
@@ -28,30 +27,28 @@
     "node": ">=16.6.0"
   },
   "scripts": {
-    "rimraf": "pnpm -c dlx rimraf",
-    "build": "eslint && pnpm rimraf dist && tsc",
-    "clean": "pnpm rimraf pnpm-lock.yaml node_modules dist"
+    "build": "eslint && tsup"
   },
-  "peerDependencies": {
-    "deep-equal": "^2.2.1",
+  "dependencies": {
+    "deep-equal": "^2.2.2",
     "deepmerge-ts": "^5.1.0",
     "escape-string-regexp": "^5.0.0",
-    "rfdc": "^1.3.0",
-    "type-fest": "^3.11.1"
+    "type-fest": "^3.13.0"
   },
   "devDependencies": {
     "@types/deep-equal": "^1.0.1",
-    "@types/eslint": "^8.40.0",
-    "@types/eslint-config-prettier": "^6.11.0",
-    "@types/node": "^20.2.5",
-    "@typescript-eslint/eslint-plugin": "^5.59.8",
-    "@typescript-eslint/parser": "^5.59.8",
-    "eslint": "^8.42.0",
+    "@types/node": "^20.4.1",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.44.0",
     "eslint-config-prettier": "^8.8.0",
+    "eslint-define-config": "^1.21.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-tree-shaking": "^1.10.0",
-    "prettier": "^2.8.8",
-    "tsup": "^6.7.0",
-    "typescript": "^5.1.3"
+    "prettier": "^3.0.0",
+    "tsup": "^7.1.0",
+    "typescript": "^5.1.6"
   },
   "np": {
     "branch": "main",

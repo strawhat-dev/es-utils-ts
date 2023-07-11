@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { AsyncFunction, Constructor, JsObject, TypedArray, Union, primitive } from '../type-utils.js';
-import type { AssertionOptions, AssertionType, AsyncGeneratorFunction, GeneratorFunction, MultiTypeQueryFunction, TypeName } from './types.js';
+import type { Constructor, Primitive, TypedArray } from 'type-fest';
+import type { AsyncFunction, JsObject, Union } from '../type-utils.js';
+import type { AssertionOptions, AsyncGeneratorFunction, GeneratorFunction, MultiTypeQueryFunction, TypeName } from './type-checking.types.js';
 
 import { inspect } from 'util';
-import { equal } from '../externals.js';
+import { equal } from '../lib/deep-equal.js';
 
 /**
  * Used internally for some type checking methods in this module
  * and provides useful completions for some common built-in types.
- * @returns `string` representing the given `value`'s type from its *prototype*
+ * @returns `string` representing the given `value`'s type from its *prototype* (without spaces)
  */
-export const type = (value: unknown): Union<TypeName> => Object.prototype.toString.call(value).slice(8, -1);
+export const type = (value: unknown): Union<TypeName> => Object.prototype.toString.call(value).slice(8, -1).replaceAll(' ', '');
 
 // conditionals with type gaurding
 export const isArrayBuffer = (value: unknown): value is ArrayBufferLike => /^(Shared)?ArrayBuffer$/.test(type(value));
@@ -27,7 +28,7 @@ export const isIterable = (value: unknown): value is Iterable<any> => !!value?.[
 export const isIterator = (value: unknown): value is Iterator<any> => /(^Generator|Iterator)$/.test(type(value));
 export const isMap = (value: unknown): value is Map<any, any> => type(value) === 'Map';
 export const isObject = (value: unknown): value is JsObject<any> => type(value) === 'Object';
-export const isPrimitive = (value: unknown): value is primitive => value !== Object(value);
+export const isPrimitive = (value: unknown): value is Primitive => value !== Object(value);
 export const isPromise = (value: unknown): value is Promise<any> => type(value) === 'Promise';
 export const isRegExp = (value: unknown): value is RegExp => type(value) === 'RegExp';
 export const isRequest = (value: unknown): value is Request => type(value) === 'Request';
@@ -53,7 +54,7 @@ export const is: MultiTypeQueryFunction = (value) => ({
  *   execution contexts *(using internal {@link type} method)*.
  * - does not rely on platform specific *(e.g. node.js)* methods such as `util.types.isArrayBuffer`
  */
-export const assert = Object.freeze({
+export const assert = {
   isArrayBuffer: createAssertion(isArrayBuffer),
   isAsyncFunction: createAssertion(isAsyncFunction),
   isAsyncGeneratorFunction: createAssertion(isAsyncGeneratorFunction),
@@ -88,15 +89,15 @@ export const assert = Object.freeze({
   isString: createAssertion((value) => typeof value === 'string', 'String'),
   isSymbol: createAssertion((value) => typeof value === 'symbol', 'Symbol'),
   isUndefined: createAssertion((value) => typeof value === 'undefined', 'Undefined'),
-} as const);
+} as const;
 
 /** @internal */
 const querycallback = (value: unknown) => {
   return (query: unknown) => {
-    if (typeof query === 'boolean') return query;
     if (isConstructor(query)) return value instanceof query;
+    if (typeof query === 'boolean') return query;
     if (typeof query === 'string' && `is${query}` in assert) {
-      return assert[`is${query as AssertionType}`](value, { quiet: true });
+      return assert[`is${query as 'Null'}`](value, { quiet: true });
     }
 
     return equal(value, query);

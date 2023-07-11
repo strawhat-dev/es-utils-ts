@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type { CreateLinkOptions, HTMLElementProps, HTMLTag } from './types.js';
+import type { PartialDeep } from 'type-fest';
+import type { HTMLElementProps, HTMLTag } from '../type-utils.js';
 
 import { pop } from '../objects/index.js';
-import { trimLines } from '../common/index.js';
-import { isObject } from '../conditionals/index.js';
+import { trimLines } from '../common/string-utils.js';
 
 /**
  * Like `querySelectorAll`, but returns an array of elements where
@@ -19,7 +18,7 @@ import { isObject } from '../conditionals/index.js';
 export const querySelectorMatchAll = (
   regex: RegExp,
   selectors = '*',
-  document = globalThis['document']
+  document = globalThis['document'],
 ) => {
   const result = [];
   for (const el of document.querySelectorAll(selectors)) {
@@ -41,15 +40,14 @@ export const querySelectorMatchAll = (
  *
  * @returns some `HTMLElement` created from the given `tag` & `properties`
  */
-// prettier-ignore
 export const createElement = <T extends HTMLTag>(
   tag: T,
-  properties?: HTMLElementProps<T>,
-  document = globalThis['document']
+  props: PartialDeep<HTMLElementProps<T>> = {} as never,
+  document = globalThis['document'],
 ) => {
   const el = document.createElement(tag);
-  const style = isObject(properties?.['style' as never]) && pop(properties!, 'style');
-  Object.assign(el, properties);
+  const style = typeof props['style' as never] === 'object' && pop(props!, 'style');
+  Object.assign(el, props);
   Object.assign(el.style, style);
   return el;
 };
@@ -65,11 +63,25 @@ export const createElement = <T extends HTMLTag>(
 export const createLink = (
   href: string,
   options: CreateLinkOptions = {},
-  document = globalThis['document']
+  document = globalThis['document'],
 ) => {
   let { newtab, textContent = href } = { ...options };
   (newtab as {}) &&= { target: '_blank', rel: 'noreferrer noopener' };
   return createElement('a', { href, textContent, ...(newtab as {}) }, document);
+};
+
+type CreateLinkOptions = {
+  /**
+   * The `textContent` property to be set on the element.
+   * @defaultValue `href` passed from the *first argument*
+   */
+  textContent?: string;
+  /**
+   * If `true`, sets the `target` and `rel` properties of
+   * the element accordingly to allow opening in new tabs.
+   * @defaultValue `false`
+   */
+  newtab?: boolean;
 };
 
 /**

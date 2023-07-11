@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { nullish } from '../conditionals/index.js';
+import { nullish } from '../conditionals/validation.js';
 
 /**
  * Note: A decreasing range (`step = -1`) will be

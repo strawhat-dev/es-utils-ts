@@ -1,25 +1,69 @@
-/// <reference types="node" resolution-mode="require"/>
-import type { Path } from './types.js';
-import path from 'path';
-export declare const sep = "/";
-export declare const toUnix: (path: string) => string;
-export declare const delimiter: ";" | ":";
-export declare const basename: (path: string, suffix?: string | undefined) => string;
-export declare const dirname: (path: string) => string;
-export declare const extname: (path: string) => string;
-export declare const format: (pathObject: path.FormatInputPathObject) => string;
-export declare const isAbsolute: (path: string) => boolean;
-export declare const join: (...paths: string[]) => string;
-export declare const relative: (from: string, to: string) => string;
-export declare const resolve: (...paths: string[]) => string;
-export declare const toNamespacedPath: (path: string) => string;
-export declare const parse: Path['parse'];
-export declare const normalize: Path['normalize'];
-export declare const trimExt: Path['trimExt'];
-export declare const addExt: Path['addExt'];
-export declare const defaultExt: Path['defaultExt'];
-export declare const changeExt: Path['changeExt'];
-export declare const removeExt: Path['removeExt'];
+import path, { PlatformPath } from 'path';
+
+interface Path extends PlatformPath {
+    posix: Path;
+    win32: Path;
+    /**
+     * Converts **all** `\` to `/` and consolidates
+     * duplicates without performing any normalization.
+     */
+    toUnix(path: string): string;
+    /**
+     * Trims a path's extension.
+     */
+    trimExt(path: string, options?: ExtOptions): string;
+    /**
+     * Adds a given extension,
+     * *but only if the path provided doesn't already have the exact extension*.
+     */
+    addExt(path: string, ext: string): string;
+    /**
+     * Remove a given extension if possible
+     * *(otherwise left as is)*.
+     */
+    removeExt(path: string, ext: string): string;
+    /**
+     * Changes an extension given the `ext` provided. \
+     * *(Extension added if no valid extension already available)*
+     */
+    changeExt(path: string, ext: string, options?: ExtOptions): string;
+    /**
+     * Adds a given extension,
+     * *but only if the path provided did not already have any extensions before*.
+     */
+    defaultExt(path: string, ext: string, options?: ExtOptions): string;
+}
+type ExtOptions = {
+    /**
+     * Do not the consider extensions listed, if provided.
+     */
+    ignore?: string[];
+    /**
+     * Consider extensions up to `maxLength` long *(counting the `.`)*.
+     * @defaultValue `7`
+     */
+    maxLength?: number;
+};
+
+declare const sep = "/";
+declare const toUnix: (path: string) => string;
+declare const delimiter: ";" | ":";
+declare const basename: (path: string, suffix?: string | undefined) => string;
+declare const dirname: (path: string) => string;
+declare const extname: (path: string) => string;
+declare const format: (pathObject: path.FormatInputPathObject) => string;
+declare const isAbsolute: (path: string) => boolean;
+declare const join: (...paths: string[]) => string;
+declare const relative: (from: string, to: string) => string;
+declare const resolve: (...paths: string[]) => string;
+declare const toNamespacedPath: (path: string) => string;
+declare const parse: Path['parse'];
+declare const normalize: Path['normalize'];
+declare const trimExt: Path['trimExt'];
+declare const addExt: Path['addExt'];
+declare const defaultExt: Path['defaultExt'];
+declare const changeExt: Path['changeExt'];
+declare const removeExt: Path['removeExt'];
 /**
  * Universal drop-in replacement for node.js's path w/ unix style seperators + other utilities.
  * In most contexts windows, already allows forward slashes as the path seperator,
@@ -35,6 +79,7 @@ export declare const removeExt: Path['removeExt'];
  * @see {@link https://www.npmjs.com/package/upath}
  */
 declare const upath: Path;
-export declare const win32: Path;
-export declare const posix: Path;
-export default upath;
+declare const win32: Path;
+declare const posix: Path;
+
+export { addExt, basename, changeExt, upath as default, defaultExt, delimiter, dirname, extname, format, isAbsolute, join, normalize, parse, posix, relative, removeExt, resolve, sep, toNamespacedPath, toUnix, trimExt, win32 };
